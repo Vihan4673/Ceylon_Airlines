@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroNova Airlines - Book & Fly</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-maroon: #8a1538;
+            --dark-gray: #333;
+            --light-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--light-bg);
+        }
+
+        /* Navbar */
+        .navbar { background: white !important; }
+        .navbar-brand { font-weight: bold; color: var(--primary-maroon) !important; }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+            url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover; background-position: center;
+            height: 70vh; display: flex; align-items: center; color: white;
+        }
+
+        /* Booking Card */
+        .booking-container { margin-top: -80px; position: relative; z-index: 10; }
+        .booking-card { background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .nav-tabs-custom { display: flex; border-bottom: 1px solid #eee; }
+        .nav-tabs-custom .nav-link { flex: 1; text-align: center; padding: 15px; color: #666 !important; border-bottom: 3px solid transparent; }
+        .nav-tabs-custom .nav-link.active { color: var(--primary-maroon) !important; border-bottom: 3px solid var(--primary-maroon); }
+
+        /* Fares Section Styling */
+        .fares-section { padding: 60px 0; }
+        .fare-card {
+            border: none;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            background: white;
+            height: 100%;
+        }
+        .fare-card:hover { transform: translateY(-5px); }
+        .fare-card .card-body { padding: 25px; }
+        .dest-name { font-weight: 700; font-size: 1.4rem; color: var(--dark-gray); }
+        .fare-price { font-size: 1.2rem; font-weight: 700; color: var(--primary-maroon); }
+        .btn-book-now { background-color: var(--primary-maroon); color: white; border-radius: 25px; font-weight: 600; transition: 0.3s; }
+        .btn-book-now:hover { background-color: #5a0e25; color: white; }
+        .btn-discover { border: 1px solid var(--primary-maroon); color: var(--primary-maroon); border-radius: 25px; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="#"><i class="fas fa-paper-plane me-2"></i>AERONOVA</a>
+        <div class="collapse navbar-collapse justify-content-center">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="#">Explore</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Book</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Privilege Club</a></li>
+            </ul>
+        </div>
+        <a href="#" class="btn btn-outline-secondary btn-sm">Log in | Sign up</a>
+    </div>
+</nav>
+
+<section class="hero-section">
+    <div class="container">
+        <div class="col-md-6">
+            <h1 class="display-4 fw-bold">Discover the world and save up to 20%*</h1>
+            <p>Plan your next adventure with our exclusive Valentine's offers.</p>
+        </div>
+    </div>
+</section>
+
+<div class="container booking-container">
+    <div class="booking-card p-4">
+        <h5 class="mb-3">Find great fares</h5>
+        <form class="row g-3">
+            <div class="col-md-4">
+                <input type="text" class="form-control" placeholder="From (e.g. Colombo)">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select"><option>Economy</option><option>Business</option></select>
+            </div>
+            <div class="col-md-3">
+                <div class="d-flex gap-3 pt-2">
+                    <label><input type="radio" name="t" checked> Return</label>
+                    <label><input type="radio" name="t"> One way</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-danger w-100" style="background: var(--primary-maroon)">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<section class="fares-section">
+    <div class="container">
+        <h2 class="fw-bold mb-2">Start planning your next trip</h2>
+        <p class="text-muted mb-5">Thinking of travelling somewhere soon? Here are some options to help you get started.</p>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="fare-card card">
+                    <div class="card-body">
+                        <div class="dest-name">Dubai</div>
+                        <p class="text-muted small mb-1">09 Jun 2026 - 22 Jun 2026</p>
+                        <div class="fare-price mb-3"><span class="small fw-normal">LKR</span> 121,448</div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-book-now px-4">Book now</button>
+                            <button class="btn btn-discover px-4">Discover</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="fare-card card">
+                    <div class="card-body">
+                        <div class="dest-name">London</div>
+                        <p class="text-muted small mb-1">22 Apr 2026 - 27 Apr 2026</p>
+                        <div class="fare-price mb-3"><span class="small fw-normal">LKR</span> 222,511</div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-book-now px-4">Book now</button>
+                            <button class="btn btn-discover px-4">Discover</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="fare-card card">
+                    <div class="card-body">
+                        <div class="dest-name">Doha</div>
+                        <p class="text-muted small mb-1">21 May 2026 - 25 May 2026</p>
+                        <div class="fare-price mb-3"><span class="small fw-normal">LKR</span> 100,867</div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-book-now px-4">Book now</button>
+                            <button class="btn btn-discover px-4">Discover</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="fare-card card">
+                    <div class="card-body">
+                        <div class="dest-name">Paris</div>
+                        <p class="text-muted small mb-1">07 May 2026 - 11 May 2026</p>
+                        <div class="fare-price mb-3"><span class="small fw-normal">LKR</span> 208,764</div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-book-now px-4">Book now</button>
+                            <button class="btn btn-discover px-4">Discover</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="fare-card card">
+                    <div class="card-body">
+                        <div class="dest-name">Milan</div>
+                        <p class="text-muted small mb-1">16 Jun 2026 - 23 Jun 2026</p>
+                        <div class="fare-price mb-3"><span class="small fw-normal">LKR</span> 203,266</div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-book-now px-4">Book now</button>
+                            <button class="btn btn-discover px-4">Discover</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="fare-card card">
+                    <div class="card-body">
+                        <div class="dest-name">Amsterdam</div>
+                        <p class="text-muted small mb-1">19 May 2026 - 26 May 2026</p>
+                        <div class="fare-price mb-3"><span class="small fw-normal">LKR</span> 267,644</div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-book-now px-4">Book now</button>
+                            <button class="btn btn-discover px-4">Discover</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <button class="btn btn-link text-decoration-none fw-bold" style="color: var(--primary-maroon)">View more fares <i class="fas fa-arrow-right ms-1"></i></button>
+        </div>
+    </div>
+</section>
+
+<footer class="bg-dark text-white py-4 mt-5">
+    <div class="container text-center">
+        <p>© 2026 AeroNova Airlines. Travel with confidence.</p>
+    </div>
+</footer>
+
+</body>
+</html>
