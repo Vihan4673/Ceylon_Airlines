@@ -1,16 +1,20 @@
-import React from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import FeaturedFares from './components/FeaturedFares';
-import Footer from './components/Footer';
+import React from "react";
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
+import FeaturedFares from "./components/FeaturedFares";
+import Footer from "./components/Footer";
 
-export default function App() {
+function App() {
     return (
-        <div className="min-h-screen bg-gray-50 font-sans text-gray-800 selection:bg-[#8a1538] selection:text-white">
+        <div className="min-h-screen bg-gray-50 text-gray-800 font-sans selection:bg-[#8a1538] selection:text-white">
             <Navbar />
-            <Hero />
-            <FeaturedFares />
+            <main>
+                <Hero />
+                <FeaturedFares />
+            </main>
             <Footer />
         </div>
     );
 }
+
+export default App;
