@@ -1,37 +1,59 @@
-import React from 'react';
-import { Plane, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plane, ChevronDown, Globe, LogIn, UserPlus, ArrowRight } from 'lucide-react';
+import { navLinks } from '../data/constants';
 
-const Navbar = ({ isScrolled, setIsChatOpen }) => (
-    <nav className={`fixed w-full z-50 transition-all duration-500 px-6 py-4 flex justify-center ${
-        isScrolled ? 'bg-black/40 backdrop-blur-xl border-b border-white/10' : 'bg-transparent'
-    }`}>
-        <div className="max-w-7xl w-full flex justify-between items-center">
-            <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]">
-                    <Plane size={22} className="-rotate-45" />
+const Navbar = ({ isScrolled }) => {
+    const [activeMenu, setActiveMenu] = useState(null);
+
+    return (
+        <nav
+            className={`fixed w-full z-[70] transition-all duration-500 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg py-2' : 'bg-transparent py-4 text-white'}`}
+            onMouseLeave={() => setActiveMenu(null)}
+        >
+            <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between">
+                <div className="flex items-center gap-10">
+                    <div className="flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo(0,0)}>
+                        <div className="w-10 h-10 bg-[#8A1538] flex items-center justify-center rounded-lg shadow-lg group-hover:rotate-12 transition-transform duration-300">
+                            <Plane className="text-white -rotate-45" size={24} />
+                        </div>
+                        <span className={`text-2xl font-black tracking-tighter ${isScrolled ? 'text-[#8A1538]' : 'text-white'}`}>CEYLONE</span>
+                    </div>
+
+                    <div className={`hidden xl:flex gap-8 text-[11px] font-bold uppercase tracking-[0.15em] ${isScrolled ? 'text-slate-600' : 'text-white/90'}`}>
+                        {navLinks.map((link) => (
+                            <div
+                                key={link.label}
+                                className="relative py-4 cursor-pointer group"
+                                onMouseEnter={() => setActiveMenu(link.label)}
+                            >
+                                <div className="flex items-center gap-1 hover:text-[#8A1538] transition-colors">
+                                    {link.label}
+                                    <ChevronDown size={14} className={`transition-transform duration-300 ${activeMenu === link.label ? 'rotate-180' : ''}`} />
+                                </div>
+                                <div className={`absolute bottom-2 left-0 h-[2px] bg-[#8A1538] transition-all duration-300 ${activeMenu === link.label ? 'w-full' : 'w-0'}`} />
+                            </div>
+                        ))}
+                    </div>
                 </div>
-                <span className="text-2xl font-black tracking-tighter text-white">CEYLON<span className="text-blue-500">.</span></span>
-            </div>
 
-            <div className="hidden lg:flex items-center gap-10 text-sm font-bold uppercase tracking-widest">
-                {['Book', 'Discover', 'Experience', 'Loyalty'].map((item) => (
-                    <a key={item} href="#" className="hover:text-blue-400 transition-colors relative group">
-                        {item}
-                        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full"></span>
-                    </a>
-                ))}
+                <div className={`flex items-center gap-6 text-[11px] font-bold ${isScrolled ? 'text-slate-600' : 'text-white'}`}>
+                    <div className="hidden md:flex items-center gap-2 cursor-pointer hover:text-[#8A1538] transition-colors uppercase">
+                        <Globe size={16} /> <span className="border-b border-transparent hover:border-[#8A1538]">EN</span>
+                    </div>
+                    <div className="h-6 w-[1px] bg-slate-300/30 hidden md:block"></div>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1 cursor-pointer hover:text-[#8A1538] transition-colors">
+                            <LogIn size={16} /> Log in
+                        </div>
+                        <button className="bg-[#8A1538] text-white px-5 py-2 rounded-full shadow-lg shadow-[#8A1538]/20 cursor-pointer hover:bg-[#6b102c] transition-all flex items-center gap-2">
+                            <UserPlus size={16} /> Sign up
+                        </button>
+                    </div>
+                </div>
             </div>
-
-            <div className="flex items-center gap-4">
-                <button onClick={() => setIsChatOpen(true)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                    <Sparkles size={20} className="text-blue-400" />
-                </button>
-                <button className="bg-white text-black px-6 py-2 rounded-full text-sm font-black hover:bg-blue-500 hover:text-white transition-all transform active:scale-95 shadow-xl shadow-white/5">
-                    MY ACCOUNT
-                </button>
-            </div>
-        </div>
-    </nav>
-);
+            {/* Mega Menu implementation here... */}
+        </nav>
+    );
+};
 
 export default Navbar;
