@@ -3,7 +3,7 @@ package lk.ijes.backend.service.impl;
 import lk.ijes.backend.dto.FlightDTO;
 import lk.ijes.backend.entity.Flight;
 import lk.ijes.backend.exception.FlightException;
-import lk.ijes.backend.repository.FlightRepo;
+import lk.ijes.backend.repository.FlightRepository;
 import lk.ijes.backend.service.FlightService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -18,7 +18,7 @@ import java.util.Optional;
 public class FlightServiceImpl implements FlightService {
 
     @Autowired
-    private FlightRepo flightRepo;
+    private FlightRepository flightRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -29,7 +29,7 @@ public class FlightServiceImpl implements FlightService {
         if (flightDTO == null) {
             throw new FlightException("FlightDTO is null");
         }
-        flightRepo.save(modelMapper.map(flightDTO, Flight.class));
+        flightRepository.save(modelMapper.map(flightDTO, Flight.class));
     }
 
     @Override
@@ -59,26 +59,26 @@ public class FlightServiceImpl implements FlightService {
             throw new FlightException("FlightDTO is null");
         }
 
-        if (!flightRepo.existsById(flightDTO.getId())) {
+        if (!flightRepository.existsById(flightDTO.getId())) {
             throw new FlightException("Flight not found");
         }
 
-        flightRepo.save(modelMapper.map(flightDTO, Flight.class));
+        flightRepository.save(modelMapper.map(flightDTO, Flight.class));
     }
 
     // Delete Flight
     @Override
     public void deleteFlight(Long id) {
-        if (!flightRepo.existsById(id)) {
+        if (!flightRepository.existsById(id)) {
             throw new FlightException("Flight not found");
         }
-        flightRepo.deleteById(id);
+        flightRepository.deleteById(id);
     }
 
     // Get All Flights
     @Override
     public List<FlightDTO> getAllFlight() {
-        List<Flight> flightList = flightRepo.findAll();
+        List<Flight> flightList = flightRepository.findAll();
         return modelMapper.map(flightList,
                 new TypeToken<ArrayList<FlightDTO>>() {}.getType());
     }
@@ -86,7 +86,7 @@ public class FlightServiceImpl implements FlightService {
     // Search Flight By ID
     @Override
     public FlightDTO searchFlightByID(Long id) {
-        Optional<Flight> flight = flightRepo.findById(id);
+        Optional<Flight> flight = flightRepository.findById(id);
 
         if (flight.isEmpty()) {
             throw new FlightException("Flight not found");
