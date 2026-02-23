@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class FlightDTO {
 
-    @NotNull(message = "Flight ID cannot be null")
     private Long id;
 
     @NotBlank(message = "Flight number cannot be empty")
