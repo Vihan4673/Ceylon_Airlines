@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ceylon Airlines | Ads & Promotions Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary: #8A1538;
+            --primary-dark: #6a102b;
+            --secondary: #1e293b;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .status-pill {
+            @apply px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider;
+        }
+
+        .custom-card {
+            @apply bg-white rounded-[1.5rem] border border-slate-200 shadow-sm transition-all hover:shadow-md;
+        }
+
+        /* Ad Preview Style */
+        .ad-preview-card {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80&w=800');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen">
+
+<!-- Top Header -->
+<header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="bg-gradient-to-br from-[#8A1538] to-[#6a102b] p-2 rounded-xl text-white shadow-lg shadow-[#8A1538]/20">
+                <i class="fas fa-plane-departure"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-tight">Ceylon<span class="text-[#8A1538]">Air</span> <span class="text-slate-400 font-medium ml-2 text-sm">| Ads Manager</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg">Admin Access</span>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto p-6 md:p-8 space-y-8 animate-fade-in">
+
+    <!-- Welcome & Action Row -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div>
+            <h2 class="text-2xl font-black text-slate-800">Promotions & Web Ads</h2>
+            <p class="text-sm text-slate-500 font-medium">Control the visual content and offers displayed on your homepage.</p>
+        </div>
+        <button onclick="toggleModal('ad-modal')" class="bg-[#8A1538] text-white px-6 py-3.5 rounded-2xl font-bold text-sm hover:bg-[#6a102b] transition-all shadow-xl shadow-[#8A1538]/20 flex items-center gap-2 active:scale-95">
+            <i class="fas fa-plus"></i> Create New Campaign
+        </button>
+    </div>
+
+    <!-- Dashboard Layout -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+
+        <!-- Ad List Table -->
+        <div class="xl:col-span-2 custom-card overflow-hidden">
+            <div class="p-5 bg-slate-50/50 border-b flex justify-between items-center">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Current Live Campaigns</span>
+                <div class="flex gap-2">
+                    <button class="bg-white border border-slate-200 px-4 py-1.5 rounded-xl text-[10px] font-bold shadow-sm">ALL</button>
+                    <button class="bg-white border border-[#8A1538] px-4 py-1.5 rounded-xl text-[10px] font-bold text-[#8A1538] shadow-sm">ACTIVE</button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50/30 border-b">
+                    <tr>
+                        <th class="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Campaign Details</th>
+                        <th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Placement</th>
+                        <th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status</th>
+                        <th class="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="ads-table-body" class="divide-y divide-slate-100">
+                    <!-- Sample Row 1 -->
+                    <tr class="hover:bg-slate-50/50 transition-all group">
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-4">
+                                <div class="w-14 h-10 rounded-xl bg-slate-100 overflow-hidden shadow-sm">
+                                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=100" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-800">Summer Escape 2024</p>
+                                    <p class="text-[10px] text-slate-400">25% Off for Maldives Trips</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-5">
+                            <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">Home Hero</span>
+                        </td>
+                        <td class="px-6 py-5">
+                            <span class="status-pill bg-emerald-100 text-emerald-700">Active</span>
+                        </td>
+                        <td class="px-8 py-5 text-right">
+                            <div class="flex justify-end gap-2">
+                                <button class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all"><i class="fas fa-edit text-xs"></i></button>
+                                <button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all"><i class="fas fa-trash text-xs"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- Sample Row 2 -->
+                    <tr class="hover:bg-slate-50/50 transition-all">
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-4">
+                                <div class="w-14 h-10 rounded-xl bg-slate-100 overflow-hidden shadow-sm">
+                                    <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&q=80&w=100" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-800">Elite Loyalty Deals</p>
+                                    <p class="text-[10px] text-slate-400">Exclusive Business Upgrades</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-5">
+                            <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">Sidebar</span>
+                        </td>
+                        <td class="px-6 py-5">
+                            <span class="status-pill bg-slate-100 text-slate-500">Scheduled</span>
+                        </td>
+                        <td class="px-8 py-5 text-right">
+                            <div class="flex justify-end gap-2">
+                                <button class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all"><i class="fas fa-edit text-xs"></i></button>
+                                <button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all"><i class="fas fa-trash text-xs"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Ad Preview Section -->
+        <div class="space-y-6">
+            <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest px-2">Live Preview</h3>
+            <div id="ad-preview" class="custom-card p-8 ad-preview-card h-[350px] relative flex flex-col justify-end text-white overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-0"></div>
+                <div class="z-10">
+                    <h4 class="text-2xl font-black leading-tight mb-2" id="preview-title">Summer Escape 2024</h4>
+                    <p class="text-sm text-white/80 mb-6 line-clamp-2" id="preview-desc">Book your dream trip to the Maldives with 25% off today.</p>
+                    <button class="bg-[#8A1538] text-white px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-xl shadow-[#8A1538]/40">Explore Now</button>
+                </div>
+            </div>
+
+            <div class="custom-card p-6 bg-slate-900 text-white border-none shadow-2xl">
+                <div class="flex gap-4">
+                    <div class="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-blue-400">Deployment Info</p>
+                        <p class="text-[11px] text-slate-400 leading-relaxed mt-1">
+                            Changes made here are synced to the ceyloneair.com public front-end within 60 seconds of publishing.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal: Create New Ad -->
+<div id="ad-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+    <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-fade-in">
+        <div class="p-8 border-b flex justify-between items-center bg-slate-50/50">
+            <div>
+                <h3 class="font-black text-xl text-slate-800 tracking-tight">Create Promotion</h3>
+                <p class="text-xs text-slate-500 font-medium">Draft your marketing asset for the website.</p>
+            </div>
+            <button onclick="toggleModal('ad-modal')" class="w-10 h-10 rounded-full bg-white border flex items-center justify-center text-slate-400 hover:text-red-500 transition-all"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="p-8 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Promotion Title</label>
+                    <input type="text" id="input-ad-title" onkeyup="updateLivePreview()" placeholder="e.g. Winter Holidays" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-[#8A1538]/10 focus:border-[#8A1538] transition-all font-bold">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Image URL</label>
+                    <input type="text" id="input-ad-img" onchange="updateLivePreview()" placeholder="https://..." class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-[#8A1538]/10 transition-all">
+                </div>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Description</label>
+                <textarea id="input-ad-desc" onkeyup="updateLivePreview()" rows="3" placeholder="Explain the offer in 2 lines..." class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-[#8A1538]/10 transition-all font-medium"></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Placement Area</label>
+                    <select class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-xs outline-none focus:ring-4 focus:ring-[#8A1538]/10 font-bold">
+                        <option>Main Home Hero</option>
+                        <option>Flight Results Sidebar</option>
+                        <option>Post-Booking Page</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-3 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 mt-2">
+                    <input type="checkbox" checked class="w-5 h-5 accent-[#8A1538]">
+                    <span class="text-[10px] font-black text-emerald-700 uppercase">Set as Live Campaign</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-8 pt-0">
+            <button onclick="publishAd()" class="w-full bg-[#8A1538] text-white font-black py-4 rounded-[1.5rem] text-sm shadow-xl shadow-[#8A1538]/30 active:scale-95 transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-paper-plane"></i> PUBLISH PROMOTION
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Toast -->
+<div id="toast" class="fixed bottom-10 right-10 z-[100] transform translate-y-32 opacity-0 transition-all duration-500">
+    <div class="bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-white/10">
+        <div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-[10px]">
+            <i class="fas fa-check"></i>
+        </div>
+        <div>
+            <p class="text-xs font-bold" id="toast-title">Success</p>
+            <p class="text-[10px] text-slate-400" id="toast-msg">Campaign is now live.</p>
+        </div>
+    </div>
+</div>
+
+<script src="../js/ad.js"></script>
+
+</body>
+</html>

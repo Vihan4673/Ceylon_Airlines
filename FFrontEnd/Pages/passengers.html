@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyLink Ops | Passenger Manifest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        .passenger-row:hover .action-btns { opacity: 1; }
+        .action-btns { opacity: 0; transition: opacity 0.2s; }
+        .input-focus { @apply focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all; }
+    </style>
+</head>
+<body class="bg-[#f3f4f9] text-slate-900">
+
+<div class="flex min-h-screen">
+    <!-- Main Content -->
+    <main class="flex-1 p-8">
+        <!-- Top Dashboard Header -->
+        <div class="flex justify-between items-end mb-8">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight text-slate-800">Passenger Manifest</h1>
+                <p class="text-slate-500 font-medium">Manage traveler profiles, documentation, and security clearance.</p>
+            </div>
+            <div class="flex gap-3">
+                <button class="bg-white border border-slate-200 text-slate-600 px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 hover:bg-slate-50 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    Export CSV
+                </button>
+                <button onclick="openModal()" class="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 flex items-center gap-2 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                    Register Passenger
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <p class="text-slate-400 text-xs font-black uppercase tracking-widest mb-1">Total Profiles</p>
+                <h3 class="text-2xl font-bold">12,482</h3>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm border-l-4 border-l-amber-400">
+                <p class="text-slate-400 text-xs font-black uppercase tracking-widest mb-1">Expiring Passports</p>
+                <h3 class="text-2xl font-bold">42</h3>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm border-l-4 border-l-indigo-400">
+                <p class="text-slate-400 text-xs font-black uppercase tracking-widest mb-1">International</p>
+                <h3 class="text-2xl font-bold">88%</h3>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm border-l-4 border-l-emerald-400">
+                <p class="text-slate-400 text-xs font-black uppercase tracking-widest mb-1">New Registrations</p>
+                <h3 class="text-2xl font-bold">+124 <span class="text-xs font-medium text-emerald-500 text-sm">Today</span></h3>
+            </div>
+        </div>
+
+        <!-- Search & Filter Bar -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm mb-6 flex gap-4">
+            <div class="relative flex-1">
+                <input type="text" placeholder="Search by name, passport number, or email..." class="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-4 top-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            </div>
+            <select class="px-6 py-3 bg-slate-50 border-none rounded-xl text-slate-600 font-semibold focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer">
+                <option>All Nationalities</option>
+                <option>Sri Lankan</option>
+                <option>British</option>
+                <option>American</option>
+            </select>
+            <button class="bg-slate-800 text-white px-8 py-3 rounded-xl font-bold hover:bg-black transition-all">Filter Manifest</button>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-[1.5rem] border border-slate-200 shadow-sm overflow-hidden">
+            <table class="w-full text-left">
+                <thead>
+                <tr class="bg-slate-50/50 border-b border-slate-100">
+                    <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.15em] text-slate-400">Full Name & Title</th>
+                    <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.15em] text-slate-400">Nationality</th>
+                    <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.15em] text-slate-400">Document No.</th>
+                    <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.15em] text-slate-400">Email & Contact</th>
+                    <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.15em] text-slate-400">Doc Expiry</th>
+                    <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.15em] text-slate-400 text-right">Operations</th>
+                </tr>
+                </thead>
+                <tbody id="passenger-table" class="divide-y divide-slate-50">
+                <!-- Table Rows -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<!-- Registration Modal -->
+<div id="modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md hidden flex items-center justify-center z-50 p-6">
+    <div class="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[95vh] animate-in zoom-in-95 duration-200">
+        <!-- Modal Header -->
+        <div class="px-10 py-8 bg-slate-900 text-white flex justify-between items-center relative overflow-hidden">
+            <div class="z-10">
+                <h3 class="text-2xl font-bold tracking-tight">Passenger Profile Registration</h3>
+                <p class="text-slate-400 text-sm">Please ensure document details match the traveler's passport.</p>
+            </div>
+            <button onclick="closeModal()" class="z-10 bg-white/10 p-2 rounded-full hover:bg-white/20 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500 rounded-full blur-3xl opacity-30"></div>
+        </div>
+
+        <!-- Modal Form Body -->
+        <div class="flex-1 overflow-y-auto p-10 space-y-8 custom-scrollbar">
+
+            <!-- Section 1: Identity -->
+            <div>
+                <h4 class="text-xs font-black text-indigo-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <span class="w-6 h-px bg-indigo-100"></span> Personal Identity
+                </h4>
+                <div class="grid grid-cols-6 gap-6">
+                    <div class="col-span-1 space-y-1.5">
+                        <label class="text-xs font-bold text-slate-500 ml-1">Title</label>
+                        <select id="p-title" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl input-focus">
+                            <option>Mr</option><option>Ms</option><option>Mrs</option><option>Dr</option>
+                        </select>
+                    </div>
+                    <div class="col-span-2 space-y-1.5">
+                        <label class="text-xs font-bold text-slate-500 ml-1">First Name</label>
+                        <input id="p-fn" type="text" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl input-focus">
+                    </div>
+                    <div class="col-span-3 space-y-1.5">
+                        <label class="text-xs font-bold text-slate-500 ml-1">Last Name</label>
+                        <input id="p-ln" type="text" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl input-focus">
+                    </div>
+                    <div class="col-span-2 space-y-1.5">
+                        <label class="text-xs font-bold text-slate-500 ml-1">Gender</label>
+                        <select id="p-gender" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl input-focus">
+                            <option>Male</option><option>Female</option><option>Other</option>
+                        </select>
+                    </div>
+                    <div class="col-span-2 space-y-1.5">
+                        <label class="text-xs font-bold text-slate-500 ml-1">Date of Birth</label>
+                        <input id="p-dob" type="date" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl input-focus">
+                    </div>
+                    <div class="col-span-2 space-y-1.5">
+                        <label class="text-xs font-bold text-slate-500 ml-1">Nationality</label>
+                        <input id="p-nat" type="text" placeholder="e.g. Sri Lankan" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl input-focus">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Travel Documents -->
+            <div>
+                <h4 class="text-xs font-black text-indigo-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <span class="w-6 h-px bg-indigo-100"></span> Travel Documents
+                </h4>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-500 ml-1 text-slate-400">Passport / Document Number</label>
+                        <input id="p-doc" type="text" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl input-focus font-mono uppercase tracking-widest">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-500 ml-1">Expiry Date</label>
+                        <input id="p-expiry" type="date" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl input-focus">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Contact -->
+            <div>
+                <h4 class="text-xs font-black text-indigo-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <span class="w-6 h-px bg-indigo-100"></span> Contact Communication
+                </h4>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-500 ml-1">Email Address</label>
+                        <input id="p-email" type="email" placeholder="name@airline.com" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl input-focus">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-500 ml-1">Mobile Number</label>
+                        <input id="p-phone" type="text" placeholder="+94 77 000 0000" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl input-focus">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="px-10 py-6 bg-slate-50 border-t border-slate-100 flex justify-end items-center gap-4 shrink-0">
+            <button onclick="closeModal()" class="px-6 py-2.5 text-slate-500 font-bold hover:text-slate-700 transition-all">Dismiss</button>
+            <button onclick="savePassenger()" class="px-10 py-3 bg-indigo-600 text-white rounded-2xl font-bold shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all">Complete Registration</button>
+        </div>
+    </div>
+</div>
+
+<script src="../js/passenger.js"></script>
+</body>
+</html>
