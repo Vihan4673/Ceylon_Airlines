@@ -7,34 +7,35 @@ function toggleModal(id) {
 
 // Show toast notification
 function showToast(title, msg, isError = false) {
-    const t = document.getElementById('toast');
+    const toast = document.getElementById('toast');
     document.getElementById('toast-title').innerText = title;
     document.getElementById('toast-msg').innerText = msg;
 
-    // Change icon color for error
-    const icon = t.querySelector('div.w-8');
+    const icon = toast.querySelector('div.w-8');
     if (isError) icon.classList.replace('bg-emerald-500', 'bg-red-500');
     else icon.classList.replace('bg-red-500', 'bg-emerald-500');
 
-    t.classList.remove('translate-y-32', 'opacity-0');
+    toast.classList.remove('translate-y-32', 'opacity-0');
     setTimeout(() => {
-        t.classList.add('translate-y-32', 'opacity-0');
+        toast.classList.add('translate-y-32', 'opacity-0');
     }, 3000);
 }
 
-// Handle Flight Form Submission
+// Submit new flight
 async function handleSubmitFlight() {
     const data = {
         flightNumber: document.getElementById('flightNumber').value.trim(),
+        bookedSeats: parseInt(document.getElementById('bookedSeats').value) || 0,
+        totalSeats: parseInt(document.getElementById('totalSeats').value) || 0,
         departure: document.getElementById('departure').value.trim(),
         arrival: document.getElementById('arrival').value.trim(),
         departureTime: document.getElementById('departureTime').value,
         arrivalTime: document.getElementById('arrivalTime').value
     };
 
-    // Validate mandatory fields
-    if (!data.flightNumber || !data.departure || !data.arrival) {
-        showToast('Validation Error', 'Please fill all mandatory fields.', true);
+    // Validation
+    if (!data.flightNumber || !data.departure || !data.arrival || !data.totalSeats) {
+        showToast('Validation Error', 'Please fill all required fields.', true);
         return;
     }
 
@@ -50,20 +51,18 @@ async function handleSubmitFlight() {
         if (response.ok) {
             toggleModal('flight-modal');
             showToast('Flight Scheduled', `Flight ${data.flightNumber} added successfully.`);
-            console.log('Backend response:', result);
-            // Refresh flight table after adding
             await loadFlights();
         } else {
             showToast('Error', result.message || 'Failed to save flight.', true);
-            console.error('Backend error:', result);
+            console.error(result);
         }
     } catch (err) {
         showToast('Network Error', 'Could not connect to server.', true);
-        console.error('Fetch error:', err);
+        console.error(err);
     }
 }
 
-// Load all flights and populate table
+// Load flights dynamically into table
 async function loadFlights() {
     try {
         const response = await fetch('http://localhost:8080/api/v1/flights/getAllFlight');
@@ -72,9 +71,13 @@ async function loadFlights() {
         if (!response.ok) throw new Error(result.message || 'Failed to fetch flights');
 
         const tbody = document.querySelector('table tbody');
-        tbody.innerHTML = ''; // Clear existing rows
+        tbody.innerHTML = '';
 
         result.data.forEach(flight => {
+            const booked = flight.bookedSeats || 0;
+            const total = flight.totalSeats || 0;
+            const progress = total ? ((booked / total) * 100).toFixed(1) : 0;
+
             const row = document.createElement('tr');
             row.className = 'hover:bg-slate-50/50 transition-all group';
             row.innerHTML = `
@@ -85,10 +88,22 @@ async function loadFlights() {
                         <i class="fas fa-long-arrow-alt-right text-slate-300"></i>
                         <span class="font-bold text-slate-700">${flight.arrival}</span>
                     </div>
+                    <p class="text-[10px] text-slate-400 mt-1 uppercase">${flight.departure} to ${flight.arrival}</p>
                 </td>
                 <td class="px-6 py-5">
                     <div class="text-xs font-bold text-slate-600">${flight.departureTime}</div>
                     <div class="text-[10px] text-slate-400">${flight.arrivalTime}</div>
+                </td>
+                <td class="px-6 py-5">
+                    <div class="space-y-1.5">
+                        <div class="flex items-center gap-2 text-slate-700">
+                            <i class="fas fa-user-check text-[10px] text-slate-400"></i>
+                            <span class="font-bold text-xs"><span class="text-[#8A1538]">${booked}</span> / ${total}</span>
+                        </div>
+                        <div class="w-24 h-1 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="bg-[#8A1538] h-full" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
                 </td>
                 <td class="px-6 py-5">
                     <span class="px-3 py-1 ${flight.status === 'On Time' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'} rounded-full text-[10px] font-bold uppercase tracking-wider">${flight.status || 'On Time'}</span>
@@ -109,7 +124,7 @@ async function loadFlights() {
     }
 }
 
-// Delete a flight
+// Delete flight
 async function deleteFlight(id) {
     if (!confirm('Are you sure you want to delete this flight?')) return;
     try {
@@ -128,9 +143,8 @@ async function deleteFlight(id) {
     }
 }
 
-// Initial load of flights on page load
+// Load flights on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadFlights();
-    // Close modal on backdrop click
     window.onclick = (e) => { if(e.target.id === 'flight-modal') toggleModal('flight-modal'); }
 });

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passenger Information - SriLankan Airlines</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+
+        /* Floating label effect logic for focus */
+        .input-group:focus-within .label-text {
+            color: #00529B;
+        }
+
+        .toggle-dot {
+            transition: all 0.3s ease-in-out;
+        }
+
+        input:checked + .toggle-bg {
+            background-color: #2563eb;
+        }
+
+        input:checked + .toggle-bg .toggle-dot {
+            transform: translateX(1.25rem);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 pb-20">
+
+<!-- Blue Header Strip -->
+<header class="bg-[#00529B] text-white p-4 sticky top-0 z-50 shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center text-sm font-semibold">
+        <div class="flex items-center space-x-6">
+            <div class="flex flex-col">
+                <span class="text-[10px] opacity-80 uppercase tracking-wider font-bold">ADL</span>
+                <span>Adelaide</span>
+            </div>
+            <div class="flex flex-col items-center">
+                    <span class="text-[10px] border-b border-dotted border-white w-16 mb-1 relative">
+                        <i class="fa-solid fa-plane text-[10px] absolute -right-2 -top-1 rotate-45"></i>
+                    </span>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-[10px] opacity-80 uppercase tracking-wider font-bold">CMB</span>
+                <span>Colombo</span>
+            </div>
+            <div class="h-8 w-px bg-white/20 mx-4 hidden md:block"></div>
+            <div class="flex flex-col hidden md:flex">
+                <span class="text-[10px] opacity-80 uppercase tracking-wider font-bold">Depart</span>
+                <span>Sun, 1 Mar</span>
+            </div>
+            <div class="h-8 w-px bg-white/20 mx-4 hidden md:block"></div>
+            <div class="flex flex-col hidden md:flex">
+                <span class="text-[10px] opacity-80 uppercase tracking-wider font-bold">Passenger</span>
+                <div class="flex items-center">
+                    <span>1</span>
+                    <i class="fa-solid fa-user text-[10px] ml-1"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-cart-shopping text-lg"></i>
+            <div class="flex flex-col items-end">
+                <span class="text-[10px] uppercase font-bold">AUD</span>
+                <span class="text-lg">2,061.77</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Hero Section -->
+<div class="relative h-64 overflow-hidden">
+    <img
+            src="https://images.unsplash.com/photo-1540339832862-47452993c71b?auto=format&fit=crop&q=80&w=2000"
+            alt="Business traveler"
+            class="w-full h-full object-cover grayscale-[0.2]"
+    />
+    <div class="absolute inset-0 bg-blue-900/10 flex flex-col items-center justify-center">
+        <button class="bg-white/90 px-4 py-1.5 rounded-full text-blue-900 text-sm font-bold flex items-center mb-8 shadow-md hover:bg-white transition-colors">
+            Modify <i class="fa-solid fa-chevron-down ml-1 text-[10px]"></i>
+        </button>
+        <div class="bg-white/90 px-12 py-4 rounded shadow-lg text-center">
+            <h1 class="text-[#003876] text-2xl font-bold">Enter your information</h1>
+        </div>
+    </div>
+</div>
+
+<!-- Form Container -->
+<div class="max-w-4xl mx-auto mt-[-40px] relative z-10 px-4">
+
+    <!-- Personal Information Section -->
+    <section class="bg-white rounded-xl shadow-sm border border-slate-100 p-8 mb-6">
+        <h2 class="text-xl font-bold text-[#003876] text-center mb-6">Personal information</h2>
+
+        <div class="text-[11px] text-slate-500 mb-6 space-y-1">
+            <p>* = mandatory fields</p>
+            <p>Please fill personal information as shown in the passport. <a href="#" class="text-blue-600 underline">Tips for entering names</a></p>
+        </div>
+
+        <div class="space-y-6">
+            <!-- Title Select -->
+            <div class="relative input-group">
+                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Title*</div>
+                <select class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800 bg-white appearance-none cursor-pointer">
+                    <option value="" disabled selected>Choose a title</option>
+                    <option>Mr</option>
+                    <option>Mrs</option>
+                    <option>Ms</option>
+                    <option>Dr</option>
+                </select>
+                <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs pointer-events-none"></i>
+            </div>
+
+            <!-- First Name -->
+            <div class="relative input-group">
+                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">First name*</div>
+                <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Enter a first name">
+            </div>
+
+            <!-- Last Name -->
+            <div class="relative input-group">
+                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Last name*</div>
+                <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Enter a last name">
+            </div>
+
+            <!-- Gender Select -->
+            <div class="relative input-group">
+                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Gender*</div>
+                <select class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800 bg-white appearance-none cursor-pointer">
+                    <option value="" disabled selected>Select gender</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                </select>
+                <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs pointer-events-none"></i>
+            </div>
+
+            <!-- DOB -->
+            <div class="relative input-group">
+                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Date of birth*</div>
+                <div class="relative">
+                    <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Day / Month / Year">
+                    <i class="fa-solid fa-calendar absolute right-4 top-4 text-slate-400"></i>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1 ml-1">Example: 31/01/2025</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Frequent Flyer -->
+    <section class="bg-white rounded-xl shadow-sm border border-slate-100 p-8 mb-6">
+        <h2 class="text-xl font-bold text-[#003876] text-center mb-6">Frequent Flyer Program</h2>
+        <div class="space-y-6">
+            <div class="relative input-group">
+                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Frequent Flyer Airline</div>
+                <select class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800 bg-white appearance-none cursor-pointer">
+                    <option>Frequent Flyer Airline</option>
+                </select>
+                <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs pointer-events-none"></i>
+            </div>
+            <div class="relative input-group">
+                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Frequent Flyer Number</div>
+                <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Enter your frequent flyer number">
+            </div>
+        </div>
+    </section>
+
+    <!-- Passport Details -->
+    <section class="bg-white rounded-xl shadow-sm border border-slate-100 p-8 mb-6">
+        <h2 class="text-xl font-bold text-[#003876] text-center mb-6">Passport Details</h2>
+        <div class="space-y-6">
+            <div class="relative input-group">
+                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Nationality*</div>
+                <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Nationality">
+            </div>
+            <div class="relative input-group">
+                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Document number*</div>
+                <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Your document number">
+            </div>
+            <div class="relative input-group">
+                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Expiry date*</div>
+                <div class="relative">
+                    <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Day / Month / Year">
+                    <i class="fa-solid fa-calendar absolute right-4 top-4 text-slate-400"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Information -->
+    <section class="bg-white rounded-xl shadow-sm border border-slate-100 p-8 mb-6">
+        <h2 class="text-xl font-bold text-[#003876] text-center mb-6">Contact Information</h2>
+        <div class="space-y-6">
+            <div class="relative input-group">
+                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Email*</div>
+                <input type="email" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Enter an email address">
+            </div>
+            <div class="relative input-group">
+                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Confirm email*</div>
+                <input type="email" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Confirm an email address">
+            </div>
+
+            <div class="flex justify-center mb-8">
+                <button class="flex items-center text-[#00529B] border border-[#00529B] px-6 py-2.5 rounded text-sm font-bold hover:bg-blue-50 transition-colors">
+                    <i class="fa-solid fa-plus mr-2"></i> Add another email address
+                </button>
+            </div>
+
+            <div class="relative input-group">
+                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Phone (WhatsApp preferred)*</div>
+                <select class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800 bg-white appearance-none cursor-pointer">
+                    <option>Personal</option>
+                </select>
+                <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs pointer-events-none"></i>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="relative input-group">
+                    <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Country calling code*</div>
+                    <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Enter code">
+                </div>
+                <div class="relative input-group">
+                    <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Phone number*</div>
+                    <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Enter number">
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3 mt-8 pb-4">
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" value="" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    <span class="ms-3 text-sm text-[#003876] font-semibold">Fill emergency contact</span>
+                </label>
+            </div>
+        </div>
+    </section>
+
+    <!-- Save Info Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-8 mb-6 flex items-center space-x-4">
+        <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" value="" class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+        </label>
+        <div>
+            <h3 class="text-[#003876] font-bold">Remember passenger information</h3>
+            <p class="text-xs text-slate-500">Save your personal information now, save time in future bookings.</p>
+        </div>
+    </div>
+
+    <!-- Marketing/Legal -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-8 mb-12 space-y-4">
+        <label class="flex items-start space-x-3 cursor-pointer group">
+            <input type="checkbox" class="mt-1 rounded border-slate-300 text-blue-600 focus:ring-blue-500 h-4 w-4" />
+            <span class="text-sm text-[#003876] font-medium group-hover:text-blue-800">
+                    I would like to stay updated with SriLankan Airlines' latest news and special offers.
+                </span>
+        </label>
+        <label class="flex items-start space-x-3 cursor-pointer group">
+            <input type="checkbox" class="mt-1 rounded border-slate-300 text-blue-600 focus:ring-blue-500 h-4 w-4" />
+            <span class="text-sm text-[#003876] font-medium group-hover:text-blue-800">
+                    I understand & accept that my personal data will be processed in accordance with the applicable carrier's privacy policy.
+                </span>
+        </label>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="flex justify-end items-center space-x-4 mt-8 pb-10">
+        <button class="px-10 py-2.5 border border-[#00529B] text-[#00529B] font-bold rounded hover:bg-slate-100 transition-colors">
+            Back
+        </button>
+        <button class="px-10 py-2.5 bg-[#174182] text-white font-bold rounded shadow-lg hover:bg-[#0d2a54] transition-colors">
+            Confirm
+        </button>
+    </div>
+</div>
+
+<script>
+    // Simple script to handle console logs or basic interactions if needed
+    document.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            if(btn.innerText.trim() === 'Confirm') {
+                console.log('Form submission triggered');
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ceylone Airlines - Explore the Pearl of the Indian Ocean</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1552423133-3dcb99729bf8?auto=format&fit=crop&q=80&w=1920');
+            background-size: cover;
+            background-position: center;
+            height: 600px;
+        }
+
+        .booking-widget {
+            margin-top: -100px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .primary-color { background-color: #8b1d41; } /* Deep Maroon - Inspired by the original design */
+        .primary-hover:hover { background-color: #6a1632; }
+        .text-primary { color: #8b1d41; }
+
+        .nav-link:after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 2px;
+            background: #fff;
+            transition: width .3s;
+        }
+        .nav-link:hover:after { width: 100%; }
+
+        .card-zoom:hover img {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- Header / Navigation -->
+<header class="bg-white/10 backdrop-blur-md absolute top-0 w-full z-50 border-b border-white/20">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-8">
+            <div class="text-white text-2xl font-bold tracking-tighter">
+                <span class="text-yellow-400">CEYLONE</span> AIRLINES
+            </div>
+            <nav class="hidden lg:flex space-x-6 text-white text-sm font-medium">
+                <a href="#" class="nav-link">Explore</a>
+                <a href="#" class="nav-link">Book</a>
+                <a href="#" class="nav-link">Experience</a>
+                <a href="#" class="nav-link">Privilege Club</a>
+            </nav>
+        </div>
+        <div class="flex items-center space-x-6 text-white text-sm">
+            <a href="#"><i class="fas fa-question-circle mr-1"></i> Help</a>
+            <a href="#"><i class="fas fa-search mr-1"></i></a>
+            <a href="#"><i class="fas fa-globe mr-1"></i> EN</a>
+            <a href="#" class="border border-white px-4 py-2 rounded-full hover:bg-white hover:text-maroon-900 transition">Log in | Sign up</a>
+        </div>
+    </div>
+</header>
+
+<!-- Hero Section -->
+<section class="hero-section flex items-center justify-start px-6 lg:px-24">
+    <div class="text-white max-w-2xl">
+        <h1 class="text-5xl font-bold mb-4">Explore Asia and Beyond</h1>
+        <p class="text-xl mb-8">Experience the warmth of Sri Lankan hospitality with premium comfort and world-class service.</p>
+        <button
+                onclick="window.location.href='BookingWebpage.html'"
+                class="bg-white/20 backdrop-blur-md border-2 border-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-black transition duration-300">
+            Book now
+        </button>
+    </div>
+</section>
+
+<!-- Booking Widget -->
+<div class="container mx-auto px-4 booking-widget relative z-10">
+    <div class="bg-white rounded-xl overflow-hidden shadow-2xl">
+        <!-- Tabs -->
+        <div class="flex border-b">
+            <button class="flex-1 py-4 flex items-center justify-center space-x-2 border-b-2 border-maroon-700 font-semibold text-primary">
+                <i class="fas fa-plane-departure"></i>
+                <span>Book a flight</span>
+            </button>
+            <button class="flex-1 py-4 flex items-center justify-center space-x-2 text-gray-500 hover:bg-gray-50 transition">
+                <i class="fas fa-hotel"></i>
+                <span>Stopover / Packages</span>
+            </button>
+            <button class="flex-1 py-4 flex items-center justify-center space-x-2 text-gray-500 hover:bg-gray-50 transition">
+                <i class="fas fa-tasks"></i>
+                <span>Manage / Check in</span>
+            </button>
+            <button class="flex-1 py-4 flex items-center justify-center space-x-2 text-gray-500 hover:bg-gray-50 transition">
+                <i class="fas fa-info-circle"></i>
+                <span>Flight status</span>
+            </button>
+        </div>
+
+        <!-- Form -->
+        <div class="p-6">
+            <div class="flex items-center space-x-6 mb-6">
+                <label class="inline-flex items-center">
+                    <input type="radio" name="trip" class="form-radio text-maroon-700" checked>
+                    <span class="ml-2 text-sm text-gray-700">Return</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="radio" name="trip" class="form-radio text-maroon-700">
+                    <span class="ml-2 text-sm text-gray-700">One way</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="radio" name="trip" class="form-radio text-maroon-700">
+                    <span class="ml-2 text-sm text-gray-700">Multi-city</span>
+                </label>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="border rounded p-3 relative">
+                    <span class="text-xs text-gray-400 absolute top-1">From</span>
+                    <input type="text" value="Colombo CMB" class="w-full pt-4 focus:outline-none font-medium">
+                </div>
+                <div class="border rounded p-3 relative">
+                    <span class="text-xs text-gray-400 absolute top-1">To</span>
+                    <input type="text" placeholder="Select destination" class="w-full pt-4 focus:outline-none font-medium">
+                    <div class="absolute -left-3 top-1/2 -translate-y-1/2 bg-white border rounded-full p-1 cursor-pointer hidden md:block">
+                        <i class="fas fa-exchange-alt text-gray-400 text-xs"></i>
+                    </div>
+                </div>
+                <div class="border rounded p-3 relative">
+                    <span class="text-xs text-gray-400 absolute top-1">Departure - Return</span>
+                    <input type="text" value="18 Mar 2026 - 27 Mar 2026" class="w-full pt-4 focus:outline-none font-medium">
+                </div>
+                <div class="border rounded p-3 relative">
+                    <span class="text-xs text-gray-400 absolute top-1">Passengers / Class</span>
+                    <select class="w-full pt-4 focus:outline-none font-medium bg-transparent">
+                        <option>1 Passenger, Economy</option>
+                        <option>1 Passenger, Business</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <label class="inline-flex items-center mb-4 md:mb-0">
+                    <input type="checkbox" class="form-checkbox rounded text-maroon-700">
+                    <span class="ml-2 text-sm text-gray-600">Book using Ceylone Points</span>
+                </label>
+                <div class="flex items-center space-x-6">
+                    <button class="text-sm font-medium text-gray-600 hover:text-black">+ Add promo code</button>
+                    <button class="primary-color text-white px-10 py-3 rounded-full font-bold primary-hover transition shadow-lg">
+                        Search flights
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- London Promo Section -->
+<section class="container mx-auto px-6 py-20">
+    <h2 class="text-3xl font-light text-gray-700 mb-2">Still interested in travelling to London?</h2>
+    <p class="text-gray-500 mb-8">There is a limited number of seats available. Complete your booking to secure yours.</p>
+
+    <div class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col lg:flex-row">
+        <div class="lg:w-1/3">
+            <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&q=80&w=800" alt="London Tower Bridge" class="h-64 lg:h-full w-full object-cover">
+        </div>
+        <div class="lg:w-2/3 p-8 flex flex-col justify-between">
+            <div>
+                <div class="text-sm text-gray-400 mb-4">27 Apr 2026 - 25 May 2026</div>
+                <div class="flex items-center justify-between mb-8 max-w-md">
+                    <div>
+                        <div class="text-2xl font-bold">CMB</div>
+                        <div class="text-sm text-gray-500">Colombo</div>
+                    </div>
+                    <div class="flex-1 mx-4 flex flex-col items-center">
+                        <i class="fas fa-plane text-gray-300"></i>
+                        <div class="w-full border-t border-dashed border-gray-300 mt-2"></div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold">LHR</div>
+                        <div class="text-sm text-gray-500 text-right">London</div>
+                    </div>
+                    <div class="ml-12">
+                        <div class="text-xs text-gray-400">Return</div>
+                        <div class="text-sm font-semibold">1 Passenger</div>
+                    </div>
+                    <div class="ml-8">
+                        <button class="primary-color text-white px-6 py-2 rounded-full text-sm font-bold primary-hover transition">
+                            Complete my booking
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 border-t">
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-award text-xl text-gray-400"></i>
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-700">Why book with us</h4>
+                        <p class="text-xs text-gray-500">Enjoy exclusive benefits and 24/7 priority support when you book direct.</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3 border-l border-gray-100 pl-4">
+                    <i class="fas fa-clock text-xl text-gray-400"></i>
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-700">Cancel within 24 hours</h4>
+                        <p class="text-xs text-gray-500">Plans change. Enjoy fee-free cancellation on select fare types.</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3 border-l border-gray-100 pl-4">
+                    <i class="fas fa-wallet text-xl text-gray-400"></i>
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-700">Pay with Cash + Points</h4>
+                        <p class="text-xs text-gray-500">Benefit from incredible savings and greater payment flexibility.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Planning Section -->
+<section class="container mx-auto px-6 pb-20">
+    <h2 class="text-3xl font-light text-gray-700 mb-2">Start planning your next trip</h2>
+    <p class="text-gray-500 mb-10">Thinking of travelling somewhere soon? Here are some options to help you get started.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Card 1 -->
+        <div class="bg-white rounded-xl overflow-hidden shadow-lg card-zoom group cursor-pointer">
+            <div class="relative overflow-hidden h-48">
+                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover transition duration-500">
+                <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition"></div>
+                <div class="absolute bottom-4 left-4 text-white font-bold">In-flight Dining</div>
+            </div>
+            <div class="p-4">
+                <p class="text-sm text-gray-600">Discover our new seasonal menu curated by world-class chefs.</p>
+            </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="bg-white rounded-xl overflow-hidden shadow-lg card-zoom group cursor-pointer">
+            <div class="relative overflow-hidden h-48">
+                <img src="https://images.unsplash.com/photo-1540339832862-474599807836?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover transition duration-500">
+                <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition"></div>
+                <div class="absolute bottom-4 left-4 text-white font-bold">Premium Cabin</div>
+            </div>
+            <div class="p-4">
+                <p class="text-sm text-gray-600">Explore our Business and First Class suites for ultimate privacy.</p>
+            </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="bg-white rounded-xl overflow-hidden shadow-lg card-zoom group cursor-pointer">
+            <div class="relative overflow-hidden h-48">
+                <img src="https://images.unsplash.com/photo-1436491865332-7a61a109c0f2?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover transition duration-500">
+                <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition"></div>
+                <div class="absolute bottom-4 left-4 text-white font-bold">Destinations</div>
+            </div>
+            <div class="p-4">
+                <p class="text-sm text-gray-600">Connecting you to over 150 destinations worldwide via Colombo.</p>
+            </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="bg-white rounded-xl overflow-hidden shadow-lg card-zoom group cursor-pointer">
+            <div class="relative overflow-hidden h-48">
+                <img src="https://images.unsplash.com/photo-1582650625119-3a31f8fa2699?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover transition duration-500">
+                <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition"></div>
+                <div class="absolute bottom-4 left-4 text-white font-bold">Privilege Club</div>
+            </div>
+            <div class="p-4">
+                <p class="text-sm text-gray-600">Join our loyalty program and earn points on every flight.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-gray-400 py-12">
+    <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div>
+            <div class="text-white text-xl font-bold mb-6 tracking-tighter">
+                <span class="text-yellow-400">CEYLONE</span> AIRLINES
+            </div>
+            <p class="text-sm">The pride of Sri Lanka, taking you to new heights with elegance and safety since 2026.</p>
+        </div>
+        <div>
+            <h4 class="text-white font-bold mb-4">Ceylone Airlines</h4>
+            <ul class="text-sm space-y-2">
+                <li><a href="#" class="hover:text-white">About us</a></li>
+                <li><a href="#" class="hover:text-white">Careers</a></li>
+                <li><a href="#" class="hover:text-white">Press releases</a></li>
+                <li><a href="#" class="hover:text-white">Sustainability</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="text-white font-bold mb-4">Help</h4>
+            <ul class="text-sm space-y-2">
+                <li><a href="#" class="hover:text-white">Contact us</a></li>
+                <li><a href="#" class="hover:text-white">Travel alerts</a></li>
+                <li><a href="#" class="hover:text-white">Bagage</a></li>
+                <li><a href="#" class="hover:text-white">Refuacnds</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="text-white font-bold mb-4">Follow us</h4>
+            <div class="flex space-x-4 text-xl">
+                <a href="#" class="hover:text-white"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="hover:text-white"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="hover:text-white"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="container mx-auto px-6 border-t border-gray-800 mt-12 pt-8 text-xs flex justify-between">
+        <p>&copy; 2026 Ceylone Airlines. All rights reserved.</p>
+        <div class="flex space-x-6">
+            <a href="#" class="hover:text-white">Privacy Policy</a>
+            <a href="#" class="hover:text-white">Cookie Policy</a>
+            <a href="#" class="hover:text-white">Conditions of Carriage</a>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>
