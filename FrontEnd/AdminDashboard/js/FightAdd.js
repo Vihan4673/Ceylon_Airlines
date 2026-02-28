@@ -1,4 +1,4 @@
-// flight.js
+// FightAdd.js
 
 // Toggle modal visibility
 function toggleModal(id) {
@@ -25,16 +25,18 @@ function showToast(title, msg, isError = false) {
 async function handleSubmitFlight() {
     const data = {
         flightNumber: document.getElementById('flightNumber').value.trim(),
-        bookedSeats: parseInt(document.getElementById('bookedSeats').value) || 0,
+        bookedSeats: 0, // default
         totalSeats: parseInt(document.getElementById('totalSeats').value) || 0,
+        price: parseFloat(document.getElementById('flightPrice').value) || 0,
         departure: document.getElementById('departure').value.trim(),
         arrival: document.getElementById('arrival').value.trim(),
-        departureTime: document.getElementById('departureTime').value,
-        arrivalTime: document.getElementById('arrivalTime').value
+        departureTime: convertTimeToISO(document.getElementById('departureTime').value),
+        arrivalTime: convertTimeToISO(document.getElementById('arrivalTime').value),
+        status: 'On Time' // default
     };
 
     // Validation
-    if (!data.flightNumber || !data.departure || !data.arrival || !data.totalSeats) {
+    if (!data.flightNumber || !data.departure || !data.arrival || !data.totalSeats || !data.price) {
         showToast('Validation Error', 'Please fill all required fields.', true);
         return;
     }
@@ -52,6 +54,7 @@ async function handleSubmitFlight() {
             toggleModal('flight-modal');
             showToast('Flight Scheduled', `Flight ${data.flightNumber} added successfully.`);
             await loadFlights();
+            clearFlightForm();
         } else {
             showToast('Error', result.message || 'Failed to save flight.', true);
             console.error(result);
@@ -60,6 +63,22 @@ async function handleSubmitFlight() {
         showToast('Network Error', 'Could not connect to server.', true);
         console.error(err);
     }
+}
+
+// Convert time (HH:MM) to ISO datetime (today's date + time)
+function convertTimeToISO(timeStr) {
+    if (!timeStr) return null;
+    const [hours, minutes] = timeStr.split(':');
+    const now = new Date();
+    now.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    return now.toISOString();
+}
+
+// Clear form after submission
+function clearFlightForm() {
+    ['flightNumber','flightPrice','totalSeats','departure','arrival','departureTime','arrivalTime'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
 }
 
 // Load flights dynamically into table
@@ -91,8 +110,8 @@ async function loadFlights() {
                     <p class="text-[10px] text-slate-400 mt-1 uppercase">${flight.departure} to ${flight.arrival}</p>
                 </td>
                 <td class="px-6 py-5">
-                    <div class="text-xs font-bold text-slate-600">${flight.departureTime}</div>
-                    <div class="text-[10px] text-slate-400">${flight.arrivalTime}</div>
+                    <div class="text-xs font-bold text-slate-600">${formatTime(flight.departureTime)}</div>
+                    <div class="text-[10px] text-slate-400">${formatTime(flight.arrivalTime)}</div>
                 </td>
                 <td class="px-6 py-5">
                     <div class="space-y-1.5">
@@ -122,6 +141,13 @@ async function loadFlights() {
         console.error(err);
         showToast('Error', 'Could not load flights.', true);
     }
+}
+
+// Format ISO datetime to HH:MM
+function formatTime(isoStr) {
+    if (!isoStr) return '';
+    const d = new Date(isoStr);
+    return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 }
 
 // Delete flight

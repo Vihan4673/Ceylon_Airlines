@@ -13,6 +13,10 @@
         .custom-card { @apply bg-white rounded-[1.5rem] border border-slate-200 shadow-sm transition-all hover:shadow-md; }
         .animate-fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Chrome, Safari, Edge, Opera - hide arrows for number input */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="antialiased min-h-screen">
@@ -42,7 +46,7 @@
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
             <h2 class="text-2xl font-black text-slate-800">Flight Schedule Management</h2>
-            <p class="text-sm text-slate-500 font-medium">Organize departures, arrivals, and real-time flight statuses.</p>
+            <p class="text-sm text-slate-500 font-medium">Organize departures, arrivals, and real-time flight pricing.</p>
         </div>
         <button onclick="toggleModal('flight-modal')" class="bg-slate-900 text-white px-6 py-3.5 rounded-2xl font-bold text-sm hover:bg-[#8A1538] transition-all shadow-xl shadow-slate-200 flex items-center gap-2 active:scale-95">
             <i class="fas fa-plus"></i> Schedule New Flight
@@ -60,8 +64,8 @@
             <div><p class="text-[10px] font-bold text-slate-400 uppercase">Delayed</p><p class="text-xl font-black">02</p></div>
         </div>
         <div class="custom-card p-6 flex items-center gap-4">
-            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center"><i class="fas fa-globe"></i></div>
-            <div><p class="text-[10px] font-bold text-slate-400 uppercase">Destinations</p><p class="text-xl font-black">18</p></div>
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center"><i class="fas fa-tag"></i></div>
+            <div><p class="text-[10px] font-bold text-slate-400 uppercase">Avg. Fare</p><p class="text-xl font-black">LKR 195k</p></div>
         </div>
     </div>
 
@@ -81,7 +85,7 @@
                     <th class="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Flight Number</th>
                     <th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Origin & Destination</th>
                     <th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Timings (Dep/Arr)</th>
-                    <th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Seats (Booked/Total)</th>
+                    <th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fare & Capacity</th>
                     <th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status</th>
                     <th class="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Actions</th>
                 </tr>
@@ -102,14 +106,11 @@
                         <div class="text-[10px] text-slate-400">08:30 PM</div>
                     </td>
                     <td class="px-6 py-5">
-                        <div class="space-y-1.5">
-                            <div class="flex items-center gap-2 text-slate-700">
-                                <i class="fas fa-user-check text-[10px] text-slate-400"></i>
-                                <span class="font-bold text-xs"><span class="text-[#8A1538]">12</span> / 280</span>
-                            </div>
-                            <!-- Progress Bar -->
-                            <div class="w-24 h-1 bg-slate-100 rounded-full overflow-hidden">
-                                <div class="bg-[#8A1538] h-full" style="width: 4.2%"></div>
+                        <div class="space-y-1">
+                            <div class="text-[#8A1538] font-black text-sm">LKR 221,700</div>
+                            <div class="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold uppercase">
+                                <i class="fas fa-chair"></i>
+                                <span>280 Seats</span>
                             </div>
                         </div>
                     </td>
@@ -135,21 +136,26 @@
         <div class="p-8 border-b flex justify-between items-center bg-slate-50/50">
             <div>
                 <h3 class="font-black text-xl text-slate-800 tracking-tight">Configure New Flight</h3>
-                <p class="text-xs text-slate-500 font-medium">Enter flight details as per lk.ijes.backend.dto</p>
+                <p class="text-xs text-slate-500 font-medium">Enter flight details and ticket pricing</p>
             </div>
             <button onclick="toggleModal('flight-modal')" class="w-10 h-10 rounded-full bg-white border flex items-center justify-center text-slate-400 hover:text-red-500 transition-all"><i class="fas fa-times"></i></button>
         </div>
 
         <div class="p-8 space-y-5">
+            <!-- Row 1: Flight No -->
             <div class="space-y-1.5">
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Flight Number</label>
                 <input type="text" id="flightNumber" placeholder="e.g. UL 123" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-[#8A1538]/10 font-bold">
             </div>
 
+            <!-- Row 2: Price & Capacity -->
             <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-1.5">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Booked Seats</label>
-                    <input type="number" id="bookedSeats" placeholder="12" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-[#8A1538]/10 font-bold">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Price (LKR)</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">LKR</span>
+                        <input type="number" id="flightPrice" placeholder="221000" class="w-full bg-slate-50 border border-slate-100 p-4 pl-12 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-[#8A1538]/10 font-bold">
+                    </div>
                 </div>
                 <div class="space-y-1.5">
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Total Capacity</label>
@@ -157,6 +163,7 @@
                 </div>
             </div>
 
+            <!-- Row 3: Stations -->
             <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-1.5">
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Departure Station</label>
@@ -168,6 +175,7 @@
                 </div>
             </div>
 
+            <!-- Row 4: Times -->
             <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-1.5">
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Departure Time</label>
@@ -201,6 +209,8 @@
     </div>
 </div>
 
-<script src="../js/flight.js"></script>
+<script src ="../js/FightAdd.js">
+
+</script>
 </body>
 </html>

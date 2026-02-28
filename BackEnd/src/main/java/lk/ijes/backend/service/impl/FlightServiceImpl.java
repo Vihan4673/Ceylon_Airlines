@@ -2,7 +2,7 @@ package lk.ijes.backend.service.impl;
 
 import lk.ijes.backend.dto.FlightDTO;
 import lk.ijes.backend.entity.Flight;
-import lk.ijes.backend.exception.FlightException;
+import lk.ijes.backend.exception.CustomException;
 import lk.ijes.backend.repository.FlightRepository;
 import lk.ijes.backend.service.FlightService;
 import org.modelmapper.ModelMapper;
@@ -27,9 +27,16 @@ public class FlightServiceImpl implements FlightService {
     @Override
     public void saveFlight(FlightDTO flightDTO) {
         if (flightDTO == null) {
-            throw new FlightException("FlightDTO is null");
+            throw new CustomException("FlightDTO is null");
         }
-        flightRepository.save(modelMapper.map(flightDTO, Flight.class));
+
+        Flight flight = modelMapper.map(flightDTO, Flight.class);
+
+        // Default values
+        if (flight.getBookedSeats() == null) flight.setBookedSeats(0);
+        if (flight.getStatus() == null || flight.getStatus().isEmpty()) flight.setStatus("On Time");
+
+        flightRepository.save(flight);
     }
 
     @Override
@@ -56,21 +63,33 @@ public class FlightServiceImpl implements FlightService {
     @Override
     public void updateFlight(FlightDTO flightDTO) {
         if (flightDTO == null) {
-            throw new FlightException("FlightDTO is null");
+            throw new CustomException("FlightDTO is null");
         }
 
-        if (!flightRepository.existsById(flightDTO.getId())) {
-            throw new FlightException("Flight not found");
+        Optional<Flight> existingFlightOpt = flightRepository.findById(flightDTO.getId());
+        if (existingFlightOpt.isEmpty()) {
+            throw new CustomException("Flight not found");
         }
 
-        flightRepository.save(modelMapper.map(flightDTO, Flight.class));
+        Flight existingFlight = existingFlightOpt.get();
+
+        // Map all fields from DTO
+        existingFlight.setFlightNumber(flightDTO.getFlightNumber());
+        existingFlight.setDeparture(flightDTO.getDeparture());
+        existingFlight.setArrival(flightDTO.getArrival());
+        existingFlight.setDepartureTime(flightDTO.getDepartureTime());
+        existingFlight.setArrivalTime(flightDTO.getArrivalTime());
+        existingFlight.setTotalSeats(flightDTO.getTotalSeats());
+        existingFlight.setPrice(flightDTO.getPrice());
+
+        flightRepository.save(existingFlight);
     }
 
     // Delete Flight
     @Override
     public void deleteFlight(Long id) {
         if (!flightRepository.existsById(id)) {
-            throw new FlightException("Flight not found");
+            throw new CustomException("Flight not found");
         }
         flightRepository.deleteById(id);
     }
@@ -79,19 +98,16 @@ public class FlightServiceImpl implements FlightService {
     @Override
     public List<FlightDTO> getAllFlight() {
         List<Flight> flightList = flightRepository.findAll();
-        return modelMapper.map(flightList,
-                new TypeToken<ArrayList<FlightDTO>>() {}.getType());
+        return modelMapper.map(flightList, new TypeToken<ArrayList<FlightDTO>>() {}.getType());
     }
 
     // Search Flight By ID
     @Override
     public FlightDTO searchFlightByID(Long id) {
         Optional<Flight> flight = flightRepository.findById(id);
-
         if (flight.isEmpty()) {
-            throw new FlightException("Flight not found");
+            throw new CustomException("Flight not found");
         }
-
         return modelMapper.map(flight.get(), FlightDTO.class);
     }
 }

@@ -2,7 +2,7 @@ package lk.ijes.backend.service.impl;
 
 import lk.ijes.backend.dto.PassengerDTO;
 import lk.ijes.backend.entity.Passenger;
-import lk.ijes.backend.exception.PassengerException;
+import lk.ijes.backend.exception.CustomException;
 import lk.ijes.backend.repository.PassengerRepository;
 import lk.ijes.backend.service.PassengerService;
 import org.modelmapper.ModelMapper;
@@ -25,7 +25,7 @@ public class PassengerServiceImpl implements PassengerService {
     @Override
     public void savePassenger(PassengerDTO passengerDTO) {
         if (passengerDTO == null) {
-            throw new PassengerException("PassengerDTO cannot be null");
+            throw new CustomException("PassengerDTO cannot be null");
         }
         passengerRepository.save(modelMapper.map(passengerDTO, Passenger.class));
     }
@@ -33,10 +33,10 @@ public class PassengerServiceImpl implements PassengerService {
     @Override
     public void updatePassenger(PassengerDTO passengerDTO) {
         if (passengerDTO == null || passengerDTO.getId() == null) {
-            throw new PassengerException("PassengerDTO or ID cannot be null");
+            throw new CustomException("PassengerDTO or ID cannot be null");
         }
         if (!passengerRepository.existsById(passengerDTO.getId())) {
-            throw new PassengerException("Passenger not found for ID: " + passengerDTO.getId());
+            throw new CustomException("Passenger not found for ID: " + passengerDTO.getId());
         }
         passengerRepository.save(modelMapper.map(passengerDTO, Passenger.class));
     }
@@ -44,7 +44,7 @@ public class PassengerServiceImpl implements PassengerService {
     @Override
     public void deletePassenger(Long id) {
         if (!passengerRepository.existsById(id)) {
-            throw new PassengerException("Passenger not found for ID: " + id);
+            throw new CustomException("Passenger not found for ID: " + id);
         }
         passengerRepository.deleteById(id);
     }
@@ -52,7 +52,7 @@ public class PassengerServiceImpl implements PassengerService {
     @Override
     public PassengerDTO searchPassengerByID(Long id) {
         Passenger passenger = passengerRepository.findById(id)
-                .orElseThrow(() -> new PassengerException("Passenger not found for ID: " + id));
+                .orElseThrow(() -> new CustomException("Passenger not found for ID: " + id));
         return modelMapper.map(passenger, PassengerDTO.class);
     }
 

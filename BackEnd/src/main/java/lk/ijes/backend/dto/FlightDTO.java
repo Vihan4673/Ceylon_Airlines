@@ -27,4 +27,13 @@ public class FlightDTO {
 
     @NotBlank(message = "Arrival time cannot be empty")
     private String arrivalTime;
+
+    @NotNull(message = "Total seats cannot be empty")
+    private Integer totalSeats;
+
+    @NotNull(message = "Price cannot be empty")
+    private Double price;
+
+    private Integer bookedSeats = 0; // default 0
+    private String status = "On Time"; // default status
 }

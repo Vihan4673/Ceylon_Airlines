@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ceylon Airlines | Pro Admin Control</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --primary: #8A1538;
+      --primary-dark: #6a102b;
+      --secondary: #1e293b;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f1f5f9;
+      color: #1e293b;
+    }
+
+    .sidebar-link.active {
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 10px 15px -3px rgba(138, 21, 56, 0.3);
+    }
+
+    .nav-view { display: none; }
+    .nav-view.active { display: block; animation: fadeIn 0.4s ease-out; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .status-pill {
+      @apply px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider;
+    }
+
+    .custom-card {
+      @apply bg-white rounded-[1.5rem] border border-slate-200 shadow-sm transition-all hover:shadow-md;
+    }
+  </style>
+</head>
+<body class="antialiased">
+
+<!-- Sidebar -->
+<aside class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0">
+  <div class="h-full px-4 py-8 overflow-y-auto bg-[#0f172a] text-white">
+    <div class="flex items-center gap-3 mb-10 px-2">
+      <div class="bg-gradient-to-br from-[#8A1538] to-[#6a102b] p-2 rounded-xl text-white shadow-lg">
+        <i class="fas fa-plane-departure text-xl"></i>
+      </div>
+      <h1 class="text-xl font-bold tracking-tight">Ceylon<span class="text-[#8A1538]">Air</span></h1>
+    </div>
+
+    <nav class="space-y-1">
+      <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4 mb-2">Main Menu</p>
+      <a href="#" onclick="showView('dashboard')" class="sidebar-link active flex items-center p-3 rounded-xl transition-all group">
+        <i class="fas fa-th-large w-6"></i>
+        <span class="ml-3 font-semibold text-sm">Overview</span>
+      </a>
+      <a href="Pages/FlightAdd.html" onclick="showView" class="sidebar-link flex items-center p-3 rounded-xl transition-all group">
+        <i class="fas fa-route w-6"></i>
+        <span class="ml-3 font-semibold text-sm">Flights</span>
+      </a>
+      <a href="Pages/booking.html" onclick="showView" class="sidebar-link flex items-center p-3 rounded-xl transition-all group">
+        <i class="fas fa-calendar-check w-6"></i>
+        <span class="ml-3 font-semibold text-sm">Bookings</span>
+      </a>
+      <a href="Pages/passengers.html" onclick="showView" class="sidebar-link flex items-center p-3 rounded-xl transition-all group text-slate-400 hover:text-white">
+        <i class="fas fa-user-shield w-6"></i>
+        <span class="ml-3 font-semibold text-sm">Passengers</span>
+      </a>
+      <a href="Pages/ad.html" onclick="showView" class="sidebar-link flex items-center p-3 rounded-xl transition-all group text-slate-400 hover:text-white">
+        <i class="fas fa-ad w-6"></i>
+        <span class="ml-3 font-semibold text-sm">Ad</span>
+      </a>
+    </nav>
+
+    <div class="mt-10 pt-10 border-t border-slate-800">
+      <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4 mb-2">System</p>
+      <a href="#" class="flex items-center p-3 text-slate-400 hover:text-white transition-all">
+        <i class="fas fa-cog w-6"></i>
+        <span class="ml-3 font-semibold text-sm">Settings</span>
+      </a>
+      <a href="#" class="flex items-center p-3 text-red-400 hover:text-red-300 transition-all">
+        <i class="fas fa-sign-out-alt w-6"></i>
+        <span class="ml-3 font-semibold text-sm">Logout</span>
+      </a>
+    </div>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<main class="p-6 sm:ml-64 min-h-screen">
+
+  <!-- Top Nav -->
+  <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div>
+      <h2 id="view-title" class="text-2xl font-extrabold text-slate-800">System Dashboard</h2>
+      <div class="flex items-center gap-2 text-sm text-slate-500">
+        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+        Operational Mode: Real-time Update
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="hidden lg:flex flex-col text-right">
+        <span class="text-xs font-bold">Admin: Vihan</span>
+        <span class="text-[10px] text-slate-400 uppercase tracking-tighter">Senior Controller</span>
+      </div>
+      <img src="https://ui-avatars.com/api/?name=Admin+V&background=8A1538&color=fff" class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
+    </div>
+  </header>
+
+  <!-- View: Dashboard -->
+  <div id="view-dashboard" class="nav-view active space-y-6">
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="custom-card p-6 bg-white">
+        <div class="flex justify-between items-start mb-4">
+          <div class="p-3 bg-red-50 text-[#8A1538] rounded-xl"><i class="fas fa-plane"></i></div>
+          <span class="text-green-500 text-xs font-bold">+4 Today</span>
+        </div>
+        <p class="text-slate-400 text-xs font-bold uppercase">Total Flights</p>
+        <h3 class="text-2xl font-black">248</h3>
+      </div>
+      <div class="custom-card p-6 bg-white">
+        <div class="flex justify-between items-start mb-4">
+          <div class="p-3 bg-blue-50 text-blue-600 rounded-xl"><i class="fas fa-ticket-alt"></i></div>
+          <span class="text-green-500 text-xs font-bold">85% Occ.</span>
+        </div>
+        <p class="text-slate-400 text-xs font-bold uppercase">Total Bookings</p>
+        <h3 class="text-2xl font-black">12,402</h3>
+      </div>
+      <div class="custom-card p-6 bg-white text-white bg-slate-900">
+        <div class="flex justify-between items-start mb-4">
+          <div class="p-3 bg-white/10 text-white rounded-xl"><i class="fas fa-dollar-sign"></i></div>
+          <span class="text-green-400 text-xs font-bold">Target Hit</span>
+        </div>
+        <p class="text-slate-400 text-xs font-bold uppercase">Revenue (USD)</p>
+        <h3 class="text-2xl font-black">$2.4M</h3>
+      </div>
+      <div class="custom-card p-6 border-l-4 border-l-amber-500">
+        <div class="flex justify-between items-start mb-4">
+          <div class="p-3 bg-amber-50 text-amber-600 rounded-xl"><i class="fas fa-clock"></i></div>
+        </div>
+        <p class="text-slate-400 text-xs font-bold uppercase">Pending Payments</p>
+        <h3 class="text-2xl font-black">24</h3>
+      </div>
+    </div>
+
+    <!-- Dashboard Charts Placeholder & Tables -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 custom-card p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h4 class="font-bold text-slate-800">Today's Flight Schedule</h4>
+          <a href="#" class="text-xs text-[#8A1538] font-bold">FULL SCHEDULE</a>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="text-[10px] text-slate-400 uppercase border-b pb-2">
+            <tr>
+              <th class="pb-3">Flight</th>
+              <th class="pb-3">Route</th>
+              <th class="pb-3">Dep. Time</th>
+              <th class="pb-3">Status</th>
+            </tr>
+            </thead>
+            <tbody class="text-sm divide-y">
+            <tr class="group hover:bg-slate-50 transition-all">
+              <td class="py-4 font-bold text-[#8A1538]">UL 503</td>
+              <td class="py-4">CMB <i class="fas fa-long-arrow-alt-right mx-2 text-slate-300"></i> LHR</td>
+              <td class="py-4 font-medium">10:45 AM</td>
+              <td class="py-4"><span class="status-pill bg-green-100 text-green-700">On Time</span></td>
+            </tr>
+            <tr class="group hover:bg-slate-50 transition-all">
+              <td class="py-4 font-bold text-[#8A1538]">UL 302</td>
+              <td class="py-4">CMB <i class="fas fa-long-arrow-alt-right mx-2 text-slate-300"></i> SIN</td>
+              <td class="py-4 font-medium">11:20 AM</td>
+              <td class="py-4"><span class="status-pill bg-amber-100 text-amber-700">Delayed</span></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="custom-card p-6">
+        <h4 class="font-bold text-slate-800 mb-6">Revenue Sources</h4>
+        <div class="space-y-6">
+          <div class="relative pt-1">
+            <div class="flex mb-2 items-center justify-between">
+              <span class="text-xs font-bold text-slate-600">Economy Class</span>
+              <span class="text-xs font-bold text-[#8A1538]">62%</span>
+            </div>
+            <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-slate-100">
+              <div style="width:62%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-[#8A1538]"></div>
+            </div>
+          </div>
+          <div class="relative pt-1">
+            <div class="flex mb-2 items-center justify-between">
+              <span class="text-xs font-bold text-slate-600">Business Class</span>
+              <span class="text-xs font-bold text-slate-800">38%</span>
+            </div>
+            <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-slate-100">
+              <div style="width:38%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-slate-800"></div>
+            </div>
+          </div>
+          <div class="mt-8 p-4 bg-red-50 rounded-2xl border border-red-100">
+            <p class="text-[10px] font-bold text-[#8A1538] uppercase">System Alert</p>
+            <p class="text-xs text-slate-600 mt-1 leading-tight">UL 302 delayed due to weather in Singapore. Passenger notification sent.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- View: Flight Management -->
+  <div id="view-flights" class="nav-view space-y-6">
+    <div class="flex justify-between items-center">
+      <h3 class="text-xl font-bold">Flight Operations</h3>
+      <button onclick="toggleModal('flight-modal')" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-[#8A1538] transition-all">
+        <i class="fas fa-plus mr-2"></i> Add New Flight
+      </button>
+    </div>
+
+    <div class="bg-white rounded-[1.5rem] border border-slate-200 overflow-hidden shadow-sm">
+      <table class="w-full text-left">
+        <thead class="bg-slate-50 border-b">
+        <tr>
+          <th class="px-6 py-4 text-[10px] uppercase font-bold text-slate-400">Flight ID</th>
+          <th class="px-6 py-4 text-[10px] uppercase font-bold text-slate-400">Route Info</th>
+          <th class="px-6 py-4 text-[10px] uppercase font-bold text-slate-400">Status</th>
+          <th class="px-6 py-4 text-[10px] uppercase font-bold text-slate-400">Seats (Avail/Total)</th>
+          <th class="px-6 py-4 text-[10px] uppercase font-bold text-slate-400">Actions</th>
+        </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-sm">
+        <tr>
+          <td class="px-6 py-4 font-bold text-slate-800">UL 503</td>
+          <td class="px-6 py-4">
+            <div class="font-semibold text-slate-700">Colombo <i class="fas fa-arrow-right text-[10px] mx-1"></i> London</div>
+            <div class="text-[10px] text-slate-400 italic">Airbus A330-300</div>
+          </td>
+          <td class="px-6 py-4">
+            <select onchange="showToast('Status Updated', 'Flight status changed to ' + this.value)" class="bg-green-50 text-green-700 border-none rounded-lg text-xs font-bold py-1 px-2 outline-none">
+              <option value="On Time">On Time</option>
+              <option value="Delayed">Delayed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </td>
+          <td class="px-6 py-4 font-medium">42 / 280</td>
+          <td class="px-6 py-4 flex gap-2">
+            <button class="text-blue-500 hover:text-blue-700"><i class="fas fa-edit"></i></button>
+            <button onclick="showToast('Deleted', 'Flight record removed')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- View: Booking Management -->
+  <div id="view-bookings" class="nav-view space-y-6">
+    <h3 class="text-xl font-bold">Booking Registry</h3>
+    <div class="custom-card overflow-hidden">
+      <div class="p-4 bg-slate-50 border-b flex flex-wrap gap-4">
+        <input type="text" placeholder="Search PNR..." class="px-4 py-2 border rounded-xl text-xs outline-none focus:ring-1 focus:ring-[#8A1538]">
+        <select class="px-4 py-2 border rounded-xl text-xs outline-none">
+          <option>All Classes</option>
+          <option>Economy</option>
+          <option>Business</option>
+        </select>
+      </div>
+      <table class="w-full text-left text-sm">
+        <thead>
+        <tr class="bg-white border-b text-[10px] font-bold text-slate-400 uppercase">
+          <th class="px-6 py-3">PNR</th>
+          <th class="px-6 py-3">Passenger</th>
+          <th class="px-6 py-3">Flight</th>
+          <th class="px-6 py-3">Seat</th>
+          <th class="px-6 py-3 text-right">Action</th>
+        </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+        <tr>
+          <td class="px-6 py-4 font-mono font-bold text-[#8A1538]">CEY92X</td>
+          <td class="px-6 py-4">
+            <p class="font-bold">Kasun Jayasekara</p>
+            <button class="text-[10px] text-blue-500 font-bold hover:underline">VIEW FULL DETAILS</button>
+          </td>
+          <td class="px-6 py-4">UL 503</td>
+          <td class="px-6 py-4 font-bold text-slate-600">12A</td>
+          <td class="px-6 py-4 text-right">
+            <button onclick="showToast('Cancelled', 'Booking cancelled and seats released')" class="text-red-500 text-xs font-bold uppercase">Cancel</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- View: Passenger Management -->
+  <div id="view-passengers" class="nav-view space-y-6">
+    <h3 class="text-xl font-bold">Passenger Oversight</h3>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="p-4 bg-white rounded-2xl border text-center">
+        <p class="text-xs text-slate-400 font-bold uppercase">Verified</p>
+        <h5 class="text-lg font-black">92%</h5>
+      </div>
+      <div class="p-4 bg-red-50 rounded-2xl border border-red-100 text-center">
+        <p class="text-xs text-red-500 font-bold uppercase">Blocked</p>
+        <h5 class="text-lg font-black text-red-700">12</h5>
+      </div>
+    </div>
+    <div class="custom-card overflow-hidden">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-slate-50 border-b">
+        <tr>
+          <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase">Profile</th>
+          <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase">Passport Status</th>
+          <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase">Security</th>
+          <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase text-right">Actions</th>
+        </tr>
+        </thead>
+        <tbody class="divide-y">
+        <tr>
+          <td class="px-6 py-4">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500">VP</div>
+              <div>
+                <p class="font-bold">Vihan Perera</p>
+                <p class="text-[10px] text-slate-400">vihan.p@gmail.com</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <span class="status-pill bg-green-100 text-green-700"><i class="fas fa-check-circle mr-1"></i> Valid until 2028</span>
+            <p class="text-[10px] mt-1 text-slate-400">N82937492</p>
+          </td>
+          <td class="px-6 py-4">
+            <span class="status-pill bg-slate-100 text-slate-600">CLEARED</span>
+          </td>
+          <td class="px-6 py-4 text-right flex justify-end gap-3">
+            <button title="Block" class="text-slate-300 hover:text-red-500 transition-all"><i class="fas fa-ban"></i></button>
+            <button title="View History" class="text-slate-300 hover:text-blue-500 transition-all"><i class="fas fa-history"></i></button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- View: Payment Management -->
+  <div id="view-payments" class="nav-view space-y-6">
+    <h3 class="text-xl font-bold">Financial Operations</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="custom-card p-6 border-t-4 border-t-green-500">
+        <h4 class="font-bold text-slate-800 mb-4">Daily Inflow</h4>
+        <div class="text-3xl font-black text-green-600 mb-2">$84,320.00</div>
+        <p class="text-xs text-slate-400">Calculated across 124 transactions today.</p>
+        <button class="mt-4 text-xs font-bold text-blue-600 uppercase">Download Report <i class="fas fa-download ml-1"></i></button>
+      </div>
+      <div class="custom-card p-6 border-t-4 border-t-amber-500">
+        <h4 class="font-bold text-slate-800 mb-4">Refund Requests</h4>
+        <div class="flex items-center justify-between p-3 bg-amber-50 rounded-xl mb-3">
+          <div class="text-xs">
+            <p class="font-bold text-slate-800">Booking #CEY92X</p>
+            <p class="text-slate-500">$450.00 Request</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="showToast('Refund Approved', '$450.00 will be credited back')" class="bg-green-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold">APPROVE</button>
+            <button class="bg-white border text-red-500 px-3 py-1 rounded-lg text-[10px] font-bold">DENY</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Modal: Add Flight -->
+<div id="flight-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+  <div class="bg-white w-full max-w-lg rounded-[2rem] shadow-2xl overflow-hidden">
+    <div class="p-6 border-b flex justify-between items-center bg-slate-50">
+      <h3 class="font-bold text-slate-800">Configure New Flight</h3>
+      <button onclick="toggleModal('flight-modal')" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="p-6 space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Flight Number</label>
+          <input type="text" placeholder="UL 000" class="w-full bg-slate-50 border-none p-3 rounded-xl text-sm outline-none focus:ring-1 focus:ring-[#8A1538]">
+        </div>
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Aircraft</label>
+          <select class="w-full bg-slate-50 border-none p-3 rounded-xl text-sm outline-none">
+            <option>Airbus A330</option>
+            <option>Boeing 787</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Origin (IATA)</label>
+          <input type="text" placeholder="CMB" class="w-full bg-slate-50 border-none p-3 rounded-xl text-sm outline-none">
+        </div>
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Destination</label>
+          <input type="text" placeholder="LHR" class="w-full bg-slate-50 border-none p-3 rounded-xl text-sm outline-none">
+        </div>
+      </div>
+      <button onclick="handleSubmitFlight()" class="w-full bg-[#8A1538] text-white font-bold py-4 rounded-xl text-sm shadow-xl shadow-[#8A1538]/20 mt-4 active:scale-95 transition-all">
+        SCHEDULE FLIGHT
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed bottom-10 right-10 z-[100] transform translate-y-20 opacity-0 transition-all duration-500">
+  <div class="bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-white/10">
+    <div id="toast-icon" class="w-8 h-8 bg-[#8A1538] rounded-full flex items-center justify-center">
+      <i class="fas fa-info text-xs"></i>
+    </div>
+    <div>
+      <p class="text-xs font-bold" id="toast-title">System Message</p>
+      <p class="text-[10px] text-slate-400" id="toast-msg">Operation completed.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showView(viewId) {
+    document.querySelectorAll('.nav-view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + viewId).classList.add('active');
+
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+      link.classList.remove('active');
+      if(link.innerHTML.toLowerCase().includes(viewId === 'dashboard' ? 'overview' : viewId)) {
+        link.classList.add('active');
+      }
+    });
+
+    const titles = {
+      dashboard: "Overview Dashboard",
+      flights: "Flight Operations & Status",
+      bookings: "Booking & Seat Registry",
+      passengers: "Passenger Security Oversight",
+      payments: "Financial Reports & Revenue"
+    };
+    document.getElementById('view-title').innerText = titles[viewId];
+  }
+
+  function toggleModal(id) {
+    document.getElementById(id).classList.toggle('hidden');
+  }
+
+  function handleSubmitFlight() {
+    toggleModal('flight-modal');
+    showToast('Flight Scheduled', 'The new route has been added to Global Search.');
+  }
+
+  function showToast(title, msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toast-title').innerText = title;
+    document.getElementById('toast-msg').innerText = msg;
+
+    toast.classList.remove('translate-y-20', 'opacity-0');
+    setTimeout(() => {
+      toast.classList.add('translate-y-20', 'opacity-0');
+    }, 3000);
+  }
+
+  window.onclick = (e) => {
+    if (e.target.id.includes('modal')) e.target.classList.add('hidden');
+  }
+</script>
+</body>
+</html>
