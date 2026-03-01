@@ -1,11 +1,169 @@
-<div class="fade-in space-y-6">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="custom-card p-6">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Overview | Ceylon Airlines</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary: #8A1538;
+            --primary-dark: #6a102b;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: transparent; /* Parent layout එකේ background එක පෙනීමට */
+            color: #1e293b;
+        }
+
+        .custom-card {
+            @apply bg-white rounded-[1.5rem] border border-slate-200 shadow-sm transition-all hover:shadow-md;
+        }
+
+        .status-pill {
+            @apply px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider;
+        }
+
+        /* Iframe එක ඇතුලේ scrollbar එක ලස්සන කිරීමට */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+<!-- View: Dashboard -->
+<div id="view-dashboard" class="space-y-6">
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="custom-card p-6 bg-white">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-3 bg-red-50 text-[#8A1538] rounded-xl"><i class="fas fa-plane"></i></div>
+                <span class="text-green-500 text-xs font-bold">+4 Today</span>
+            </div>
             <p class="text-slate-400 text-xs font-bold uppercase">Total Flights</p>
-            <h3 class="text-2xl font-black">248</h3>
+            <h3 class="text-2xl font-black text-slate-800">248</h3>
         </div>
+
+        <div class="custom-card p-6 bg-white">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-3 bg-blue-50 text-blue-600 rounded-xl"><i class="fas fa-ticket-alt"></i></div>
+                <span class="text-green-500 text-xs font-bold">85% Occ.</span>
+            </div>
+            <p class="text-slate-400 text-xs font-bold uppercase">Total Bookings</p>
+            <h3 class="text-2xl font-black text-slate-800">12,402</h3>
+        </div>
+
+        <div class="custom-card p-6 text-white bg-slate-900">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-3 bg-white/10 text-white rounded-xl"><i class="fas fa-dollar-sign"></i></div>
+                <span class="text-green-400 text-xs font-bold">Target Hit</span>
+            </div>
+            <p class="text-slate-400 text-xs font-bold uppercase">Revenue (USD)</p>
+            <h3 class="text-2xl font-black">$2.4M</h3>
+        </div>
+
+        <div class="custom-card p-6 border-l-4 border-l-amber-500">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-3 bg-amber-50 text-amber-600 rounded-xl"><i class="fas fa-clock"></i></div>
+            </div>
+            <p class="text-slate-400 text-xs font-bold uppercase">Pending Payments</p>
+            <h3 class="text-2xl font-black text-slate-800">24</h3>
+        </div>
+    </div>
+
+    <!-- Dashboard Charts & Tables -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Left Column: Flight Schedule -->
+        <div class="lg:col-span-2 custom-card p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h4 class="font-bold text-slate-800">Today's Flight Schedule</h4>
+                <a href="#" class="text-xs text-[#8A1538] font-bold hover:underline">FULL SCHEDULE</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="text-[10px] text-slate-400 uppercase border-b">
+                    <tr>
+                        <th class="pb-3 px-2">Flight</th>
+                        <th class="pb-3 px-2">Route</th>
+                        <th class="pb-3 px-2">Dep. Time</th>
+                        <th class="pb-3 px-2">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody class="text-sm divide-y">
+                    <tr class="group hover:bg-slate-50 transition-all">
+                        <td class="py-4 px-2 font-bold text-[#8A1538]">UL 503</td>
+                        <td class="py-4 px-2 text-slate-600">CMB <i class="fas fa-long-arrow-alt-right mx-2 text-slate-300"></i> LHR</td>
+                        <td class="py-4 px-2 font-medium">10:45 AM</td>
+                        <td class="py-4 px-2"><span class="status-pill bg-green-100 text-green-700">On Time</span></td>
+                    </tr>
+                    <tr class="group hover:bg-slate-50 transition-all">
+                        <td class="py-4 px-2 font-bold text-[#8A1538]">UL 302</td>
+                        <td class="py-4 px-2 text-slate-600">CMB <i class="fas fa-long-arrow-alt-right mx-2 text-slate-300"></i> SIN</td>
+                        <td class="py-4 px-2 font-medium">11:20 AM</td>
+                        <td class="py-4 px-2"><span class="status-pill bg-amber-100 text-amber-700">Delayed</span></td>
+                    </tr>
+                    <tr class="group hover:bg-slate-50 transition-all">
+                        <td class="py-4 px-2 font-bold text-[#8A1538]">UL 115</td>
+                        <td class="py-4 px-2 text-slate-600">CMB <i class="fas fa-long-arrow-alt-right mx-2 text-slate-300"></i> DXB</td>
+                        <td class="py-4 px-2 font-medium">01:45 PM</td>
+                        <td class="py-4 px-2"><span class="status-pill bg-green-100 text-green-700">On Time</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Right Column: Revenue & Alerts -->
+        <div class="custom-card p-6">
+            <h4 class="font-bold text-slate-800 mb-6">Revenue Sources</h4>
+            <div class="space-y-6">
+                <div class="relative pt-1">
+                    <div class="flex mb-2 items-center justify-between">
+                        <span class="text-xs font-bold text-slate-600">Economy Class</span>
+                        <span class="text-xs font-bold text-[#8A1538]">62%</span>
+                    </div>
+                    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-slate-100">
+                        <div style="width:62%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-[#8A1538]"></div>
+                    </div>
+                </div>
+                <div class="relative pt-1">
+                    <div class="flex mb-2 items-center justify-between">
+                        <span class="text-xs font-bold text-slate-600">Business Class</span>
+                        <span class="text-xs font-bold text-slate-800">38%</span>
+                    </div>
+                    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-slate-100">
+                        <div style="width:38%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-slate-800"></div>
+                    </div>
+                </div>
+
+                <div class="mt-8 p-4 bg-red-50 rounded-2xl border border-red-100">
+                    <div class="flex items-center gap-2 mb-1">
+                        <i class="fas fa-bell text-[#8A1538] text-xs"></i>
+                        <p class="text-[10px] font-bold text-[#8A1538] uppercase">System Alert</p>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-1 leading-tight">
+                        UL 302 delayed due to weather in Singapore. Passenger notification sent.
+                    </p>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
-
-
+</body>
+</html>

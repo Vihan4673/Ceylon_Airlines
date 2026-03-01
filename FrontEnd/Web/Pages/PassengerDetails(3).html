@@ -3,290 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Passenger Information - SriLankan Airlines</title>
+    <title>Passenger Details | Ceylon Air</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
-        /* Floating label effect logic for focus */
-        .input-group:focus-within .label-text {
-            color: #00529B;
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
         }
 
-        .toggle-dot {
-            transition: all 0.3s ease-in-out;
+        .step-gradient {
+            background: linear-gradient(90deg, #00529B 0%, #003876 100%);
         }
 
-        input:checked + .toggle-bg {
-            background-color: #2563eb;
+        .input-field {
+            transition: all 0.2s ease-in-out;
+            border: 1.5px solid #e2e8f0;
         }
 
-        input:checked + .toggle-bg .toggle-dot {
-            transform: translateX(1.25rem);
+        .input-field:focus {
+            border-color: #00529B;
+            box-shadow: 0 0 0 4px rgba(0, 82, 155, 0.1);
+        }
+
+        .floating-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .floating-card:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+        }
+
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #00529B;
+        }
+
+        @keyframes progress {
+            from { width: 0; }
+            to { width: 45%; }
+        }
+        .progress-fill {
+            animation: progress 1.5s ease-out forwards;
+        }
+
+        /* Custom Notification Toast */
+        #notification {
+            display: none;
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            z-index: 100;
+            animation: slideIn 0.3s ease-out;
+            font-weight: 700;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
     </style>
 </head>
-<body class="bg-slate-50 pb-20">
+<body class="text-slate-800">
 
-<!-- Blue Header Strip -->
-<header class="bg-[#00529B] text-white p-4 sticky top-0 z-50 shadow-md">
-    <div class="max-w-7xl mx-auto flex justify-between items-center text-sm font-semibold">
-        <div class="flex items-center space-x-6">
-            <div class="flex flex-col">
-                <span class="text-[10px] opacity-80 uppercase tracking-wider font-bold">ADL</span>
-                <span>Adelaide</span>
+<!-- Notification UI -->
+<div id="notification"></div>
+
+<!-- Top Navigation / Progress -->
+<nav class="step-gradient text-white sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+        <div class="flex items-center gap-4">
+            <div class="bg-white/10 p-2 rounded-lg backdrop-blur-md">
+                <i class="fa-solid fa-plane-up"></i>
             </div>
-            <div class="flex flex-col items-center">
-                    <span class="text-[10px] border-b border-dotted border-white w-16 mb-1 relative">
-                        <i class="fa-solid fa-plane text-[10px] absolute -right-2 -top-1 rotate-45"></i>
-                    </span>
-            </div>
-            <div class="flex flex-col">
-                <span class="text-[10px] opacity-80 uppercase tracking-wider font-bold">CMB</span>
-                <span>Colombo</span>
-            </div>
-            <div class="h-8 w-px bg-white/20 mx-4 hidden md:block"></div>
-            <div class="flex flex-col hidden md:flex">
-                <span class="text-[10px] opacity-80 uppercase tracking-wider font-bold">Depart</span>
-                <span>Sun, 1 Mar</span>
-            </div>
-            <div class="h-8 w-px bg-white/20 mx-4 hidden md:block"></div>
-            <div class="flex flex-col hidden md:flex">
-                <span class="text-[10px] opacity-80 uppercase tracking-wider font-bold">Passenger</span>
-                <div class="flex items-center">
-                    <span>1</span>
-                    <i class="fa-solid fa-user text-[10px] ml-1"></i>
-                </div>
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Flight Summary</p>
+                <p class="text-sm font-bold">ADL <i class="fa-solid fa-arrow-right mx-2 text-[10px]"></i> CMB</p>
             </div>
         </div>
 
-        <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-cart-shopping text-lg"></i>
-            <div class="flex flex-col items-end">
-                <span class="text-[10px] uppercase font-bold">AUD</span>
-                <span class="text-lg">2,061.77</span>
+        <div class="hidden lg:flex items-center gap-8 text-[11px] font-bold uppercase tracking-widest">
+            <span class="opacity-50">01 Selection</span>
+            <span class="flex items-center gap-2"><span class="bg-white text-[#00529B] w-5 h-5 rounded-full flex items-center justify-center text-[9px]">02</span> Details</span>
+            <span class="opacity-50">03 Extras</span>
+            <span class="opacity-50">04 Payment</span>
+        </div>
+
+        <div class="flex items-center gap-4 bg-black/10 px-4 py-2 rounded-full border border-white/10">
+            <div class="text-right">
+                <p class="text-[10px] font-bold opacity-60 uppercase">Total Amount</p>
+                <p class="text-lg font-extrabold leading-none">AUD 2,061.77</p>
             </div>
+            <i class="fa-solid fa-cart-shopping opacity-60"></i>
         </div>
     </div>
-</header>
-
-<!-- Hero Section -->
-<div class="relative h-64 overflow-hidden">
-    <img
-            src="https://images.unsplash.com/photo-1540339832862-47452993c71b?auto=format&fit=crop&q=80&w=2000"
-            alt="Business traveler"
-            class="w-full h-full object-cover grayscale-[0.2]"
-    />
-    <div class="absolute inset-0 bg-blue-900/10 flex flex-col items-center justify-center">
-        <button class="bg-white/90 px-4 py-1.5 rounded-full text-blue-900 text-sm font-bold flex items-center mb-8 shadow-md hover:bg-white transition-colors">
-            Modify <i class="fa-solid fa-chevron-down ml-1 text-[10px]"></i>
-        </button>
-        <div class="bg-white/90 px-12 py-4 rounded shadow-lg text-center">
-            <h1 class="text-[#003876] text-2xl font-bold">Enter your information</h1>
-        </div>
+    <div class="h-1 bg-black/20 w-full">
+        <div class="h-full bg-blue-400 progress-fill" style="width: 45%"></div>
     </div>
-</div>
+</nav>
 
-<!-- Form Container -->
-<div class="max-w-4xl mx-auto mt-[-40px] relative z-10 px-4">
+<main class="max-w-4xl mx-auto px-6 py-12">
 
-    <!-- Personal Information Section -->
-    <section class="bg-white rounded-xl shadow-sm border border-slate-100 p-8 mb-6">
-        <h2 class="text-xl font-bold text-[#003876] text-center mb-6">Personal information</h2>
+    <div class="mb-12 text-center lg:text-left">
+        <h1 class="text-4xl font-extrabold text-[#003876] tracking-tight">Passenger Details</h1>
+        <p class="text-slate-500 mt-2 font-medium">Please ensure the information matches your passport exactly.</p>
+    </div>
 
-        <div class="text-[11px] text-slate-500 mb-6 space-y-1">
-            <p>* = mandatory fields</p>
-            <p>Please fill personal information as shown in the passport. <a href="#" class="text-blue-600 underline">Tips for entering names</a></p>
-        </div>
+    <form id="passengerForm" class="space-y-8">
 
-        <div class="space-y-6">
-            <!-- Title Select -->
-            <div class="relative input-group">
-                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Title*</div>
-                <select class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800 bg-white appearance-none cursor-pointer">
-                    <option value="" disabled selected>Choose a title</option>
-                    <option>Mr</option>
-                    <option>Mrs</option>
-                    <option>Ms</option>
-                    <option>Dr</option>
-                </select>
-                <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs pointer-events-none"></i>
-            </div>
-
-            <!-- First Name -->
-            <div class="relative input-group">
-                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">First name*</div>
-                <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Enter a first name">
-            </div>
-
-            <!-- Last Name -->
-            <div class="relative input-group">
-                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Last name*</div>
-                <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Enter a last name">
-            </div>
-
-            <!-- Gender Select -->
-            <div class="relative input-group">
-                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Gender*</div>
-                <select class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800 bg-white appearance-none cursor-pointer">
-                    <option value="" disabled selected>Select gender</option>
-                    <option>Male</option>
-                    <option>Female</option>
-                    <option>Other</option>
-                </select>
-                <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs pointer-events-none"></i>
-            </div>
-
-            <!-- DOB -->
-            <div class="relative input-group">
-                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Date of birth*</div>
-                <div class="relative">
-                    <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Day / Month / Year">
-                    <i class="fa-solid fa-calendar absolute right-4 top-4 text-slate-400"></i>
+        <!-- Section: Personal Info -->
+        <div class="bg-white rounded-[2rem] p-8 lg:p-10 border border-slate-100 shadow-sm floating-card">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-[#00529B]">
+                    <i class="fa-solid fa-user"></i>
                 </div>
-                <p class="text-[10px] text-slate-400 mt-1 ml-1">Example: 31/01/2025</p>
+                <h2 class="text-xl font-extrabold text-[#003876]">Personal Information</h2>
             </div>
-        </div>
-    </section>
 
-    <!-- Frequent Flyer -->
-    <section class="bg-white rounded-xl shadow-sm border border-slate-100 p-8 mb-6">
-        <h2 class="text-xl font-bold text-[#003876] text-center mb-6">Frequent Flyer Program</h2>
-        <div class="space-y-6">
-            <div class="relative input-group">
-                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Frequent Flyer Airline</div>
-                <select class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800 bg-white appearance-none cursor-pointer">
-                    <option>Frequent Flyer Airline</option>
-                </select>
-                <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs pointer-events-none"></i>
-            </div>
-            <div class="relative input-group">
-                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Frequent Flyer Number</div>
-                <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Enter your frequent flyer number">
-            </div>
-        </div>
-    </section>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <div class="md:col-span-3">
+                    <label class="block text-[11px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Title*</label>
+                    <div class="relative">
+                        <select id="title" class="w-full input-field rounded-xl px-4 py-3.5 bg-slate-50 appearance-none focus:outline-none font-bold text-slate-700">
+                            <option value="Mr">Mr</option>
+                            <option value="Mrs">Mrs</option>
+                            <option value="Ms">Ms</option>
+                            <option value="Dr">Dr</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-xs"></i>
+                    </div>
+                </div>
 
-    <!-- Passport Details -->
-    <section class="bg-white rounded-xl shadow-sm border border-slate-100 p-8 mb-6">
-        <h2 class="text-xl font-bold text-[#003876] text-center mb-6">Passport Details</h2>
-        <div class="space-y-6">
-            <div class="relative input-group">
-                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Nationality*</div>
-                <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Nationality">
-            </div>
-            <div class="relative input-group">
-                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Document number*</div>
-                <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Your document number">
-            </div>
-            <div class="relative input-group">
-                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Expiry date*</div>
-                <div class="relative">
-                    <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Day / Month / Year">
-                    <i class="fa-solid fa-calendar absolute right-4 top-4 text-slate-400"></i>
+                <div class="md:col-span-9">
+                    <label class="block text-[11px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">First Name (as per passport)*</label>
+                    <input type="text" id="firstName" placeholder="e.g. JOHN DAVID" class="w-full input-field rounded-xl px-5 py-3.5 bg-slate-50 focus:outline-none font-bold placeholder:text-slate-300">
+                </div>
+
+                <div class="md:col-span-12">
+                    <label class="block text-[11px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Last Name*</label>
+                    <input type="text" id="lastName" placeholder="e.g. SMITH" class="w-full input-field rounded-xl px-5 py-3.5 bg-slate-50 focus:outline-none font-bold">
+                </div>
+
+                <div class="md:col-span-6">
+                    <label class="block text-[11px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Gender*</label>
+                    <div class="flex gap-4">
+                        <label class="flex-1 flex items-center justify-center gap-2 border-2 border-slate-100 rounded-xl py-3 px-4 cursor-pointer hover:bg-slate-50 transition font-bold text-sm">
+                            <input type="radio" name="gender" value="Male" class="accent-[#00529B]"> Male
+                        </label>
+                        <label class="flex-1 flex items-center justify-center gap-2 border-2 border-slate-100 rounded-xl py-3 px-4 cursor-pointer hover:bg-slate-50 transition font-bold text-sm">
+                            <input type="radio" name="gender" value="Female" class="accent-[#00529B]"> Female
+                        </label>
+                    </div>
+                </div>
+
+                <div class="md:col-span-6">
+                    <label class="block text-[11px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Date of Birth*</label>
+                    <input type="date" id="dob" class="w-full input-field rounded-xl px-5 py-3.5 bg-slate-50 focus:outline-none font-bold text-slate-700">
                 </div>
             </div>
         </div>
-    </section>
 
-    <!-- Contact Information -->
-    <section class="bg-white rounded-xl shadow-sm border border-slate-100 p-8 mb-6">
-        <h2 class="text-xl font-bold text-[#003876] text-center mb-6">Contact Information</h2>
-        <div class="space-y-6">
-            <div class="relative input-group">
-                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Email*</div>
-                <input type="email" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Enter an email address">
-            </div>
-            <div class="relative input-group">
-                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Confirm email*</div>
-                <input type="email" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Confirm an email address">
-            </div>
-
-            <div class="flex justify-center mb-8">
-                <button class="flex items-center text-[#00529B] border border-[#00529B] px-6 py-2.5 rounded text-sm font-bold hover:bg-blue-50 transition-colors">
-                    <i class="fa-solid fa-plus mr-2"></i> Add another email address
-                </button>
-            </div>
-
-            <div class="relative input-group">
-                <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Phone (WhatsApp preferred)*</div>
-                <select class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800 bg-white appearance-none cursor-pointer">
-                    <option>Personal</option>
-                </select>
-                <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs pointer-events-none"></i>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div class="relative input-group">
-                    <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Country calling code*</div>
-                    <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Enter code">
+        <!-- Section: Contact Info -->
+        <div class="bg-white rounded-[2rem] p-8 lg:p-10 border border-slate-100 shadow-sm floating-card">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center text-green-600">
+                    <i class="fa-solid fa-address-book"></i>
                 </div>
-                <div class="relative input-group">
-                    <div class="absolute -top-2.5 left-3 bg-white px-1 text-xs text-slate-500 font-medium z-10 label-text">Phone number*</div>
-                    <input type="text" class="w-full border border-slate-300 rounded-md px-4 py-3 text-slate-700 focus:outline-none focus:border-blue-800" placeholder="Enter number">
+                <h2 class="text-xl font-extrabold text-[#003876]">Contact Information</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label class="block text-[11px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Email Address*</label>
+                    <input type="email" id="email" placeholder="email@example.com" class="w-full input-field rounded-xl px-5 py-3.5 bg-slate-50 focus:outline-none font-bold">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-[11px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Mobile Number*</label>
+                    <div class="flex items-center">
+                        <input type="text" id="mobile" placeholder="+61 000 000 000" class="w-full input-field rounded-xl px-5 py-3.5 bg-slate-50 focus:outline-none font-bold">
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-2 ml-1 font-medium italic">Include country code (e.g. +61 for Australia)</p>
                 </div>
             </div>
 
-            <div class="flex items-center space-x-3 mt-8 pb-4">
+            <div class="mt-8 p-4 bg-green-50 rounded-2xl flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <i class="fab fa-whatsapp text-green-600 text-xl"></i>
+                    <p class="text-xs font-bold text-green-800">Receive flight updates via WhatsApp</p>
+                </div>
                 <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" value="" class="sr-only peer">
-                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    <span class="ms-3 text-sm text-[#003876] font-semibold">Fill emergency contact</span>
+                    <input type="checkbox" checked class="sr-only peer">
+                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
                 </label>
             </div>
         </div>
-    </section>
 
-    <!-- Save Info Card -->
-    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-8 mb-6 flex items-center space-x-4">
-        <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" value="" class="sr-only peer">
-            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-        </label>
-        <div>
-            <h3 class="text-[#003876] font-bold">Remember passenger information</h3>
-            <p class="text-xs text-slate-500">Save your personal information now, save time in future bookings.</p>
+        <!-- Section: Passport -->
+        <div class="bg-white rounded-[2rem] p-8 lg:p-10 border border-slate-100 shadow-sm floating-card">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-10 h-10 bg-amber-50 rounded-full flex items-center justify-center text-amber-600">
+                    <i class="fa-solid fa-passport"></i>
+                </div>
+                <h2 class="text-xl font-extrabold text-[#003876]">Travel Documents</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label class="block text-[11px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Passport Number*</label>
+                    <input type="text" id="passportNumber" class="w-full input-field rounded-xl px-5 py-3.5 bg-slate-50 focus:outline-none font-bold uppercase">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Nationality*</label>
+                    <input type="text" id="nationality" placeholder="Select Country" class="w-full input-field rounded-xl px-5 py-3.5 bg-slate-50 focus:outline-none font-bold">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Expiry Date*</label>
+                    <input type="date" id="passportExpiry" class="w-full input-field rounded-xl px-5 py-3.5 bg-slate-50 focus:outline-none font-bold">
+                </div>
+            </div>
         </div>
-    </div>
 
-    <!-- Marketing/Legal -->
-    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-8 mb-12 space-y-4">
-        <label class="flex items-start space-x-3 cursor-pointer group">
-            <input type="checkbox" class="mt-1 rounded border-slate-300 text-blue-600 focus:ring-blue-500 h-4 w-4" />
-            <span class="text-sm text-[#003876] font-medium group-hover:text-blue-800">
-                    I would like to stay updated with SriLankan Airlines' latest news and special offers.
+        <!-- Consent & Buttons -->
+        <div class="space-y-4 pt-6">
+            <label class="flex items-start gap-4 cursor-pointer group p-2">
+                <input type="checkbox" id="privacyConsent" class="custom-checkbox mt-1">
+                <span class="text-xs font-medium text-slate-500 group-hover:text-slate-800 transition leading-relaxed">
+                    I understand and accept that my personal data will be processed in accordance with the <a href="#" class="text-[#00529B] font-bold underline">Privacy Policy</a>. I confirm that all entered details match my travel documents.
                 </span>
-        </label>
-        <label class="flex items-start space-x-3 cursor-pointer group">
-            <input type="checkbox" class="mt-1 rounded border-slate-300 text-blue-600 focus:ring-blue-500 h-4 w-4" />
-            <span class="text-sm text-[#003876] font-medium group-hover:text-blue-800">
-                    I understand & accept that my personal data will be processed in accordance with the applicable carrier's privacy policy.
-                </span>
-        </label>
-    </div>
+            </label>
 
-    <!-- Footer Actions -->
-    <div class="flex justify-end items-center space-x-4 mt-8 pb-10">
-        <button class="px-10 py-2.5 border border-[#00529B] text-[#00529B] font-bold rounded hover:bg-slate-100 transition-colors">
-            Back
-        </button>
-        <button class="px-10 py-2.5 bg-[#174182] text-white font-bold rounded shadow-lg hover:bg-[#0d2a54] transition-colors">
-            Confirm
-        </button>
-    </div>
-</div>
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 pt-6">
+                <button type="button" class="w-full md:w-auto px-10 py-4 font-black uppercase tracking-widest text-xs text-slate-400 hover:text-slate-800 transition">
+                    <i class="fa-solid fa-chevron-left mr-2"></i> Back to selection
+                </button>
+                <button type="submit" class="w-full md:w-auto bg-[#00529B] text-white px-16 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-[#003876] transition-all shadow-xl shadow-blue-900/20 active:scale-95 flex items-center justify-center gap-3">
+                    Continue to Extras <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+</main>
 
-<script>
-    // Simple script to handle console logs or basic interactions if needed
-    document.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            if(btn.innerText.trim() === 'Confirm') {
-                console.log('Form submission triggered');
-            }
-        });
-    });
+<footer class="py-12 border-t border-slate-200 mt-12 bg-white">
+    <div class="max-w-7xl mx-auto px-6 text-center">
+        <p class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300">© 2025 Ceylon Air | Global Booking System</p>
+    </div>
+</footer>
+
+<script src="../JavaScript/PassengerDetails.js">
 </script>
 </body>
 </html>

@@ -7,8 +7,16 @@ import lk.ijes.backend.service.AdService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,5 +52,45 @@ public class AdServiceImpl implements AdService {
     @Override
     public void deleteAd(Long id) {
         adRepository.deleteById(id);
+    }
+
+    @Override
+    public AdDTO saveAdWithImage(MultipartFile file,
+                                 String title,
+                                 String description,
+                                 String placement,
+                                 String startDate,
+                                 String endDate) throws IOException {
+
+        if (file == null || file.isEmpty()) {
+            throw new IOException("File is empty");
+        }
+
+        // ✅ Create uploads folder if it doesn't exist
+        Path uploadDir = Paths.get("uploads");
+        if (!Files.exists(uploadDir)) {
+            Files.createDirectories(uploadDir);
+        }
+
+        // ✅ Save the file with unique name
+        String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path filePath = uploadDir.resolve(filename);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        // ✅ Create Ad entity
+        Ad ad = new Ad();
+        ad.setTitle(title);
+        ad.setDescription(description);
+        ad.setPlacement(placement);
+        ad.setStartDate(LocalDate.parse(startDate));
+        ad.setEndDate(LocalDate.parse(endDate));
+        ad.setImageUrl("/uploads/" + filename); // relative path for frontend
+        ad.setActive(false); // default inactive
+
+        // ✅ Save Ad to DB
+        Ad savedAd = adRepository.save(ad);
+
+        // ✅ Map to DTO and return
+        return modelMapper.map(savedAd, AdDTO.class);
     }
 }

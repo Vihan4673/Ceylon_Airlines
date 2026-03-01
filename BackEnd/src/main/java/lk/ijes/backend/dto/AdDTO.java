@@ -23,13 +23,13 @@ public class AdDTO {
     @NotBlank(message = "Placement is required")
     private String placement;
 
-    @NotBlank(message = "Image URL is required")
+    // imageUrl can be empty initially if file not yet uploaded
     private String imageUrl;
 
-    @NotNull(message = "Start date required")
+    @NotNull(message = "Start date is required")
     private LocalDate startDate;
 
-    @NotNull(message = "End date required")
+    @NotNull(message = "End date is required")
     private LocalDate endDate;
 
     private boolean active;
