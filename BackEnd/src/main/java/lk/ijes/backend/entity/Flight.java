@@ -33,8 +33,7 @@ public class Flight {
     @Column(nullable = false)
     private Integer totalSeats;
 
-    @Column(nullable = false)
-    private Double price;
+
 
     @Column(nullable = false)
     private Integer bookedSeats = 0; // default 0

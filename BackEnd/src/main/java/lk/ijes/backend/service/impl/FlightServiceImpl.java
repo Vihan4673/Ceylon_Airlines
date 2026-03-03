@@ -73,14 +73,15 @@ public class FlightServiceImpl implements FlightService {
 
         Flight existingFlight = existingFlightOpt.get();
 
-        // Map all fields from DTO
+        // Map all fields from DTO except price
         existingFlight.setFlightNumber(flightDTO.getFlightNumber());
         existingFlight.setDeparture(flightDTO.getDeparture());
         existingFlight.setArrival(flightDTO.getArrival());
         existingFlight.setDepartureTime(flightDTO.getDepartureTime());
         existingFlight.setArrivalTime(flightDTO.getArrivalTime());
         existingFlight.setTotalSeats(flightDTO.getTotalSeats());
-        existingFlight.setPrice(flightDTO.getPrice());
+        existingFlight.setBookedSeats(flightDTO.getBookedSeats());
+        existingFlight.setStatus(flightDTO.getStatus());
 
         flightRepository.save(existingFlight);
     }

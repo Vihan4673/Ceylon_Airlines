@@ -1,159 +1,206 @@
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
+    // ===== Passenger / Cabin State Management =====
+    let state = {
+        adults: 1,
+        children: 0,
+        infants: 0,
+        cabin: 'Economy'
+    };
 
-    // =========================
-    // Date Modal Section
-    // =========================
-    const dateTrigger = document.getElementById('dateTrigger');
-    const dateModal = document.getElementById('dateModal');
-    const closeModal = document.getElementById('closeModal');
+    const trigger = document.getElementById('passengerTrigger');
+    const dropdown = document.getElementById('passengerDropdown');
+    const summary = document.getElementById('passengerSummary');
 
-    dateTrigger.addEventListener('click', (e) => {
+    function toggleDropdown(e) {
         e.stopPropagation();
-        dateModal.classList.toggle('hidden');
-        dateTrigger.classList.toggle('bg-blue-50');
-    });
+        dropdown.classList.toggle('active');
+    }
 
-    closeModal.addEventListener('click', () => {
-        dateModal.classList.add('hidden');
-        dateTrigger.classList.remove('bg-blue-50');
-    });
+    trigger.addEventListener('click', toggleDropdown);
 
+    // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
-        if (!dateModal.contains(e.target) && e.target !== dateTrigger) {
-            dateModal.classList.add('hidden');
-            dateTrigger.classList.remove('bg-blue-50');
+        if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('active');
         }
     });
 
-    // =========================
-    // Tab Switching
-    // =========================
-    const tabs = document.querySelectorAll('.nav-tab');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
+    dropdown.addEventListener('click', (e) => e.stopPropagation());
+
+    window.updateCount = function(type, delta, e) {
+        if (e) e.preventDefault();
+        const total = state.adults + state.children + state.infants + delta;
+        if (type === 'adults' && state.adults + delta < 1) return;
+        if (state[type] + delta < 0) return;
+        if (total > 9) return;
+
+        state[type] += delta;
+        document.getElementById(`${type}Count`).innerText = state[type];
+        updateSummary();
+    };
+
+    window.updateClass = function(val) {
+        state.cabin = val;
+        updateSummary();
+    };
+
+    function updateSummary() {
+        const total = state.adults + state.children + state.infants;
+        const travelerText = total > 1 ? 'Travelers' : 'Traveler';
+        summary.innerText = `${total} ${travelerText}, ${state.cabin}`;
+    }
+
+    updateSummary();
+
+    // ===== Trip Type Handling =====
+    const tripRadios = document.querySelectorAll('input[name="trip"]');
+    const returnContainer = document.getElementById('returnContainer');
+
+    tripRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            if (radio.value === 'oneway') {
+                returnContainer.style.display = 'none';
+            } else {
+                returnContainer.style.display = 'block';
+            }
         });
     });
 
-    // =========================
-    // Flight Search Section
-    // =========================
+    // ===== Flight Search / Autocomplete =====
     const fromInput = document.getElementById("fromLoc");
     const toInput = document.getElementById("toLoc");
-    const fromSuggestions = document.getElementById("fromSuggestions");
-    const toSuggestions = document.getElementById("toSuggestions");
+    const depDate = document.getElementById("depDate");
+    const retDate = document.getElementById("retDate");
     const searchBtn = document.getElementById("searchBtn");
 
-    let flights = [];
-    let airports = [];
+    depDate.valueAsDate = new Date();
 
-    // 🔹 Fetch flights once
-    async function loadFlights() {
+    // Create suggestion containers if not in HTML
+    let fromSuggestions = document.getElementById("fromSuggestions");
+    if (!fromSuggestions) {
+        fromSuggestions = document.createElement('div');
+        fromSuggestions.id = "fromSuggestions";
+        fromSuggestions.className = "suggestions-list hidden";
+        fromInput.parentElement.appendChild(fromSuggestions);
+    }
+
+    let toSuggestions = document.getElementById("toSuggestions");
+    if (!toSuggestions) {
+        toSuggestions = document.createElement('div');
+        toSuggestions.id = "toSuggestions";
+        toSuggestions.className = "suggestions-list hidden";
+        toInput.parentElement.appendChild(toSuggestions);
+    }
+
+    let departures = [];
+    let arrivals = [];
+
+    async function fetchFlightLocations() {
         try {
-            const response = await fetch("http://localhost:8080/api/v1/flights/getAllFlight");
-            const result = await response.json();
+            const res = await fetch("http://localhost:8080/api/v1/flights/getAllFlight");
+            const data = await res.json();
 
-            if (result.code === 200 && result.data) {
-                flights = result.data;
+            if (data && data.data) {
+                const flights = data.data;
+                const depSet = new Set();
+                const arrSet = new Set();
 
-                // Extract unique airports
-                const airportSet = new Set();
                 flights.forEach(f => {
-                    if (f.departure) airportSet.add(f.departure);
-                    if (f.arrival) airportSet.add(f.arrival);
+                    if (f.departure) depSet.add(f.departure.toUpperCase());
+                    if (f.arrival) arrSet.add(f.arrival.toUpperCase());
                 });
 
-                airports = Array.from(airportSet).map(code => ({
-                    code,
-                    city: code
-                }));
+                departures = Array.from(depSet).sort();
+                arrivals = Array.from(arrSet).sort();
             }
-        } catch (error) {
-            console.error("Error loading flights:", error);
+        } catch (err) {
+            console.error("Error fetching flights:", err);
         }
     }
 
-    // 🔹 Filter airports
-    function filterAirports(query) {
-        return airports.filter(a =>
-            a.code.toLowerCase().includes(query.toLowerCase())
-        );
-    }
+    function setupAutocomplete(input, list, options) {
+        input.addEventListener("input", () => {
+            const val = input.value.toLowerCase();
+            if (!val) return list.classList.add("hidden");
 
-    // 🔹 Extract airport code safely
-    function extractCode(value) {
-        const match = value.match(/\((.*?)\)/);
-        return match ? match[1] : null;
-    }
-
-    // 🔹 Suggestion logic
-    function setupSuggestions(inputEl, suggestionsEl) {
-
-        inputEl.addEventListener("input", () => {
-            const value = inputEl.value.trim();
-            if (!value) {
-                suggestionsEl.classList.add("hidden");
-                return;
+            const filtered = options.filter(opt => opt.toLowerCase().includes(val));
+            if (filtered.length > 0) {
+                list.innerHTML = filtered.map(opt => `
+                    <div class="px-4 py-2 cursor-pointer hover:bg-gray-100" data-city="${opt}">
+                        ${opt}
+                    </div>
+                `).join('');
+                list.classList.remove("hidden");
+            } else {
+                list.classList.add("hidden");
             }
-
-            const results = filterAirports(value);
-
-            suggestionsEl.innerHTML = results.map(a => `
-                <div class="suggestion-item cursor-pointer px-2 py-1 hover:bg-slate-200 rounded">
-                    <span class="city font-bold text-sm">${a.city}</span>
-                    <span class="code text-xs text-gray-500">(${a.code})</span>
-                </div>
-            `).join("");
-
-            suggestionsEl.classList.remove("hidden");
-
-            suggestionsEl.querySelectorAll(".suggestion-item").forEach(item => {
-                item.addEventListener("click", () => {
-                    const city = item.querySelector(".city").textContent;
-                    const code = item.querySelector(".code").textContent;
-                    inputEl.value = `${city} ${code}`;
-                    suggestionsEl.classList.add("hidden");
-                });
-            });
         });
 
-        document.addEventListener("click", e => {
-            if (!suggestionsEl.contains(e.target) && e.target !== inputEl) {
-                suggestionsEl.classList.add("hidden");
+        list.addEventListener("click", e => {
+            const item = e.target.closest("[data-city]");
+            if (item) {
+                input.value = item.dataset.city;
+                list.classList.add("hidden");
             }
         });
     }
 
-    // 🔹 Search Button
-    searchBtn.addEventListener("click", () => {
+    async function initAutocomplete() {
+        await fetchFlightLocations();
+        setupAutocomplete(fromInput, fromSuggestions, departures);
+        setupAutocomplete(toInput, toSuggestions, arrivals);
+    }
 
-        const fromCode = extractCode(fromInput.value);
-        const toCode = extractCode(toInput.value);
+    initAutocomplete();
 
-        if (!fromCode || !toCode) {
+    document.addEventListener("click", (e) => {
+        if (!fromInput.contains(e.target)) fromSuggestions.classList.add("hidden");
+        if (!toInput.contains(e.target)) toSuggestions.classList.add("hidden");
+    });
+
+    // ===== Search Flights =====
+    searchBtn.addEventListener("click", async () => {
+        const fromCity = fromInput.value.trim().toUpperCase();
+        const toCity = toInput.value.trim().toUpperCase();
+        const date = depDate.value;
+        const returnDateVal = retDate ? retDate.value : "";
+        const cabin = state.cabin;
+
+        if (!fromCity || !toCity) {
             alert("Please select both origin and destination.");
             return;
         }
 
-        const routeExists = flights.some(f =>
-            f.departure === fromCode && f.arrival === toCode
-        );
-
-        if (!routeExists) {
-            alert("No flights available for this route.");
+        if (!departures.includes(fromCity)) {
+            alert(`Origin "${fromCity}" does not exist in our flights.`);
             return;
         }
 
-        window.location.href =
-            `../Pages/FlightBooking2.html?from=${fromCode}&to=${toCode}`;
+        if (!arrivals.includes(toCity)) {
+            alert(`Destination "${toCity}" does not exist in our flights.`);
+            return;
+        }
+
+        // Loading animation
+        searchBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Searching...';
+        searchBtn.disabled = true;
+
+        setTimeout(() => {
+
+            const params = new URLSearchParams({
+                from: fromCity,
+                to: toCity,
+                dep: date,
+                ret: returnDateVal,
+                cabin: cabin,
+                adults: state.adults,
+                children: state.children,
+                infants: state.infants
+            });
+
+            // ✅ FIXED: Params append karala redirect karanawa
+            window.location.href = `../Pages/FlightBooking2.html?${params.toString()}`;
+
+        }, 1000);
     });
-
-    // =========================
-    // Initialize
-    // =========================
-    await loadFlights();
-    setupSuggestions(fromInput, fromSuggestions);
-    setupSuggestions(toInput, toSuggestions);
-
 });

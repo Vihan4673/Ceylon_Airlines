@@ -8,77 +8,72 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
-@RequestMapping("api/v1/bookings")
+@RequestMapping("/api/v1/bookings")
 public class BookingController {
 
     private final BookingService bookingService;
 
-    // Save Booking
-    @PostMapping("/saveBooking")
-    public ResponseEntity<APIResponse<String>> saveBooking(
+    // ================= CREATE BOOKING =================
+    @PostMapping
+    public ResponseEntity<APIResponse<BookingDTO>> createBooking(
             @Valid @RequestBody BookingDTO bookingDTO) {
 
-        bookingService.saveBooking(bookingDTO);
+        BookingDTO savedBooking = bookingService.saveBooking(bookingDTO);
 
-        return new ResponseEntity<>(
-                new APIResponse<>(201, "Booking saved successfully", null),
-                HttpStatus.CREATED
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new APIResponse<>(201, "Booking created successfully", savedBooking));
+    }
+
+    // ================= UPDATE BOOKING =================
+    @PutMapping("/{id}")
+    public ResponseEntity<APIResponse<BookingDTO>> updateBooking(
+            @PathVariable Long id,
+            @Valid @RequestBody BookingDTO bookingDTO) {
+
+        bookingDTO.setId(id);
+        BookingDTO updatedBooking = bookingService.updateBooking(bookingDTO);
+
+        return ResponseEntity.ok(
+                new APIResponse<>(200, "Booking updated successfully", updatedBooking)
         );
     }
 
-    // Update Booking
-    @PutMapping("/updateBooking")
-    public ResponseEntity<APIResponse<String>> updateBooking(
-            @Valid @RequestBody BookingDTO bookingDTO) {
-
-        bookingService.updateBooking(bookingDTO);
-
-        return new ResponseEntity<>(
-                new APIResponse<>(200, "Booking updated successfully", null),
-                HttpStatus.OK
-        );
-    }
-
-    // Delete Booking
-    @DeleteMapping("/deleteBooking/{id}")
-    public ResponseEntity<APIResponse<String>> deleteBooking(
-            @PathVariable Long id) {
+    // ================= DELETE BOOKING =================
+    @DeleteMapping("/{id}")
+    public ResponseEntity<APIResponse<String>> deleteBooking(@PathVariable Long id) {
 
         bookingService.deleteBooking(id);
 
-        return new ResponseEntity<>(
-                new APIResponse<>(200, "Booking deleted successfully", null),
-                HttpStatus.OK
+        return ResponseEntity.ok(
+                new APIResponse<>(200, "Booking deleted successfully", null)
         );
     }
 
-    // Get All Bookings
-    @GetMapping("/getAllBookings")
+    // ================= GET ALL BOOKINGS =================
+    @GetMapping
     public ResponseEntity<APIResponse<List<BookingDTO>>> getAllBookings() {
 
         List<BookingDTO> bookingList = bookingService.getAllBookings();
 
-        return new ResponseEntity<>(
-                new APIResponse<>(200, "Bookings retrieved successfully", bookingList),
-                HttpStatus.OK
+        return ResponseEntity.ok(
+                new APIResponse<>(200, "Bookings retrieved successfully", bookingList)
         );
     }
 
-    // Search Booking By ID
-    @GetMapping("/searchBooking/{id}")
-    public ResponseEntity<APIResponse<BookingDTO>> searchBooking(
-            @PathVariable Long id) {
+    // ================= GET BOOKING BY ID =================
+    @GetMapping("/{id}")
+    public ResponseEntity<APIResponse<BookingDTO>> getBookingById(@PathVariable Long id) {
 
         BookingDTO bookingDTO = bookingService.searchBookingByID(id);
 
-        return new ResponseEntity<>(
-                new APIResponse<>(200, "Booking retrieved successfully", bookingDTO),
-                HttpStatus.OK
+        return ResponseEntity.ok(
+                new APIResponse<>(200, "Booking retrieved successfully", bookingDTO)
         );
     }
 }

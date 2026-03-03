@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Airline Meal Selection</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-color: #f3f4f6;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .header-bg {
+      background-color: #005eb8;
+    }
+    .banner-img {
+      height: 200px;
+      background-image: url('https://images.unsplash.com/photo-1540331547168-8b63109225b7?auto=format&fit=crop&q=80&w=1200');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    .banner-overlay {
+      background: rgba(0, 0, 0, 0.2);
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .glass-btn {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px 25px;
+      border-radius: 4px;
+      font-weight: bold;
+      color: #005eb8;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Main Navigation Bar -->
+<header class="header-bg text-white px-4 py-2 flex justify-between items-center text-sm">
+  <div class="flex space-x-8">
+    <div>
+      <div class="font-bold">CMB</div>
+      <div class="text-xs opacity-80">Colombo</div>
+    </div>
+    <div class="flex flex-col items-center">
+      <span>✈ AUH</span>
+      <span class="text-xs opacity-80">Abu Dhabi</span>
+    </div>
+    <div>
+      <div class="font-bold">Depart</div>
+      <div class="text-xs opacity-80">Thu, 5 Mar</div>
+    </div>
+    <div>
+      <div class="font-bold">Passenger</div>
+      <div class="text-xs opacity-80">1</div>
+    </div>
+  </div>
+
+  <div class="flex items-center space-x-4">
+    <div class="text-right">
+      <div class="text-xs opacity-80 uppercase">Total</div>
+      <div class="font-bold text-lg">LKR 494,916</div>
+    </div>
+    <div class="bg-blue-800 p-2 rounded">
+      🛒
+    </div>
+  </div>
+</header>
+
+<!-- Banner Section -->
+<div class="banner-img">
+  <div class="banner-overlay">
+    <div class="text-center">
+      <div class="bg-white/80 px-2 py-1 text-xs inline-block mb-4 rounded cursor-pointer">Modify ▾</div>
+      <br>
+      <button class="glass-btn shadow-lg">Order your preferred meal</button>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<main class="max-w-4xl mx-auto p-6">
+
+  <div class="text-center mb-8">
+    <p class="text-blue-800 text-sm">
+      Pre-order your preferred meal (Choose your own meal from a delectable menu put together by our in-house chefs before you fly!)
+      <a href="#" class="underline font-bold">Click here for more info.</a>
+    </p>
+  </div>
+
+  <!-- Section 1: Colombo - Doha -->
+  <div class="bg-white rounded shadow-md mb-6 overflow-hidden border border-gray-200">
+    <div class="p-6">
+      <h2 class="text-center text-blue-900 font-bold mb-6 text-lg">Meals: Colombo - Doha</h2>
+      <div class="border-t pt-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="font-bold text-gray-700">Vihan Vimen</div>
+        <div class="relative flex-grow md:max-w-md">
+          <select class="w-full border p-2 rounded bg-gray-50 outline-none focus:border-blue-500 appearance-none">
+            <option>Vegetarian Jain Meal - Free of charge</option>
+            <option>Non-Veg Meal - Free of charge</option>
+          </select>
+          <div class="absolute right-3 top-3 pointer-events-none">▼</div>
+        </div>
+      </div>
+    </div>
+    <div class="bg-blue-50 p-4 border-t border-blue-100">
+      <p class="text-blue-800 text-xs font-bold uppercase mb-1">Your selection</p>
+      <p class="text-blue-900 text-sm font-medium">1 Vegetarian Jain Meal</p>
+    </div>
+  </div>
+
+  <!-- Section 2: Doha - Abu Dhabi -->
+  <div class="bg-white rounded shadow-md mb-6 overflow-hidden border border-gray-200">
+    <div class="p-6">
+      <h2 class="text-center text-blue-900 font-bold mb-6 text-lg">Meals: Doha - Abu Dhabi</h2>
+      <div class="border-t pt-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="font-bold text-gray-700">Vihan Vimen</div>
+        <div class="relative flex-grow md:max-w-md">
+          <select class="w-full border p-2 rounded bg-white outline-none focus:ring-2 focus:ring-blue-500 appearance-none">
+            <option selected>No selection</option>
+            <option>Vegetarian Meal (Non-Dairy) - Free of charge</option>
+            <option>Asian Vegetarian Meal - Free of charge</option>
+            <option>Chicken Biryani - Free of charge</option>
+          </select>
+          <div class="absolute right-3 top-3 pointer-events-none">▼</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Button -->
+  <div class="flex justify-end mt-8">
+    <button class="bg-blue-900 text-white px-8 py-2 rounded font-bold hover:bg-blue-800 transition shadow">
+      Next
+    </button>
+  </div>
+
+  <!-- Footer Info -->
+  <div class="text-center mt-10 text-gray-400 text-xs">
+    <div class="flex justify-center items-center space-x-1 mb-2">
+      <span>🔒 Secured payment</span>
+    </div>
+  </div>
+
+</main>
+
+</body>
+</html>

@@ -1,14 +1,13 @@
 package lk.ijes.backend.service;
 
 import lk.ijes.backend.dto.BookingDTO;
-
 import java.util.List;
 
 public interface BookingService {
 
-    void saveBooking(BookingDTO bookingDTO);
+    BookingDTO saveBooking(BookingDTO bookingDTO);
 
-    void updateBooking(BookingDTO bookingDTO);
+    BookingDTO updateBooking(BookingDTO bookingDTO);
 
     void deleteBooking(Long id);
 
