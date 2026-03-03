@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "flight")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -15,29 +16,35 @@ public class Flight {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String flightNumber;
 
     @Column(nullable = false)
-    private String departure;
+    private String departure;   // e.g., "CMB"
 
     @Column(nullable = false)
-    private String arrival;
+    private String arrival;     // e.g., "BOM"
 
     @Column(nullable = false)
-    private String departureTime;
+    private String departureTime; // e.g., "08:00"
 
     @Column(nullable = false)
-    private String arrivalTime;
+    private String arrivalTime;   // e.g., "10:30"
 
     @Column(nullable = false)
-    private Integer totalSeats;
+    private String flightDate;    // e.g., "2026-03-05"
 
+    private String duration;      // optional: "2h 30m"
 
+    private Integer totalSeats;   // total seats in the plane
 
-    @Column(nullable = false)
     private Integer bookedSeats = 0; // default 0
 
-    @Column(nullable = false)
     private String status = "On Time"; // default status
+
+    @Column(nullable = false)
+    private String economyFare;   // e.g., "20000"
+
+    @Column(nullable = false)
+    private String businessFare;  // e.g., "50000"
 }

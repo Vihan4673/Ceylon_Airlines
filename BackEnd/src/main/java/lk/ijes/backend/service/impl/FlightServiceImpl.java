@@ -23,7 +23,7 @@ public class FlightServiceImpl implements FlightService {
     @Autowired
     private ModelMapper modelMapper;
 
-    // Save Flight
+    // ================= SAVE FLIGHT =================
     @Override
     public void saveFlight(FlightDTO flightDTO) {
         if (flightDTO == null) {
@@ -59,7 +59,7 @@ public class FlightServiceImpl implements FlightService {
 
     }
 
-    // Update Flight
+    // ================= UPDATE FLIGHT =================
     @Override
     public void updateFlight(FlightDTO flightDTO) {
         if (flightDTO == null) {
@@ -73,20 +73,24 @@ public class FlightServiceImpl implements FlightService {
 
         Flight existingFlight = existingFlightOpt.get();
 
-        // Map all fields from DTO except price
+        // Map all fields from DTO
         existingFlight.setFlightNumber(flightDTO.getFlightNumber());
         existingFlight.setDeparture(flightDTO.getDeparture());
         existingFlight.setArrival(flightDTO.getArrival());
         existingFlight.setDepartureTime(flightDTO.getDepartureTime());
         existingFlight.setArrivalTime(flightDTO.getArrivalTime());
+        existingFlight.setFlightDate(flightDTO.getFlightDate());
+        existingFlight.setDuration(flightDTO.getDuration());
         existingFlight.setTotalSeats(flightDTO.getTotalSeats());
         existingFlight.setBookedSeats(flightDTO.getBookedSeats());
         existingFlight.setStatus(flightDTO.getStatus());
+        existingFlight.setEconomyFare(flightDTO.getEconomyFare());
+        existingFlight.setBusinessFare(flightDTO.getBusinessFare());
 
         flightRepository.save(existingFlight);
     }
 
-    // Delete Flight
+    // ================= DELETE FLIGHT =================
     @Override
     public void deleteFlight(Long id) {
         if (!flightRepository.existsById(id)) {
@@ -95,14 +99,14 @@ public class FlightServiceImpl implements FlightService {
         flightRepository.deleteById(id);
     }
 
-    // Get All Flights
+    // ================= GET ALL FLIGHTS =================
     @Override
     public List<FlightDTO> getAllFlight() {
         List<Flight> flightList = flightRepository.findAll();
         return modelMapper.map(flightList, new TypeToken<ArrayList<FlightDTO>>() {}.getType());
     }
 
-    // Search Flight By ID
+    // ================= SEARCH FLIGHT BY ID =================
     @Override
     public FlightDTO searchFlightByID(Long id) {
         Optional<Flight> flight = flightRepository.findById(id);

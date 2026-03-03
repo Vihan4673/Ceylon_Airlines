@@ -17,22 +17,34 @@ public class FlightDTO {
     private String flightNumber;
 
     @NotBlank(message = "Departure cannot be empty")
-    private String departure;
+    private String departure;   // e.g., "CMB"
 
     @NotBlank(message = "Arrival cannot be empty")
-    private String arrival;
+    private String arrival;     // e.g., "BOM"
 
     @NotBlank(message = "Departure time cannot be empty")
-    private String departureTime;
+    private String departureTime; // e.g., "08:00"
 
     @NotBlank(message = "Arrival time cannot be empty")
-    private String arrivalTime;
+    private String arrivalTime;   // e.g., "10:30"
 
-    @NotNull(message = "Total seats cannot be empty")
-    private Integer totalSeats;
+    @NotNull(message = "Flight date cannot be empty")
+    private String flightDate;    // e.g., "2026-03-05"
 
+    private String duration;      // optional: e.g., "2h 30m"
 
+    private Integer totalSeats;   // total seats in the plane
 
     private Integer bookedSeats = 0; // default 0
+
     private String status = "On Time"; // default status
+
+    // Fares
+    @NotNull(message = "Economy fare cannot be empty")
+    private String economyFare;   // e.g., "20000"
+
+    @NotNull(message = "Business fare cannot be empty")
+    private String businessFare;  // e.g., "50000"
+
+
 }
