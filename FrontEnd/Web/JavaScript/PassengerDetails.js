@@ -111,7 +111,6 @@ function renderPassengers(passengers) {
 
 // ================= SAVE PASSENGER =================
 async function savePassenger() {
-
     const title = document.getElementById("title").value.trim();
     const firstName = document.getElementById("firstName").value.trim();
     const lastName = document.getElementById("lastName").value.trim();
@@ -146,6 +145,11 @@ async function savePassenger() {
         return;
     }
 
+    if (new Date(expiryDate) <= new Date()) {
+        alert("Passport expiry date must be in the future.");
+        return;
+    }
+
     const passengerDTO = {
         title,
         firstName,
@@ -170,17 +174,30 @@ async function savePassenger() {
 
         if (res.ok) {
             alert(result.message || "Passenger saved successfully");
-            fetchPassengers();
-            document.getElementById("passengerForm").reset();
-        } else {
-            alert(result.message || "Save failed");
-        }
 
+            // ✅ Store passenger info for checkout page
+            localStorage.setItem("passengerInfo", JSON.stringify(passengerDTO));
+
+            // ✅ Redirect to checkout page automatically
+            window.location.href = "../Pages/Checkout page.html";
+
+        } else {
+            alert(result.message || "Save failed. Check your data.");
+        }
     } catch (error) {
         console.error("Save error:", error);
-        alert("Server error");
+        alert("Server error. Cannot save passenger.");
     }
 }
+
+// ================= FORM SUBMIT =================
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("passengerForm");
+    form?.addEventListener("submit", e => {
+        e.preventDefault();
+        savePassenger();
+    });
+});
 
 // ================= DELETE PASSENGER =================
 async function deletePassenger(id) {
