@@ -34,8 +34,8 @@ async function fetchDestinations() {
         // Set default From/To
         if (state.destinations.length > 0) {
             const defaultDest = state.destinations[0];
-            document.getElementById("fromLoc").value = `${defaultDest.from} (${defaultDest.fromCode})`;
-            document.getElementById("toLoc").value = `${defaultDest.to} (${defaultDest.toCode})`;
+            document.getElementById("fromLoc").value = `${defaultDest.city} (${defaultDest.airportCode})`;
+            document.getElementById("toLoc").value = `${state.destinations[1] ? state.destinations[1].city + ' (' + state.destinations[1].airportCode + ')' : defaultDest.city + ' (' + defaultDest.airportCode + ')'}`;
         }
     } catch (err) {
         console.error("Error fetching destinations:", err);
@@ -46,7 +46,7 @@ async function fetchDestinations() {
 }
 
 // =====================================================
-// DESTINATION INPUT SUGGESTIONS
+// DESTINATION INPUT SUGGESTIONS - VALIDATE DUPLICATE
 // =====================================================
 function initDestinationInputs() {
     const fromInput = document.getElementById("fromLoc");
@@ -62,23 +62,28 @@ function initDestinationInputs() {
             const query = input.value.toLowerCase();
             list.innerHTML = "";
 
+            const otherInput = input === fromInput ? toInput : fromInput;
+            const otherValue = otherInput.value.toLowerCase();
+
+            // Filter destinations, exclude city already selected in other input
             const matches = state.destinations.filter(d =>
-                d.from.toLowerCase().includes(query) || d.to.toLowerCase().includes(query) ||
-                d.fromCode.toLowerCase().includes(query) || d.toCode.toLowerCase().includes(query)
+                (d.city.toLowerCase().includes(query) || d.airportCode.toLowerCase().includes(query)) &&
+                !otherValue.includes(d.city.toLowerCase()) // Prevent same city
             );
 
             if (matches.length > 0) {
                 matches.forEach(d => {
                     const li = document.createElement("li");
                     li.classList.add("p-2", "hover:bg-gray-100", "cursor-pointer");
-                    li.innerText = `${d.from} (${d.fromCode}) → ${d.to} (${d.toCode})`;
+                    li.innerText = `${d.city} (${d.airportCode})`;
                     li.addEventListener("click", () => {
-                        if (input === fromInput) {
-                            input.value = `${d.from} (${d.fromCode})`;
-                        } else {
-                            input.value = `${d.to} (${d.toCode})`;
-                        }
+                        input.value = `${d.city} (${d.airportCode})`;
                         list.style.display = "none";
+
+                        // Clear other input if duplicate value exists
+                        if (otherInput.value.toLowerCase() === input.value.toLowerCase()) {
+                            otherInput.value = "";
+                        }
                     });
                     list.appendChild(li);
                 });
@@ -168,6 +173,25 @@ function updatePassengerSummary() {
 }
 
 // =====================================================
+// SWAP FROM/TO LOCATIONS - PREVENT DUPLICATE
+// =====================================================
+function swapLocations() {
+    const fromInput = document.getElementById('fromLoc');
+    const toInput = document.getElementById('toLoc');
+
+    // Prevent swap if both have same city
+    if (fromInput.value.toLowerCase() === toInput.value.toLowerCase()) return;
+
+    const temp = fromInput.value;
+    fromInput.value = toInput.value;
+    toInput.value = temp;
+
+    const btnIcon = document.querySelector('.swap-btn i');
+    btnIcon.style.transition = "transform 0.4s ease";
+    btnIcon.style.transform = btnIcon.style.transform === "rotate(180deg)" ? "rotate(0deg)" : "rotate(180deg)";
+}
+
+// =====================================================
 // SEARCH BUTTON
 // =====================================================
 function initSearchButton() {
@@ -184,13 +208,18 @@ function initSearchButton() {
             return;
         }
 
-        // Verify from/to exists in DB
-        const valid = state.destinations.some(d =>
-            from.includes(d.from) && to.includes(d.to)
-        );
+        // Validate cities exist in DB
+        const validFrom = state.destinations.some(d => from.toLowerCase().includes(d.city.toLowerCase()));
+        const validTo = state.destinations.some(d => to.toLowerCase().includes(d.city.toLowerCase()));
 
-        if (!valid) {
-            alert("Selected route is not available in the database");
+        if (!validFrom || !validTo) {
+            alert("Selected cities are not available in the database");
+            return;
+        }
+
+        // Prevent same city for both From/To
+        if (from.toLowerCase() === to.toLowerCase()) {
+            alert("Departure and destination cannot be the same city");
             return;
         }
 
