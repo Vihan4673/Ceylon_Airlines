@@ -43,8 +43,13 @@ public class AdServiceImpl implements AdService {
 
     @Override
     public List<AdDTO> getActiveAds() {
-        return adRepository.findByActiveTrue()
+        // Get ads that are active AND within date range
+        LocalDate today = LocalDate.now();
+        return adRepository.findAll()
                 .stream()
+                .filter(ad -> ad.isActive() &&
+                        (ad.getStartDate() == null || !ad.getStartDate().isAfter(today)) &&
+                        (ad.getEndDate() == null || !ad.getEndDate().isBefore(today)))
                 .map(ad -> modelMapper.map(ad, AdDTO.class))
                 .collect(Collectors.toList());
     }
@@ -84,8 +89,8 @@ public class AdServiceImpl implements AdService {
         ad.setPlacement(placement);
         ad.setStartDate(LocalDate.parse(startDate));
         ad.setEndDate(LocalDate.parse(endDate));
-        ad.setImageUrl("/uploads/" + filename); // relative path for frontend
-        ad.setActive(false); // default inactive
+        ad.setImageUrl("/uploads/" + filename); // path for frontend
+        ad.setActive(true); // ✅ make active by default
 
         // ✅ Save Ad to DB
         Ad savedAd = adRepository.save(ad);

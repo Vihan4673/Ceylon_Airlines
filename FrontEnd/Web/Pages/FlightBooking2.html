@@ -143,38 +143,11 @@
 
     <!-- Date Carousel -->
     <div class="bg-white rounded-lg shadow-xl border border-slate-100 mb-8 overflow-hidden">
-        <div class="text-center py-4 text-[#003366] font-bold border-b border-slate-50">
-            Saturday, 21 March 2026
+        <div id="current-date-display" class="text-center py-4 text-[#003366] font-bold border-b border-slate-50">
+            <!-- Current selected date will appear here -->
         </div>
         <div class="flex divide-x divide-slate-100 overflow-x-auto" id="date-selector">
-            <div class="date-card flex-1 p-4 text-center cursor-pointer hover:bg-slate-50" onclick="selectDate(this)">
-                <p class="text-[10px] text-slate-400 font-bold">LKR 128,725</p>
-                <p class="text-sm font-bold">Wed 18</p>
-            </div>
-            <div class="date-card flex-1 p-4 text-center cursor-pointer hover:bg-slate-50" onclick="selectDate(this)">
-                <p class="text-[10px] text-slate-400 font-bold">LKR 128,725</p>
-                <p class="text-sm font-bold">Thu 19</p>
-            </div>
-            <div class="date-card flex-1 p-4 text-center cursor-pointer hover:bg-slate-50" onclick="selectDate(this)">
-                <p class="text-[10px] text-slate-400 font-bold">LKR 128,725</p>
-                <p class="text-sm font-bold">Fri 20</p>
-            </div>
-            <div class="date-card active flex-1 p-4 text-center cursor-pointer" onclick="selectDate(this)">
-                <p class="text-[10px] font-bold">LKR 132,925</p>
-                <p class="text-sm font-bold"><i class="fas fa-check-circle mr-1"></i> Sat 21</p>
-            </div>
-            <div class="date-card flex-1 p-4 text-center cursor-pointer hover:bg-slate-50" onclick="selectDate(this)">
-                <p class="text-[10px] text-slate-400 font-bold">LKR 190,825</p>
-                <p class="text-sm font-bold">Sun 22</p>
-            </div>
-            <div class="date-card flex-1 p-4 text-center cursor-pointer hover:bg-slate-50" onclick="selectDate(this)">
-                <p class="text-[10px] text-slate-400 font-bold">LKR 138,225</p>
-                <p class="text-sm font-bold">Mon 23</p>
-            </div>
-            <div class="date-card flex-1 p-4 text-center cursor-pointer hover:bg-slate-50" onclick="selectDate(this)">
-                <p class="text-[10px] text-slate-400 font-bold">LKR 128,725</p>
-                <p class="text-sm font-bold">Tue 24</p>
-            </div>
+            <!-- Date cards will be dynamically generated here -->
         </div>
     </div>
 

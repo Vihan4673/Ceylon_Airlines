@@ -24,10 +24,14 @@ public class BookingController {
     public ResponseEntity<APIResponse<BookingDTO>> createBooking(
             @Valid @RequestBody BookingDTO bookingDTO) {
 
-        BookingDTO savedBooking = bookingService.saveBooking(bookingDTO);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new APIResponse<>(201, "Booking created successfully", savedBooking));
+        try {
+            BookingDTO savedBooking = bookingService.saveBooking(bookingDTO);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new APIResponse<>(201, "Booking created successfully", savedBooking));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new APIResponse<>(400, "Failed to create booking: " + e.getMessage(), null));
+        }
     }
 
     // ================= UPDATE BOOKING =================
@@ -36,44 +40,48 @@ public class BookingController {
             @PathVariable Long id,
             @Valid @RequestBody BookingDTO bookingDTO) {
 
-        bookingDTO.setId(id);
-        BookingDTO updatedBooking = bookingService.updateBooking(bookingDTO);
-
-        return ResponseEntity.ok(
-                new APIResponse<>(200, "Booking updated successfully", updatedBooking)
-        );
+        try {
+            bookingDTO.setId(id);
+            BookingDTO updatedBooking = bookingService.updateBooking(bookingDTO);
+            return ResponseEntity.ok(new APIResponse<>(200, "Booking updated successfully", updatedBooking));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new APIResponse<>(400, "Failed to update booking: " + e.getMessage(), null));
+        }
     }
 
     // ================= DELETE BOOKING =================
     @DeleteMapping("/{id}")
     public ResponseEntity<APIResponse<String>> deleteBooking(@PathVariable Long id) {
-
-        bookingService.deleteBooking(id);
-
-        return ResponseEntity.ok(
-                new APIResponse<>(200, "Booking deleted successfully", null)
-        );
+        try {
+            bookingService.deleteBooking(id);
+            return ResponseEntity.ok(new APIResponse<>(200, "Booking deleted successfully", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new APIResponse<>(404, "Booking not found: " + e.getMessage(), null));
+        }
     }
 
     // ================= GET ALL BOOKINGS =================
     @GetMapping
     public ResponseEntity<APIResponse<List<BookingDTO>>> getAllBookings() {
-
         List<BookingDTO> bookingList = bookingService.getAllBookings();
-
-        return ResponseEntity.ok(
-                new APIResponse<>(200, "Bookings retrieved successfully", bookingList)
-        );
+        return ResponseEntity.ok(new APIResponse<>(200, "Bookings retrieved successfully", bookingList));
     }
 
     // ================= GET BOOKING BY ID =================
     @GetMapping("/{id}")
     public ResponseEntity<APIResponse<BookingDTO>> getBookingById(@PathVariable Long id) {
-
-        BookingDTO bookingDTO = bookingService.searchBookingByID(id);
-
-        return ResponseEntity.ok(
-                new APIResponse<>(200, "Booking retrieved successfully", bookingDTO)
-        );
+        try {
+            BookingDTO bookingDTO = bookingService.searchBookingByID(id);
+            return ResponseEntity.ok(new APIResponse<>(200, "Booking retrieved successfully", bookingDTO));
+        } catch (RuntimeException e) {
+            // If booking not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new APIResponse<>(404, "Booking not found: " + e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new APIResponse<>(500, "Error retrieving booking: " + e.getMessage(), null));
+        }
     }
 }

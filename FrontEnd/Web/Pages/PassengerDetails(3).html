@@ -87,15 +87,20 @@
                     Flight Summary
                 </p>
 
-                <p class="text-sm font-bold">
-                    <span id="summaryFrom"></span>
-                    <i class="fa-solid fa-arrow-right mx-2 text-[10px]"></i>
-                    <span id="summaryTo"></span>
-                </p>
+                <!-- Route Section -->
+                <div class="flex items-center gap-4">
+                    <div class="text-center">
+                        <p id="navFromCode" class="font-bold leading-none">---</p>
+                        <p id="navFromCity" class="text-[10px] opacity-70">---</p>
+                    </div>
 
-                <p class="text-xs text-gray-500 mt-1">
-                    <span id="summaryDep"></span>
-                </p>
+                    <i class="fas fa-arrows-alt-h opacity-50"></i>
+
+                    <div class="text-center">
+                        <p id="navToCode" class="font-bold leading-none">---</p>
+                        <p id="navToCity" class="text-[10px] opacity-70">---</p>
+                    </div>
+                </div>
             </div>
         </div>
 

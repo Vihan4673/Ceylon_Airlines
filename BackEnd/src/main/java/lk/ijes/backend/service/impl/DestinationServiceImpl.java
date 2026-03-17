@@ -30,21 +30,18 @@ public class DestinationServiceImpl implements DestinationService {
 
     @Override
     public DestinationDTO createDestination(DestinationDTO dto) {
-        if (dto.getFrom() == null || dto.getTo() == null) {
-            throw new RuntimeException("Origin and destination cannot be null");
+        if (dto.getCity() == null || dto.getAirportCode() == null) {
+            throw new RuntimeException("City and airport code cannot be null");
         }
 
         Destination destination = new Destination();
-        destination.setFrom(dto.getFrom());
-        destination.setTo(dto.getTo());
-        destination.setFromCode(dto.getFromCode());
-        destination.setToCode(dto.getToCode());
+        destination.setCity(dto.getCity());              // maps to 'to_city'
+        destination.setAirportCode(dto.getAirportCode());// maps to 'from_airport_code'
 
         Destination saved = destinationRepository.save(destination);
         return mapToDTO(saved);
     }
 
-    // ✅ New method to fetch all destinations
     @Override
     public List<DestinationDTO> getAllDestinations() {
         List<Destination> destinations = destinationRepository.findAll();
@@ -56,10 +53,8 @@ public class DestinationServiceImpl implements DestinationService {
     // Helper method to map entity to DTO
     private DestinationDTO mapToDTO(Destination destination) {
         return new DestinationDTO(
-                destination.getFrom(),
-                destination.getTo(),
-                destination.getFromCode(),
-                destination.getToCode()
+                destination.getCity(),        // DTO city
+                destination.getAirportCode()  // DTO airportCode
         );
     }
 }

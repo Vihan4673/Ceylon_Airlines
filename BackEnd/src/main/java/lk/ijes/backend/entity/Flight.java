@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 @Entity
 @Table(name = "flight")
 @AllArgsConstructor
@@ -47,4 +50,12 @@ public class Flight {
 
     @Column(nullable = false)
     private String businessFare;  // e.g., "50000"
+
+    /**
+     * Convert the flightDate String to LocalDate
+     */
+    public LocalDate getDate() {
+        if (flightDate == null || flightDate.isBlank()) return null;
+        return LocalDate.parse(flightDate, DateTimeFormatter.ISO_LOCAL_DATE);
+    }
 }

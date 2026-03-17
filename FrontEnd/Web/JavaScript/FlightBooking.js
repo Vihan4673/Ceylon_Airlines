@@ -7,13 +7,14 @@ const API_URL = "http://localhost:8080/api/v1/flights/getAllFlight";
 // READ URL PARAMETERS
 // =====================================================
 const params = new URLSearchParams(window.location.search);
+
 const searchFrom = params.get("from");
 const searchTo = params.get("to");
 const searchDate = params.get("dep");
 const searchReturn = params.get("ret");
 
 // =====================================================
-// SINGLE STATE OBJECT
+// STATE OBJECT
 // =====================================================
 let state = {
     adults: parseInt(params.get("adults")) || 1,
@@ -25,35 +26,136 @@ let state = {
 };
 
 // =====================================================
-// UPDATE NAVBAR
+// GENERATE DATE CAROUSEL
 // =====================================================
-function updateNavbar() {
-    const totalPassengers = state.adults + state.children + state.infants;
+function generateDateCarousel() {
 
-    if (searchFrom) {
-        document.getElementById("navFromCode").innerText = searchFrom;
-        document.getElementById("navFromCity").innerText = searchFrom;
-    }
-    if (searchTo) {
-        document.getElementById("navToCode").innerText = searchTo;
-        document.getElementById("navToCity").innerText = searchTo;
-    }
-    if (searchDate) {
-        document.getElementById("navDepart").innerText = formatDate(searchDate);
-    }
-    document.getElementById("navReturn").innerText =
-        searchReturn ? formatDate(searchReturn) : "-";
+    const container = document.getElementById("date-selector");
+    if (!container) return;
 
-    document.getElementById("navPassengers").innerText =
-        `${totalPassengers} Traveler${totalPassengers > 1 ? "s" : ""}`;
+    container.innerHTML = "";
+
+    const baseDate = new Date(searchDate || new Date());
+
+    for (let offset = -3; offset <= 3; offset++) {
+
+        const date = new Date(baseDate);
+        date.setDate(baseDate.getDate() + offset);
+
+        const isoDate = date.toISOString().split("T")[0];
+
+        const card = document.createElement("div");
+
+        card.className =
+            "date-card flex-1 p-4 text-center cursor-pointer hover:bg-slate-50";
+
+        if (isoDate === state.selectedDate) {
+            card.classList.add("active");
+        }
+
+        card.dataset.date = isoDate;
+
+        const dayNumber = date.getDate();
+        const dayName = date.toLocaleDateString("en-GB", { weekday: "short" });
+
+        card.innerHTML = `
+            <p class="text-[10px] font-bold">LKR 128,725</p>
+            <p class="text-sm font-bold">${dayName} ${dayNumber}</p>
+        `;
+
+        card.onclick = () => selectDate(card);
+
+        container.appendChild(card);
+    }
+
+    updateHeaderDate(state.selectedDate);
 }
 
 // =====================================================
-// UPDATE HERO ROUTE TITLE
+// UPDATE HEADER DATE
+// =====================================================
+function updateHeaderDate(date) {
+
+    const header = document.getElementById("current-date-display");
+
+    if (!header || !date) return;
+
+    const d = new Date(date);
+
+    header.innerText = d.toLocaleDateString("en-GB", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    });
+}
+
+// =====================================================
+// SELECT DATE
+// =====================================================
+function selectDate(el) {
+
+    document
+        .querySelectorAll("#date-selector .date-card")
+        .forEach(card => card.classList.remove("active"));
+
+    el.classList.add("active");
+
+    state.selectedDate = el.dataset.date;
+
+    updateHeaderDate(state.selectedDate);
+
+    loadFlights();
+}
+
+// =====================================================
+// UPDATE NAVBAR
+// =====================================================
+function updateNavbar() {
+
+    const totalPassengers =
+        state.adults + state.children + state.infants;
+
+    if (searchFrom) {
+        const el = document.getElementById("navFromCode");
+        const el2 = document.getElementById("navFromCity");
+        if (el) el.innerText = searchFrom;
+        if (el2) el2.innerText = searchFrom;
+    }
+
+    if (searchTo) {
+        const el = document.getElementById("navToCode");
+        const el2 = document.getElementById("navToCity");
+        if (el) el.innerText = searchTo;
+        if (el2) el2.innerText = searchTo;
+    }
+
+    if (searchDate) {
+        const el = document.getElementById("navDepart");
+        if (el) el.innerText = formatDate(searchDate);
+    }
+
+    const returnEl = document.getElementById("navReturn");
+    if (returnEl) {
+        returnEl.innerText = searchReturn ? formatDate(searchReturn) : "-";
+    }
+
+    const passengersEl = document.getElementById("navPassengers");
+    if (passengersEl) {
+        passengersEl.innerText =
+            `${totalPassengers} Traveler${totalPassengers > 1 ? "s" : ""}`;
+    }
+}
+
+// =====================================================
+// HERO ROUTE TITLE
 // =====================================================
 function updateHeroRoute() {
+
     const heroTitle = document.getElementById("heroRoute");
+
     if (!heroTitle) return;
+
     if (searchFrom && searchTo) {
         heroTitle.innerText = `${searchFrom} to ${searchTo}`;
     }
@@ -63,7 +165,9 @@ function updateHeroRoute() {
 // FORMAT DATE
 // =====================================================
 function formatDate(dateStr) {
+
     const date = new Date(dateStr);
+
     return date.toLocaleDateString("en-GB", {
         weekday: "short",
         day: "2-digit",
@@ -75,32 +179,46 @@ function formatDate(dateStr) {
 // LOAD FLIGHTS
 // =====================================================
 async function loadFlights() {
+
     try {
+
         const res = await fetch(API_URL);
         const result = await res.json();
 
         if (result.status === 200 && result.data) {
-            const flights = result.data.map(f => ({
+
+            let flights = result.data.map(f => ({
+
                 flightNumber: f.flightNumber,
-                airline: f.airlineName,
-                departureCode: f.departureCode,
-                arrivalCode: f.arrivalCode,
-                departureAirport: f.departureAirport,
-                arrivalAirport: f.arrivalAirport,
+                departureCode: f.departure,
+                arrivalCode: f.arrival,
                 departureTime: f.departureTime,
                 arrivalTime: f.arrivalTime,
                 duration: f.duration,
-                stops: f.stops,
                 economyFare: f.economyFare,
                 businessFare: f.businessFare,
-                economySeats: f.economySeats
+
+                flightDate: f.flightDate
+                    ? f.flightDate.split("T")[0]
+                    : null
+
             }));
+
+            // FILTER BY DATE
+            if (state.selectedDate) {
+
+                flights = flights.filter(
+                    f => f.flightDate === state.selectedDate
+                );
+            }
+
             renderFlights(flights);
-        } else {
-            console.error("No flights found");
         }
+
     } catch (err) {
-        console.error("Error fetching flights:", err);
+
+        console.error("Flight load error", err);
+
     }
 }
 
@@ -108,34 +226,64 @@ async function loadFlights() {
 // RENDER FLIGHTS
 // =====================================================
 function renderFlights(flights) {
-    const container = document.getElementById('flights-container');
-    container.innerHTML = '';
+
+    const container = document.getElementById("flights-container");
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    if (flights.length === 0) {
+
+        container.innerHTML = `
+        <div class="text-center p-10 text-gray-500">
+            No flights available for this date
+        </div>
+        `;
+
+        return;
+    }
 
     flights.forEach(f => {
-        const card = document.createElement('div');
-        card.className = 'flight-card shadow-sm flex flex-col md:flex-row p-4 border rounded mb-4';
+
+        const card = document.createElement("div");
+
+        card.className =
+            "flight-card shadow-sm flex flex-col md:flex-row p-4 border rounded mb-4";
 
         card.innerHTML = `
-            <div class="flex justify-between items-center w-full">
-                <div>
-                    <p class="font-bold">${f.departureCode} → ${f.arrivalCode}</p>
-                    <p class="text-sm text-gray-500">${f.flightNumber} • ${f.airline}</p>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-400">${f.duration} | ${f.stops > 0 ? f.stops + ' stops' : 'nonstop'}</p>
-                </div>
+        <div class="flex justify-between items-center w-full">
+
+            <div>
+                <p class="font-bold">${f.departureCode} → ${f.arrivalCode}</p>
+                <p class="text-sm text-gray-500">${f.flightNumber}</p>
             </div>
-            <div class="flex mt-3 gap-2">
-                <div class="fare-box p-2 border rounded cursor-pointer flex-1 text-center"
-                     onclick="selectFare(this,'Economy','${f.economyFare}','${f.flightNumber}','${f.departureCode}','${f.arrivalCode}')">
-                    Economy<br>${f.economyFare}<br>(${f.economySeats} seats)
-                </div>
-                <div class="fare-box p-2 border rounded cursor-pointer flex-1 text-center"
-                     onclick="selectFare(this,'Business','${f.businessFare}','${f.flightNumber}','${f.departureCode}','${f.arrivalCode}')">
-                    Business<br>${f.businessFare}
-                </div>
+
+            <div>
+                <p class="text-xs text-gray-400">${f.duration || ""}</p>
             </div>
+
+        </div>
+
+        <div class="flex mt-3 gap-2">
+
+            <div class="fare-box p-2 border rounded cursor-pointer flex-1 text-center"
+            onclick="selectFare(this,'Economy','${f.economyFare}','${f.flightNumber}','${f.departureCode}','${f.arrivalCode}')">
+
+            Economy<br>LKR ${f.economyFare}
+
+            </div>
+
+            <div class="fare-box p-2 border rounded cursor-pointer flex-1 text-center"
+            onclick="selectFare(this,'Business','${f.businessFare}','${f.flightNumber}','${f.departureCode}','${f.arrivalCode}')">
+
+            Business<br>LKR ${f.businessFare}
+
+            </div>
+
+        </div>
         `;
+
         container.appendChild(card);
     });
 }
@@ -144,8 +292,12 @@ function renderFlights(flights) {
 // SELECT FARE
 // =====================================================
 function selectFare(el, type, price, flightNumber, from, to) {
-    document.querySelectorAll('.fare-box').forEach(b => b.classList.remove('selected'));
-    el.classList.add('selected');
+
+    document
+        .querySelectorAll(".fare-box")
+        .forEach(b => b.classList.remove("selected"));
+
+    el.classList.add("selected");
 
     state.selectedFlight = {
         flightNumber,
@@ -158,37 +310,58 @@ function selectFare(el, type, price, flightNumber, from, to) {
         infants: state.infants,
         cabin: state.cabin
     };
-    localStorage.setItem('selectedFlight', JSON.stringify(state));
 
-    document.getElementById('selected-flight-text').innerText = `${from} → ${to} • ${type}`;
-    document.getElementById('total-price-display').innerText = price;
+    localStorage.setItem(
+        "selectedFlight",
+        JSON.stringify(state.selectedFlight)
+    );
 
-    document.getElementById('footer-summary').classList.remove('hidden');
+    const flightText = document.getElementById("selected-flight-text");
+    const priceText = document.getElementById("total-price-display");
+    const footer = document.getElementById("footer-summary");
+
+    if (flightText)
+        flightText.innerText = `${from} → ${to} • ${type}`;
+
+    if (priceText)
+        priceText.innerText = price;
+
+    if (footer)
+        footer.classList.remove("hidden");
 }
 
 // =====================================================
-// PASSENGER & CABIN MANAGEMENT
+// PASSENGER SUMMARY
 // =====================================================
-function updateCount(type, delta) {
-    const total = state.adults + state.children + state.infants + delta;
-    if (total > 9 || state[type] + delta < 0) return;
-    if (type === 'adults' && state.adults + delta < 1) return;
-
-    state[type] += delta;
-    document.getElementById(`${type}Count`).innerText = state[type];
-    updateSummary();
-}
-
-function updateClass(cabin) {
-    state.cabin = cabin;
-    updateSummary();
-}
-
 function updateSummary() {
-    const total = state.adults + state.children + state.infants;
-    document.getElementById('passengerSummary').innerText = `${total} Traveler${total > 1 ? 's' : ''}, ${state.cabin}`;
+
+    const total =
+        state.adults + state.children + state.infants;
+
+    const el = document.getElementById("passengerSummary");
+
+    if (!el) return;
+
+    el.innerText =
+        `${total} Traveler${total > 1 ? "s" : ""}, ${state.cabin}`;
 }
 
+// =====================================================
+// INITIALIZE
+// =====================================================
+document.addEventListener("DOMContentLoaded", () => {
+
+    updateNavbar();
+
+    updateHeroRoute();
+
+    generateDateCarousel();
+
+    loadFlights();
+
+    updateSummary();
+
+});
 // =====================================================
 // CONTINUE BUTTON
 // =====================================================

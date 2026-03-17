@@ -64,65 +64,60 @@
 </head>
 <body>
 
-<!-- Hero Section -->
 <div class="hero-banner">
-    <div class="bg-white/90 px-8 py-2 rounded shadow-md text-blue-900 font-semibold">
-        Colombo to Abu Dhabi
+    <div class="bg-white/90 px-8 py-2 rounded shadow-md text-blue-900 font-semibold" id="hero-text">
+
     </div>
 </div>
 
 <div class="max-w-4xl mx-auto px-4 py-8">
-
-    <!-- Your Flight Section -->
     <h2 class="section-title text-blue-900 uppercase tracking-wide text-sm mb-4">Your flight</h2>
-    <div class="card p-6">
+    <div class="card p-6" id="flight-summary-card">
         <div class="flex justify-between items-center border-b pb-4 mb-4">
-            <h3 class="font-bold text-blue-900">Colombo to Abu Dhabi <span class="font-normal text-gray-500">- Thursday, 5 March 2026</span></h3>
+            <h3 class="font-bold text-blue-900" id="flight-route">
+                <!-- route will be updated dynamically -->
+            </h3>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
             <!-- Flight Times -->
             <div class="flex justify-between items-center col-span-1">
                 <div class="text-center">
-                    <div class="text-blue-500 font-bold">18:50</div>
-                    <div class="font-bold text-blue-900 text-sm">CMB</div>
-                    <div class="text-[10px] text-gray-400">Bandaranaike International</div>
+                    <div class="text-blue-500 font-bold" id="departure-time"></div>
+                    <div class="font-bold text-blue-900 text-sm" id="departure-code"></div>
+                    <div class="text-[10px] text-gray-400" id="departure-airport"></div>
                 </div>
                 <div class="flex-1 px-4 text-center relative">
-                    <div class="text-[10px] text-gray-500">1 stop</div>
+                    <div class="text-[10px] text-gray-500" id="flight-stops"></div>
                     <div class="border-t-2 border-dotted border-blue-300 w-full mt-1"></div>
                     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 bg-white px-2">
                         <i class="fa-solid fa-plane text-blue-300 text-xs"></i>
                     </div>
                 </div>
                 <div class="text-center">
-                    <div class="text-blue-500 font-bold">03:50 <span class="text-[10px] align-top">+1 day</span></div>
-                    <div class="font-bold text-blue-900 text-sm">AUH</div>
-                    <div class="text-[10px] text-gray-400">Abu Dhabi Airport Terminal A</div>
+                    <div class="text-blue-500 font-bold" id="arrival-time"></div>
+                    <div class="font-bold text-blue-900 text-sm" id="arrival-code"></div>
+                    <div class="text-[10px] text-gray-400" id="arrival-airport"></div>
                 </div>
             </div>
 
             <!-- Flight Info -->
             <div class="text-xs text-gray-600">
-                <div class="mb-1"><i class="fa-regular fa-clock mr-1"></i> Duration 10h 30min</div>
-                <div class="flex items-start gap-1">
-                    <i class="fa-solid fa-plane-up mt-1"></i>
-                    <span><strong>UL 217</strong> operated by SriLankan Airlines <br> <strong>OR 1040</strong> operated by Qatar Airways</span>
-                </div>
+                <div class="mb-1"><i class="fa-regular fa-clock mr-1"></i> Duration <span id="flight-duration"></span></div>
+                <div class="flex items-start gap-1" id="flight-number-info"></div>
             </div>
 
             <!-- Fare Class -->
             <div class="flex justify-end items-center gap-4">
-                <div class="flex items-center text-blue-900 font-bold text-sm">
-                    <i class="fa-solid fa-ribbon mr-2 text-red-600"></i> ECO FLEX
-                </div>
+                <div class="flex items-center text-blue-900 font-bold text-sm" id="fare-class"></div>
                 <i class="fa-solid fa-chevron-down text-blue-900 cursor-pointer"></i>
             </div>
         </div>
     </div>
+
     <div class="text-right mb-8">
         <span class="text-blue-900 font-medium">Total price for flight:</span>
-        <span class="text-blue-900 font-bold text-lg">LKR 494,916</span>
+        <span class="text-blue-900 font-bold text-lg" id="total-price"></span>
     </div>
 
     <!-- Passenger Section -->

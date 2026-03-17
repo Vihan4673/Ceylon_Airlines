@@ -16,15 +16,10 @@ public class Destination {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "from_city", nullable = false)
-    private String from;        // e.g., "Colombo"
+    @Column(name = "city", nullable = false)
+    private String city;        // maps to DTO city
 
-    @Column(name = "to_city", nullable = false)
-    private String to;          // e.g., "Abu Dhabi"
+    @Column(name = "airport_code", nullable = false)
+    private String airportCode; // maps to DTO airportCode
 
-    @Column(name = "from_airport_code", nullable = false)
-    private String fromCode;    // e.g., "CMB"
-
-    @Column(name = "to_airport_code", nullable = false)
-    private String toCode;      // e.g., "AUH"
 }

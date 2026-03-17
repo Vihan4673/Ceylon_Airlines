@@ -1,4 +1,4 @@
-package lk.ijes.backend.config;
+package lk.ijes.backend.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
