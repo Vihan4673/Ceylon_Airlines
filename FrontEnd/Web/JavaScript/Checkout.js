@@ -41,7 +41,12 @@ function generatePNR() {
 function updateFlightSummary() {
     const flight = getFlightState();
 
-    setText("flight-route", `${flight.from || ""} to ${flight.to || ""} - ${formatFullDate(flight.date || flight.flightDate)}`);
+    setText(
+        "flight-route",
+        `${flight.from || ""} to ${flight.to || ""} - ${formatFullDate(
+            flight.date || flight.flightDate
+        )}`
+    );
     setText("departure-code", flight.from);
     setText("arrival-code", flight.to);
     setText("departure-time", flight.departureTime);
@@ -68,7 +73,10 @@ function calculateTotalPrice(flight) {
 function updatePassengerDetails() {
     const passenger = getPassenger();
     const nameEl = document.querySelector(".card span.font-bold.text-blue-900");
-    if (nameEl) nameEl.innerText = `${passenger.title || ""} ${passenger.firstName || ""} ${passenger.lastName || ""}`.trim();
+    if (nameEl)
+        nameEl.innerText = `${passenger.title || ""} ${passenger.firstName || ""} ${
+            passenger.lastName || ""
+        }`.trim();
 
     const info = document.querySelectorAll(".text-xs.text-gray-500");
     if (info.length >= 3) {
@@ -87,7 +95,7 @@ function updateSeatCard() {
 
     if (btn) {
         btn.innerText = flight.selectedSeat ? "Change your seat" : "Add seat";
-        btn.onclick = () => window.location.href = "../Pages/Seats.html";
+        btn.onclick = () => (window.location.href = "../Pages/Seats.html");
     }
 }
 
@@ -97,9 +105,8 @@ function updateHero() {
     if (el) el.innerText = `${flight.from || ""} to ${flight.to || ""}`;
 }
 
-
 // =====================================================
-// BOOKING FUNCTION (FINAL FIX 🔥)
+// BOOKING FUNCTION (FIXED 🔥)
 // =====================================================
 async function bookSeatAndProceed() {
     const flight = getFlightState();
@@ -110,11 +117,8 @@ async function bookSeatAndProceed() {
     if (!flight.flightNumber) return alert("Select flight first!");
     if (!flight.selectedSeat) return alert("Select seat first!");
 
-    // ✅ FIX: ensure date exists
-    const departureDate =
-        flight.departureDate ||
-        flight.date ||
-        flight.flightDate;
+    // ✅ Ensure departureDate exists
+    const departureDate = flight.departureDate || flight.date || flight.flightDate;
 
     if (!departureDate) {
         alert("❌ Flight date missing!");
@@ -123,17 +127,28 @@ async function bookSeatAndProceed() {
     }
 
     const bookingDTO = {
-        passenger: `${passenger.title || ""} ${passenger.firstName || ""} ${passenger.lastName || ""}`.trim(),
+        passenger: `${passenger.title || ""} ${passenger.firstName || ""} ${
+            passenger.lastName || ""
+        }`.trim(),
         flightNumber: flight.flightNumber,
         seat: flight.selectedSeat,
-        departureDate: departureDate,
-        travelClass: flight.type || "ECONOMY",
+
+        // ✅ Correct date format for backend
+        departureDate: new Date(departureDate).toISOString().split("T")[0],
+
+        // ✅ Ensure enum uppercase
+        travelClass: (flight.type || "ECONOMY").toUpperCase(),
+
         price: parseFloat(flight.price?.toString().replace(/[^0-9.-]+/g, "")) || 0,
-        origin: flight.from,
-        destination: flight.to,
+
+        origin: flight.from || "",
+        destination: flight.to || "",
+
         paid: false,
         status: "CONFIRMED"
     };
+
+    console.log("Booking DTO 👉", bookingDTO); // DEBUG before sending
 
     try {
         const res = await fetch("http://localhost:8080/api/v1/bookings", {
@@ -151,16 +166,13 @@ async function bookSeatAndProceed() {
 
         if (res.ok) {
             alert("✅ Booking created!");
-
             if (data?.data) {
                 localStorage.setItem("currentBooking", JSON.stringify(data.data));
                 goToPayment(data.data.id);
             }
-
         } else {
             alert(data?.message || "Booking failed!");
         }
-
     } catch (err) {
         console.error(err);
         alert("❌ Server not reachable!");
@@ -171,13 +183,12 @@ async function bookSeatAndProceed() {
 // PAYMENT PAGE REDIRECT
 // =====================================================
 function goToPayment(bookingId) {
-    // Store bookingId to verify payment on Payment page
     localStorage.setItem("bookingIdForPayment", bookingId);
     window.location.href = "../Pages/Pyment.html";
 }
 
 // =====================================================
-// PAYMENT SUCCESS FLOW (on Payment.html)
+// PAYMENT SUCCESS FLOW
 // =====================================================
 async function markBookingPaid() {
     const bookingId = localStorage.getItem("bookingIdForPayment");

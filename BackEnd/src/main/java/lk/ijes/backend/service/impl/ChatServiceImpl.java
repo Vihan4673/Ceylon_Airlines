@@ -18,7 +18,6 @@ import java.util.Map;
 public class ChatServiceImpl implements ChatService {
 
     private final WebClient webClient;
-    private final String API_KEY = "OPENAI_API_KEYA"; // ✅ Replace with your valid OpenAI key
     private final ChatRepository chatRepository;
 
     public ChatServiceImpl(ChatRepository chatRepository) {
