@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ceylon Air | Admin Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .primary-color { background-color: #8b1d41; }
+        .status-pill { transition: all 0.3s ease; cursor: pointer; }
+        .status-pill.active { background-color: #8b1d41; color: white; border-color: #8b1d41; box-shadow: 0 4px 12px rgba(139, 29, 65, 0.2); }
+        .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -10px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+<!-- Header -->
+<header class="bg-white border-b sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 primary-color rounded-2xl flex items-center justify-center text-white shadow-lg shadow-[#8b1d41]/20">
+                <i class="fas fa-shield-alt text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-extrabold text-xl text-gray-900 tracking-tight">Admin Portal</h1>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Baggage Control System</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="text-right hidden md:block">
+                <p id="userEmail" class="text-sm font-bold text-gray-700">Loading...</p>
+                <p class="text-[10px] text-green-500 font-bold uppercase">System Online</p>
+            </div>
+            <button onclick="openModal()" class="primary-color text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:opacity-90 transition-all active:scale-95">
+                <i class="fas fa-plus"></i> <span class="hidden sm:inline">Add Baggage</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-6 py-8">
+
+    <!-- Stats Row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center"><i class="fas fa-suitcase"></i></div>
+            <div><p class="text-gray-400 text-xs font-bold uppercase">Total Bags</p><h3 id="statTotal" class="text-2xl font-black text-gray-800">0</h3></div>
+        </div>
+        <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center"><i class="fas fa-qrcode"></i></div>
+            <div><p class="text-gray-400 text-xs font-bold uppercase">In Scanning</p><h3 id="statScan" class="text-2xl font-black text-gray-800">0</h3></div>
+        </div>
+        <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center"><i class="fas fa-plane-loading"></i></div>
+            <div><p class="text-gray-400 text-xs font-bold uppercase">Loading</p><h3 id="statLoad" class="text-2xl font-black text-gray-800">0</h3></div>
+        </div>
+        <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center"><i class="fas fa-check-double"></i></div>
+            <div><p class="text-gray-400 text-xs font-bold uppercase">Arrived</p><h3 id="statArrived" class="text-2xl font-black text-gray-800">0</h3></div>
+        </div>
+    </div>
+
+    <!-- Filter & Search -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div class="flex bg-white p-1 rounded-2xl border border-gray-100 shadow-sm overflow-x-auto max-w-full no-scrollbar">
+            <button onclick="setFilter('All')" id="f-All" class="filter-btn px-6 py-2 rounded-xl text-xs font-bold transition-all bg-gray-900 text-white">All Flights</button>
+            <div id="dynamicFilters" class="flex"></div>
+        </div>
+        <div class="relative w-full md:w-72">
+            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input type="text" id="searchInput" oninput="renderBaggages()" placeholder="Search Passport / Name..." class="w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl text-sm focus:ring-2 focus:ring-[#8b1d41]/20 outline-none transition-all">
+        </div>
+    </div>
+
+    <!-- Baggage List -->
+    <div id="baggageList" class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div class="col-span-full py-20 text-center bg-white rounded-[3rem] border-2 border-dashed border-gray-200">
+            <div class="text-gray-300 text-5xl mb-4"><i class="fas fa-box-open"></i></div>
+            <p class="text-gray-400 font-medium">No baggage records found.</p>
+        </div>
+    </div>
+</main>
+
+<!-- Modal -->
+<div id="modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-md">
+    <div class="bg-white rounded-[3rem] w-full max-w-lg overflow-hidden shadow-2xl animate-fade">
+        <div class="primary-color p-8 text-white relative">
+            <button onclick="closeModal()" class="absolute right-8 top-8 opacity-60 hover:opacity-100 transition"><i class="fas fa-times text-xl"></i></button>
+            <h3 class="text-2xl font-extrabold mb-1">Add New Baggage</h3>
+            <p class="text-white/60 text-sm font-medium">Create a new tracking record for a passenger.</p>
+        </div>
+        <form id="baggageForm" class="p-8 space-y-5">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Passport Number (Used as ID)</label>
+                    <input type="text" id="fPassport" required placeholder="Ex: N1234567" class="w-full px-5 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-[#8b1d41]/20 outline-none font-bold text-gray-700">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Passenger Name</label>
+                    <input type="text" id="fName" required placeholder="Ex: Kamal Perera" class="w-full px-5 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-[#8b1d41]/20 outline-none font-bold text-gray-700">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Flight Number</label>
+                    <input type="text" id="fFlight" required placeholder="Ex: UL-101" class="w-full px-5 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-[#8b1d41]/20 outline-none font-bold text-gray-700 uppercase">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Bag Tag (Option)</label>
+                    <input type="text" id="fTag" placeholder="Ex: BAG-001" class="w-full px-5 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-[#8b1d41]/20 outline-none font-bold text-gray-700">
+                </div>
+            </div>
+            <button type="submit" class="w-full primary-color text-white py-5 rounded-3xl font-bold text-lg shadow-xl shadow-[#8b1d41]/30 hover:-translate-y-1 transition-all active:scale-95">Save & Start Tracking</button>
+        </form>
+    </div>
+</div>
+
+<!-- Load JS module -->
+<script type="module" src="../js/Baggage.js"></script>
+
+</body>
+</html>

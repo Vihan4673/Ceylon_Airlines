@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ceylon Airlines | Secure Checkout</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+        }
+
+        .input-field {
+            @apply w-full px-5 py-4 bg-white/50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-[#8A1538]/10 focus:border-[#8A1538] outline-none transition-all font-semibold text-sm placeholder:text-slate-300;
+        }
+
+        .label-text {
+            @apply text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2 block ml-1;
+        }
+
+        /* Card Flip Animation Premium Styling */
+        .credit-card {
+            width: 100%;
+            height: 220px;
+            perspective: 1200px;
+        }
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+        .credit-card.flipped .card-inner { transform: rotateY(180deg); }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1.5rem;
+            @apply shadow-2xl overflow-hidden;
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #8A1538 0%, #4a0b1e 100%);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #4a0b1e 0%, #2a0511 100%);
+            padding: 0;
+        }
+
+        .magnetic-strip { height: 45px; background: #1a1a1a; width: 100%; margin-top: 25px; }
+        .cvv-area { @apply bg-white/10 h-12 mx-6 mt-6 flex items-center justify-end px-4 font-mono font-bold text-xl text-white tracking-widest border border-white/10 rounded-lg; }
+
+        .btn-pay {
+            background: #8A1538;
+            @apply text-white w-full py-5 rounded-2xl font-black uppercase tracking-[0.15em] transition-all hover:bg-[#6b102b] active:scale-[0.98] shadow-2xl shadow-[#8A1538]/30 disabled:opacity-50;
+        }
+
+        /* Summary Animations */
+        .summary-item { @apply flex justify-between items-center py-2 text-sm font-semibold; }
+        .summary-label { @apply text-slate-400 font-medium; }
+        .summary-value { @apply text-slate-700; }
+
+        .ticket-cutout {
+            position: relative;
+        }
+        .ticket-cutout::before, .ticket-cutout::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            background: #f8fafc;
+            border-radius: 50%;
+            z-index: 5;
+        }
+        .ticket-cutout::before { left: -10px; transform: translateY(-50%); }
+        .ticket-cutout::after { right: -10px; transform: translateY(-50%); }
+    </style>
+</head>
+<body class="antialiased">
+
+<div class="min-h-screen flex flex-col items-center justify-center p-6 md:p-12">
+
+    <!-- Brand Header -->
+    <div class="mb-12 text-center">
+        <div class="flex items-center justify-center gap-3 mb-3">
+            <div class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center">
+                <i class="fa-solid fa-plane-up text-[#8A1538] text-2xl"></i>
+            </div>
+            <span class="text-2xl font-black uppercase tracking-tighter text-slate-900">Ceylon <span class="text-[#8A1538]">Airlines</span></span>
+        </div>
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-white rounded-full shadow-sm border border-slate-100">
+            <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">256-Bit SSL Encrypted Secure Payment</span>
+        </div>
+    </div>
+
+    <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+        <!-- Left Column: Summary -->
+        <div class="lg:col-span-5 order-2 lg:order-1 space-y-6">
+            <div class="glass-card p-10">
+                <h3 class="text-lg font-black mb-8 text-slate-800 flex items-center gap-3">
+                    <i class="fa-solid fa-receipt text-[#8A1538]"></i>
+                    Order Summary
+                </h3>
+
+                <div class="space-y-6">
+                    <!-- Ticket Design -->
+                    <div class="bg-gradient-to-br from-slate-50 to-white p-6 rounded-[1.5rem] border border-slate-100 shadow-inner relative ticket-cutout">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <p class="text-[9px] font-black text-[#8A1538] uppercase tracking-widest mb-1">Booking Ref</p>
+                                <p id="summary-pnr" class="font-mono text-xl font-black text-slate-800">CEY92X</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Flight</p>
+                                <span class="bg-white px-2.5 py-1 rounded-lg border font-black text-[10px] shadow-sm">FLT-503</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="text-left">
+                                <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">From</p>
+                                <p id="summary-from" class="text-sm font-black text-slate-800">Colombo</p>
+                            </div>
+                            <div class="flex-1 px-4 flex flex-col items-center">
+                                <i class="fa-solid fa-plane text-[#8A1538] text-xs"></i>
+                                <div class="w-full h-[1px] bg-slate-200 mt-2 relative"></div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">To</p>
+                                <p id="summary-to" class="text-sm font-black text-slate-800">London</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-dashed border-slate-200">
+                            <p class="text-[9px] text-slate-400 font-bold uppercase mb-1">Passenger</p>
+                            <p id="summary-name" class="text-xs font-black text-slate-700">Kasun Jayasekara</p>
+                        </div>
+                    </div>
+
+                    <!-- Pricing -->
+                    <div class="px-2 space-y-3">
+                        <div class="summary-item">
+                            <span class="summary-label">Base Fare</span>
+                            <span id="base-fare" class="summary-value">$820.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Taxes & Fees</span>
+                            <span class="summary-value">$30.00</span>
+                        </div>
+                        <div class="pt-6 border-t border-slate-100 flex justify-between items-end">
+                            <div>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Total Payable</p>
+                                <p id="total-amount" class="text-3xl font-black text-slate-900">$850.00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-center gap-6 opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" class="h-4">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" class="h-6">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-4">
+            </div>
+        </div>
+
+        <!-- Right Column: Payment Form -->
+        <div class="lg:col-span-7 order-1 lg:order-2">
+            <div class="glass-card p-10 md:p-14">
+
+                <!-- Live Card Preview -->
+                <div class="credit-card mb-12 mx-auto max-w-sm" id="card-preview">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="flex justify-between items-start">
+                                <div class="w-12 h-10 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-lg opacity-80 relative overflow-hidden">
+                                    <div class="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-[1px]">
+                                        <div class="border border-black/10"></div><div class="border border-black/10"></div><div class="border border-black/10"></div>
+                                        <div class="border border-black/10"></div><div class="border border-black/10"></div><div class="border border-black/10"></div>
+                                        <div class="border border-black/10"></div><div class="border border-black/10"></div><div class="border border-black/10"></div>
+                                    </div>
+                                </div>
+                                <i class="fa-brands fa-cc-visa text-4xl text-white/90"></i>
+                            </div>
+                            <div class="mt-10">
+                                <p id="view-number" class="text-xl md:text-2xl font-mono tracking-[4px] font-bold text-white text-shadow">**** **** **** ****</p>
+                            </div>
+                            <div class="mt-auto flex justify-between items-end">
+                                <div>
+                                    <p class="text-[8px] font-black uppercase opacity-60 tracking-widest mb-1">Card Holder</p>
+                                    <p id="view-name" class="text-xs font-bold uppercase tracking-[0.2em]">Your Name</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[8px] font-black uppercase opacity-60 tracking-widest mb-1">Expires</p>
+                                    <p id="view-expiry" class="text-xs font-bold tracking-widest">MM/YY</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-back">
+                            <div class="magnetic-strip"></div>
+                            <div class="px-6 mt-8">
+                                <p class="text-[9px] font-black text-white/40 uppercase mb-2">Authorized Signature</p>
+                                <div class="bg-white/10 h-10 rounded w-2/3 border border-white/5"></div>
+                            </div>
+                            <p class="text-[8px] font-black text-white/40 ml-6 mt-6 uppercase">CVV / Security Code</p>
+                            <div class="cvv-area" id="view-cvv">***</div>
+                            <div class="px-8 mt-8 opacity-30">
+                                <p class="text-[6px] text-center leading-tight">This card is issued by Ceylon Airlines Finance. If found, please return to any Ceylon Airlines ticket counter.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="payment-form" onsubmit="handlePayment(event)" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label class="label-text">Cardholder Full Name</label>
+                            <input type="text" id="card-name" placeholder="KASUN JAYASEKARA" class="input-field" required>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="label-text">Card Number</label>
+                            <div class="relative">
+                                <input type="text" id="card-number" placeholder="0000 0000 0000 0000" maxlength="19" class="input-field" required>
+                                <i class="fa-solid fa-lock absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="label-text">Expiration (MM/YY)</label>
+                            <input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5" class="input-field" required>
+                        </div>
+
+                        <div>
+                            <label class="label-text">Security Code</label>
+                            <input type="password" id="card-cvv" placeholder="***" maxlength="3" class="input-field" required>
+                        </div>
+                    </div>
+
+                    <div class="pt-6">
+                        <button type="submit" id="submit-btn" class="btn-pay group">
+                            <span id="btn-text">Confirm & Pay <span class="ml-2 font-black">$850.00</span></span>
+                            <i id="btn-spinner" class="fa-solid fa-circle-notch fa-spin hidden"></i>
+                        </button>
+                    </div>
+
+                    <p class="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                        By clicking, you agree to our <a href="#" class="text-[#8A1538] underline">terms of service</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal Overlay -->
+<div id="success-overlay" class="fixed inset-0 bg-slate-900/90 backdrop-blur-xl z-[100] hidden flex items-center justify-center p-6">
+    <div class="bg-white rounded-[4rem] p-12 max-w-md w-full text-center shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
+
+        <div class="w-24 h-24 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 text-5xl mx-auto mb-8 shadow-inner">
+            <i class="fa-solid fa-check"></i>
+        </div>
+
+        <h2 class="text-3xl font-black text-slate-900 mb-4 tracking-tighter">Payment Confirmed!</h2>
+        <p class="text-sm text-slate-500 font-medium mb-10 leading-relaxed">
+            Success! Your booking is confirmed. Your e-ticket has been dispatched to your email address.
+        </p>
+
+        <div class="bg-slate-50 rounded-[2rem] p-6 mb-10 border border-slate-100 space-y-3">
+            <div class="flex justify-between text-[11px] font-black uppercase tracking-widest">
+                <span class="text-slate-400">Reference ID</span>
+                <span class="text-slate-900">#TXN-992182</span>
+            </div>
+            <div class="flex justify-between text-[11px] font-black uppercase tracking-widest">
+                <span class="text-slate-400">Processed On</span>
+                <span id="success-date" class="text-slate-900">Oct 24, 2023</span>
+            </div>
+        </div>
+
+        <button onclick="location.reload()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs hover:bg-[#8A1538] transition-all shadow-xl shadow-slate-200">
+            Back to Dashboard
+        </button>
+    </div>
+</div>
+
+<script src="../JavaScript/Payment.js"></script>
+</body>
+</html>

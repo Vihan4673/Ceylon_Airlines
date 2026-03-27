@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ceylon Air | Settings & User Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .glass-card { @apply bg-white border border-slate-200 rounded-[2rem] shadow-sm; }
+        .input-field { @apply w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-[#8A1538]/10 focus:border-[#8A1538] transition-all font-semibold; }
+        .btn-primary { @apply bg-[#8A1538] text-white px-6 py-4 rounded-2xl font-bold text-sm hover:bg-[#6a102b] transition-all shadow-lg shadow-[#8A1538]/20 active:scale-95 flex items-center justify-center gap-2; }
+        .btn-secondary { @apply bg-slate-100 text-slate-800 px-5 py-3 rounded-xl font-bold text-xs hover:bg-slate-200 transition-all flex items-center gap-2; }
+    </style>
+</head>
+<body class="p-4 md:p-8 animate-fade-in">
+
+<div class="max-w-6xl mx-auto space-y-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <h2 class="text-2xl font-black text-slate-800">Account & System Settings</h2>
+            <p class="text-sm text-slate-500 font-medium">Manage your security credentials and administrative access.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Left Column: Security & Password -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="glass-card p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800">Security</h3>
+                </div>
+
+                <form onsubmit="event.preventDefault(); showToast('Success', 'Password updated successfully!');" class="space-y-4">
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Current Password</label>
+                        <input type="password" placeholder="••••••••" class="input-field">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">New Password</label>
+                        <input type="password" placeholder="••••••••" class="input-field">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Confirm New Password</label>
+                        <input type="password" placeholder="••••••••" class="input-field">
+                    </div>
+                    <button type="submit" class="btn-primary w-full mt-4">
+                        Update Password
+                    </button>
+                </form>
+            </div>
+
+            <!-- Info Card -->
+            <div class="bg-slate-900 rounded-[2rem] p-8 text-white relative overflow-hidden">
+                <i class="fas fa-lock absolute -right-4 -bottom-4 text-8xl opacity-10"></i>
+                <h4 class="font-bold mb-2">Password Policy</h4>
+                <p class="text-xs text-slate-400 leading-relaxed">Passwords must be at least 12 characters long and include a mix of uppercase letters, numbers, and symbols.</p>
+            </div>
+        </div>
+
+        <!-- Right Column: Team Management -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="glass-card p-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-users-cog"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800">Access Management</h3>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Employee & Administrator Controls</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleModal(true)" class="btn-secondary">
+                        <i class="fas fa-plus"></i> Add New User
+                    </button>
+                </div>
+
+                <!-- User Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="border-b border-slate-100">
+                        <tr>
+                            <th class="pb-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">User Details</th>
+                            <th class="pb-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Designation</th>
+                            <th class="pb-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status</th>
+                            <th class="pb-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                        <tr class="group">
+                            <td class="py-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://ui-avatars.com/api/?name=Arjun+Silva&background=8A1538&color=fff" class="w-9 h-9 rounded-xl">
+                                    <div>
+                                        <p class="font-bold text-slate-800">Arjun Silva</p>
+                                        <p class="text-[10px] text-slate-400">arjun.s@ceylonair.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4">
+                                <span class="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-[10px] font-black uppercase tracking-widest">Super Admin</span>
+                            </td>
+                            <td class="py-4">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    <span class="text-[10px] font-bold text-slate-600">Active</span>
+                                </div>
+                            </td>
+                            <td class="py-4 text-right">
+                                <div class="flex justify-end gap-2">
+                                    <button class="text-slate-300 hover:text-slate-600 transition-all"><i class="fas fa-pen text-xs"></i></button>
+                                    <button class="text-slate-300 hover:text-red-500 transition-all"><i class="fas fa-trash-alt text-xs"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="group">
+                            <td class="py-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://ui-avatars.com/api/?name=Sarah+Fernando&background=e2e8f0" class="w-9 h-9 rounded-xl">
+                                    <div>
+                                        <p class="font-bold text-slate-800">Sarah Fernando</p>
+                                        <p class="text-[10px] text-slate-400">sarah.f@ceylonair.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4">
+                                <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest">Flight Ops</span>
+                            </td>
+                            <td class="py-4">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    <span class="text-[10px] font-bold text-slate-600">Active</span>
+                                </div>
+                            </td>
+                            <td class="py-4 text-right">
+                                <div class="flex justify-end gap-2">
+                                    <button class="text-slate-300 hover:text-slate-600 transition-all"><i class="fas fa-pen text-xs"></i></button>
+                                    <button class="text-slate-300 hover:text-red-500 transition-all"><i class="fas fa-trash-alt text-xs"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div id="addModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl scale-95 transition-all">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h3 class="font-black text-xl text-slate-800">Register New User</h3>
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Assign system permissions</p>
+            </div>
+            <button onclick="toggleModal(false)" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 flex items-center justify-center transition-all"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="space-y-4">
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+                <input type="text" placeholder="John Doe" class="input-field">
+            </div>
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Corporate Email</label>
+                <input type="email" placeholder="john@ceylonair.com" class="input-field">
+            </div>
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Access Level</label>
+                <div class="relative">
+                    <select class="input-field appearance-none cursor-pointer">
+                        <option>System Administrator</option>
+                        <option>Flight Operations Manager</option>
+                        <option>Ground Support Staff</option>
+                        <option>Customer Relations</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></i>
+                </div>
+            </div>
+            <button onclick="toggleModal(false); showToast('User Created', 'Access credentials sent to email.')" class="btn-primary w-full mt-6">
+                Create User Account
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed bottom-10 right-10 z-[100] transform translate-y-32 opacity-0 transition-all duration-500">
+    <div class="bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-white/10">
+        <div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-[10px]">
+            <i class="fas fa-check"></i>
+        </div>
+        <div>
+            <p class="text-xs font-bold" id="toast-title">Success</p>
+            <p class="text-[10px] text-slate-400" id="toast-msg">Operation completed.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleModal(show) {
+        const modal = document.getElementById('addModal');
+        if(show) {
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.firstElementChild.classList.remove('scale-95'), 10);
+        } else {
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+    }
+
+    function showToast(title, msg) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toast-title').innerText = title;
+        document.getElementById('toast-msg').innerText = msg;
+        toast.classList.remove('translate-y-32', 'opacity-0');
+        setTimeout(() => {
+            toast.classList.add('translate-y-32', 'opacity-0');
+        }, 3000);
+    }
+</script>
+</body>
+</html>

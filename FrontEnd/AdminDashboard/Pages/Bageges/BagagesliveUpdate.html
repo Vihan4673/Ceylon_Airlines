@@ -1,0 +1,291 @@
+import React, { useState, useEffect } from 'react';
+import {
+ShieldCheck,
+Package,
+AlertOctagon,
+PlaneTakeoff,
+PlaneLanding,
+Search,
+Bell,
+Filter,
+MoreVertical,
+ChevronRight,
+User,
+MapPin,
+Clock,
+CheckCircle,
+XCircle,
+AlertTriangle,
+FileText,
+TrendingUp,
+Activity
+} from 'lucide-react';
+
+const App = () => {
+const [view, setView] = useState('inventory'); // inventory, incidents, analytics
+const [searchTerm, setSearchTerm] = useState('');
+const [notifications, setNotifications] = useState(3);
+
+// --- LIVE BAGGAGE DATA ---
+const [baggageData, setBaggageData] = useState([
+{ id: 'UL-B00192', passenger: 'Nimal Sirisena', flight: 'UL 504', weight: '23kg', status: 'In Sorting', lastSeen: 'BIA Terminal 1', priority: 'High', color: 'bg-blue-500' },
+{ id: 'UL-B00210', passenger: 'Saman Kumara', flight: 'UL 102', weight: '18kg', status: 'Loaded', lastSeen: 'Aircraft Hold A2', priority: 'Normal', color: 'bg-emerald-500' },
+{ id: 'UL-B00255', passenger: 'Jane Doe', flight: 'UL 504', weight: '31kg', status: 'Delayed', lastSeen: 'Transfer Desk', priority: 'Urgent', color: 'bg-rose-500' },
+{ id: 'UL-B00302', passenger: 'Perera M.', flight: 'UL 202', weight: '12kg', status: 'Offloaded', lastSeen: 'Baggage Belt 04', priority: 'Normal', color: 'bg-amber-500' },
+]);
+
+// --- PASSENGER INCIDENT REPORTS ---
+const [incidents, setIncidents] = useState([
+{ id: 'INC-7721', type: 'Damaged', tag: 'UL-B0099', passenger: 'Kamal Perera', details: 'Handle broken during transit', time: '1 hour ago', status: 'New' },
+{ id: 'INC-7725', type: 'Lost', tag: 'UL-B0082', passenger: 'Meena K.', details: 'Bag not arrived at London Heathrow', time: '3 hours ago', status: 'Investigating' },
+]);
+
+// --- ACTIONS ---
+const updateBagStatus = (id, newStatus) => {
+setBaggageData(prev => prev.map(bag =>
+bag.id === id ? { ...bag, status: newStatus } : bag
+));
+setNotifications(prev => prev + 1);
+};
+
+const resolveIncident = (id) => {
+setIncidents(prev => prev.map(inc =>
+inc.id === id ? { ...inc, status: 'Resolved' } : inc
+));
+};
+
+return (
+<div className="flex h-screen bg-[#0f172a] text-slate-200 font-sans overflow-hidden">
+
+  {/* Sidebar - Pro UI */}
+  <aside className="w-72 bg-[#1e293b] border-r border-slate-700/50 flex flex-col">
+    <div className="p-8 flex items-center gap-3">
+      <div className="w-10 h-10 bg-rose-600 rounded-xl flex items-center justify-center shadow-lg shadow-rose-900/20">
+        <PlaneTakeoff className="text-white" size={24} />
+      </div>
+      <div>
+        <h1 className="text-xl font-bold tracking-tight text-white leading-none">CEYLON<span className="text-rose-500 underline decoration-2 underline-offset-4">AIR</span></h1>
+        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Ground Control v4.0</span>
+      </div>
+    </div>
+
+    <nav className="flex-1 px-4 space-y-1 mt-4">
+      <button onClick={() => setView('inventory')} className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${view === 'inventory' ? 'bg-rose-600 text-white font-bold' : 'text-slate-400 hover:bg-slate-800'}`}>
+      <div className="flex items-center gap-3"><Package size={20}/> Baggage Hub</div>
+      <span className="text-xs bg-black/20 px-2 py-0.5 rounded-full">{baggageData.length}</span>
+      </button>
+      <button onClick={() => setView('incidents')} className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${view === 'incidents' ? 'bg-rose-600 text-white font-bold' : 'text-slate-400 hover:bg-slate-800'}`}>
+      <div className="flex items-center gap-3"><AlertOctagon size={20}/> Passenger Reports</div>
+      <span className="text-xs bg-rose-500 text-white px-2 py-0.5 rounded-full font-bold">{incidents.filter(i => i.status !== 'Resolved').length}</span>
+      </button>
+      <button className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800 rounded-xl transition-all">
+        <Activity size={20}/> Real-time Logs
+      </button>
+    </nav>
+
+    <div className="p-6">
+      <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-4">
+        <p className="text-[10px] font-bold text-slate-500 uppercase mb-3">System Health</p>
+        <div className="flex items-center gap-2 text-emerald-400 text-sm font-bold">
+          <CheckCircle size={14}/> All Terminals Online
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  {/* Main Layout */}
+  <div className="flex-1 flex flex-col relative overflow-hidden">
+
+    {/* Top Header */}
+    <header className="h-20 bg-[#1e293b]/50 backdrop-blur-md border-b border-slate-700/50 px-8 flex items-center justify-between z-10">
+      <div className="relative w-96">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+        <input
+                type="text"
+                placeholder="Search Tag ID or Passenger Name..."
+                className="w-full bg-[#0f172a] border border-slate-700 rounded-full py-2.5 pl-12 pr-6 text-sm focus:ring-2 focus:ring-rose-500 outline-none transition-all"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 border-r border-slate-700 pr-6">
+          <div className="text-right">
+            <p className="text-xs font-bold text-slate-400 uppercase">Current Station</p>
+            <p className="text-sm font-black text-white">BIA - COLOMBO</p>
+          </div>
+          <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-rose-500 border border-slate-700">
+            <MapPin size={20}/>
+          </div>
+        </div>
+        <div className="relative cursor-pointer">
+          <Bell size={24} className="text-slate-400"/>
+          {notifications > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-[#1e293b] animate-pulse">{notifications}</span>}
+        </div>
+      </div>
+    </header>
+
+    {/* Content Area */}
+    <main className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+
+      {/* Dashboard Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {[
+        { label: 'Active Transit', val: '1,284', icon: Package, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+        { label: 'Loading Now', val: '432', icon: PlaneTakeoff, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+        { label: 'Reported Issues', val: '12', icon: AlertTriangle, color: 'text-rose-400', bg: 'bg-rose-500/10' },
+        { label: 'Scan Accuracy', val: '99.8%', icon: TrendingUp, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+        ].map((stat, i) => (
+        <div key={i} className="bg-[#1e293b] p-6 rounded-[2rem] border border-slate-700/50 flex items-center justify-between">
+          <div>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{stat.label}</p>
+            <h3 className="text-2xl font-black text-white">{stat.val}</h3>
+          </div>
+          <div className={`w-12 h-12 ${stat.bg} ${stat.color} rounded-2xl flex items-center justify-center`}>
+            <stat.icon size={24} />
+          </div>
+        </div>
+        ))}
+      </div>
+
+      {view === 'inventory' ? (
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold flex items-center gap-2"><Package className="text-rose-500"/> Live Baggage Registry</h2>
+          <button className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-lg shadow-rose-900/20">
+            <Filter size={16}/> Filter Registry
+          </button>
+        </div>
+
+        <div className="bg-[#1e293b] rounded-[2rem] border border-slate-700/50 overflow-hidden shadow-2xl">
+          <table className="w-full text-left border-collapse">
+            <thead>
+            <tr className="bg-slate-800/50 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700">
+              <th className="px-8 py-5">Baggage Tag ID</th>
+              <th className="px-8 py-5">Passenger & Flight</th>
+              <th className="px-8 py-5">Last Scan Point</th>
+              <th className="px-8 py-5">Current Status</th>
+              <th className="px-8 py-5 text-right">Quick Action</th>
+            </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800">
+            {baggageData.filter(b => b.id.includes(searchTerm.toUpperCase()) || b.passenger.toLowerCase().includes(searchTerm.toLowerCase())).map((bag) => (
+            <tr key={bag.id} className="hover:bg-slate-800/30 transition-all group">
+              <td className="px-8 py-5">
+                <div className="flex items-center gap-3">
+                  <div className={`w-2 h-10 rounded-full ${bag.color}`}></div>
+                  <div>
+                    <p className="text-rose-500 font-mono font-black text-lg">{bag.id}</p>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase">{bag.weight} • {bag.priority}</p>
+                  </div>
+                </div>
+              </td>
+              <td className="px-8 py-5">
+                <p className="font-bold text-white">{bag.passenger}</p>
+                <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <PlaneTakeoff size={12}/> {bag.flight}
+                </div>
+              </td>
+              <td className="px-8 py-5">
+                <div className="flex items-center gap-2 text-slate-300 text-sm">
+                  <MapPin size={14} className="text-slate-500"/> {bag.lastSeen}
+                </div>
+                <p className="text-[10px] text-slate-500 mt-1 uppercase font-bold">Updated: Just Now</p>
+              </td>
+              <td className="px-8 py-5">
+                          <span className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm ${
+                                bag.status === 'Loaded' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                bag.status === 'Delayed' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                }`}>
+                {bag.status}
+                </span>
+              </td>
+              <td className="px-8 py-5 text-right">
+                <div className="flex items-center justify-end gap-2">
+                  <select
+                          onChange={(e) => updateBagStatus(bag.id, e.target.value)}
+                  className="bg-slate-900 border border-slate-700 text-[11px] font-bold rounded-xl px-3 py-2 outline-none cursor-pointer focus:ring-2 focus:ring-rose-500 transition-all text-slate-300"
+                  value={bag.status}
+                  >
+                  <option value="In Sorting">Move to Sorting</option>
+                  <option value="Loaded">Mark as Loaded</option>
+                  <option value="Delayed">Report Delay</option>
+                  <option value="Offloaded">Offload Bag</option>
+                  </select>
+                  <button className="p-2 hover:bg-slate-700 rounded-lg transition-all text-slate-500">
+                    <MoreVertical size={18}/>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      ) : (
+      <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+        <h2 className="text-xl font-bold flex items-center gap-2 mb-6"><AlertOctagon className="text-rose-500"/> Passenger Incident Queue</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {incidents.map((incident) => (
+          <div key={incident.id} className={`bg-[#1e293b] p-8 rounded-[2.5rem] border border-slate-700/50 relative overflow-hidden group transition-all hover:border-rose-500/30 ${incident.status === 'Resolved' ? 'opacity-60 grayscale' : ''}`}>
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex gap-4">
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${incident.type === 'Lost' ? 'bg-rose-500/20 text-rose-500' : 'bg-amber-500/20 text-amber-500'}`}>
+              {incident.type === 'Lost' ? <Search size={28}/> : <AlertTriangle size={28}/>}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black bg-slate-800 px-2 py-0.5 rounded text-slate-500 uppercase tracking-widest">{incident.id}</span>
+                <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest">• {incident.status}</span>
+              </div>
+              <h4 className="text-lg font-bold text-white mt-1">{incident.type} Baggage Claim</h4>
+              <p className="text-sm text-slate-400">Reporter: <span className="font-bold text-slate-200">{incident.passenger}</span></p>
+            </div>
+          </div>
+          <p className="text-[10px] font-bold text-slate-500">{incident.time}</p>
+        </div>
+
+        <div className="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 mb-6">
+          <p className="text-xs text-slate-400 leading-relaxed font-medium">"{incident.details}"</p>
+          <div className="flex items-center gap-4 mt-3 pt-3 border-t border-slate-800">
+            <div className="text-[10px] font-black text-slate-500 uppercase">Linked Tag: <span className="text-rose-500 ml-1">{incident.tag}</span></div>
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+          {incident.status !== 'Resolved' ? (
+          <>
+          <button onClick={() => resolveIncident(incident.id)} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-900/20 flex items-center justify-center gap-2">
+          <CheckCircle size={16}/> Resolve Issue
+            </button>
+            <button className="flex-1 bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border border-slate-700 flex items-center justify-center gap-2">
+              <FileText size={16}/> View Logs
+            </button>
+          </>
+          ) : (
+          <div className="w-full py-3 bg-slate-800/50 rounded-2xl text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Issue Resolved & Closed</div>
+          )}
+        </div>
+      </div>
+      ))}
+  </div>
+</div>
+)}
+</main>
+</div>
+
+{/* Styles for custom scrollbar */}
+<style>{`
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+  `}</style>
+</div>
+);
+};
+
+export default App;
