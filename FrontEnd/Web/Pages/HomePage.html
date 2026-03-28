@@ -52,14 +52,10 @@
         .step-line.active { background: #8b1d41; }
 
 
-        #chat-window {
-            display: none;
-            transition: all 0.3s ease;
-        }
-
-        #chat-window.active {
-            display: flex;
-        }
+        .hidden { display: none !important; }
+        #chat-messages table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+        #chat-messages th { background: #8b1d41; color: white; padding: 8px; text-align: left; border: 1px solid #ddd; }
+        #chat-messages td { padding: 8px; border: 1px solid #ddd; background: white; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -440,21 +436,19 @@
         </div>
     </div>
 </section>
-
-<!-- Chatbot UI -->
 <div class="fixed bottom-8 right-8 z-[100] flex flex-col items-end">
-    <!-- Chat Window -->
-    <div id="chat-window" class="w-[380px] h-[550px] bg-white rounded-[2rem] shadow-2xl flex flex-col overflow-hidden mb-6 border border-gray-100">
-        <!-- Chat Header -->
-        <div class="primary-color p-6 text-white flex items-center justify-between">
+
+    <div id="chat-window" class="hidden w-[380px] h-[550px] bg-white rounded-[2rem] shadow-2xl flex flex-col overflow-hidden mb-6 border border-gray-100 transition-all duration-300 animate-in fade-in slide-in-from-bottom-5">
+
+        <div class="bg-[#8b1d41] p-6 text-white flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
                     <i class="fas fa-robot text-lg"></i>
                 </div>
                 <div>
-                    <h4 class="font-bold text-sm">Ceylone AI Assistant</h4>
+                    <h4 class="font-bold text-sm">Ceylon AI Assistant</h4>
                     <p class="text-[10px] opacity-70 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span> Online now
+                        <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span> Online now
                     </p>
                 </div>
             </div>
@@ -463,48 +457,36 @@
             </button>
         </div>
 
-        <!-- Chat Messages -->
-        <div id="chat-messages" class="flex-1 overflow-y-auto p-6 flex flex-col chat-messages">
-            <!-- Bot Message -->
-            <div class="chat-bubble bot-bubble">
-                Ayubowan! 🙏 Welcome to Ceylone Airlines. I'm your AI travel assistant. How can I help you today?
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-6 flex flex-col gap-4 bg-gray-50 scroll-smooth">
+            <div class="self-start bg-white border border-gray-200 text-gray-800 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-sm shadow-sm">
+                Ayubowan! 🙏 Welcome to Ceylon Airlines. I'm your AI travel assistant. How can I help you today?
             </div>
 
-            <!-- Quick Actions -->
             <div class="flex flex-wrap gap-2 mt-2" id="quick-actions">
-                <button onclick="sendQuickMessage('Track my baggage')" class="text-[11px] font-bold border border-maroon-700 text-maroon-700 px-3 py-1.5 rounded-full hover:bg-maroon-700 hover:text-white transition">Track Baggage</button>
-                <button onclick="sendQuickMessage('Flight Status')" class="text-[11px] font-bold border border-maroon-700 text-maroon-700 px-3 py-1.5 rounded-full hover:bg-maroon-700 hover:text-white transition">Flight Status</button>
-                <button onclick="sendQuickMessage('Booking Help')" class="text-[11px] font-bold border border-maroon-700 text-maroon-700 px-3 py-1.5 rounded-full hover:bg-maroon-700 hover:text-white transition">Booking Help</button>
+                <button onclick="sendQuickMessage('Track my baggage')" class="text-[11px] font-bold border border-[#8b1d41] text-[#8b1d41] px-3 py-1.5 rounded-full hover:bg-[#8b1d41] hover:text-white transition">Track Baggage</button>
+                <button onclick="sendQuickMessage('Flight Status')" class="text-[11px] font-bold border border-[#8b1d41] text-[#8b1d41] px-3 py-1.5 rounded-full hover:bg-[#8b1d41] hover:text-white transition">Flight Status</button>
+                <button onclick="sendQuickMessage('Booking Help')" class="text-[11px] font-bold border border-[#8b1d41] text-[#8b1d41] px-3 py-1.5 rounded-full hover:bg-[#8b1d41] hover:text-white transition">Booking Help</button>
             </div>
         </div>
 
-        <!-- Typing Indicator -->
-        <div id="typing-indicator" class="px-6 py-2 hidden">
-            <div class="chat-bubble bot-bubble inline-flex gap-1 py-2">
-                <span class="typing-dot"></span>
-                <span class="typing-dot"></span>
-                <span class="typing-dot"></span>
-            </div>
-        </div>
-
-        <!-- Chat Input -->
-        <div class="p-4 bg-gray-50 border-t border-gray-100">
+        <div class="p-4 bg-white border-t border-gray-100">
             <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex gap-2">
-                <input type="text" id="user-input" placeholder="Ask me anything..." class="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-maroon-700 outline-none">
-                <button type="submit" class="bg-[#8b1d41] text-white w-12 h-12 rounded-xl flex items-center justify-center hover:bg-[#6a1632] transition shadow-lg">
+                <input type="text" id="user-input" placeholder="Ask me anything..."
+                       class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#8b1d41] outline-none">
+                <button type="submit" class="bg-[#8b1d41] text-white w-12 h-12 rounded-xl flex items-center justify-center hover:bg-[#6a1632] transition shadow-lg active:scale-95">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Floating Toggle Button -->
     <button onclick="toggleChat()" class="bg-[#8b1d41] w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-white text-2xl hover:scale-110 active:scale-95 transition-all duration-300 relative">
         <i id="chat-icon" class="fas fa-comment-dots"></i>
-        <!-- Notification Dot -->
         <span class="absolute top-0 right-0 w-4 h-4 bg-yellow-400 rounded-full border-2 border-white"></span>
     </button>
 </div>
+
+
 <section class="container mx-auto px-6 pb-32">
     <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
         <div>
@@ -754,7 +736,6 @@
 </script>
 <script src="../JavaScript/HomePageJS/PlanningSection.js"></script>
 <script src="../JavaScript/HomePageJS/HMFlightsSearch.js"></script>
-<script src="../JavaScript/HomePageJS/Server.js"></script>
 <script src="../JavaScript/HomePageJS/HMBaggage.js"></script>
 <script src="../JavaScript/HomePageJS/Chatbot.js"></script>
 </body>

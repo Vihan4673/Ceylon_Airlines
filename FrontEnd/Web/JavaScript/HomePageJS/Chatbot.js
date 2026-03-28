@@ -1,103 +1,75 @@
-document.addEventListener("DOMContentLoaded", () => {
+const chatWindow = document.getElementById('chat-window');
+const chatIcon = document.getElementById('chat-icon');
+const chatMessages = document.getElementById('chat-messages');
+const userInput = document.getElementById('user-input');
 
-    // =========================
-    // Toggle Chat Window
-    // =========================
-    function toggleChat() {
-        const chatWindow = document.getElementById("chat-window");
-        chatWindow.classList.toggle("hidden");
+// 1. Chat Window එක Open/Close කිරීම
+function toggleChat() {
+    if (chatWindow.classList.contains('hidden')) {
+        chatWindow.classList.remove('hidden');
+        chatIcon.className = 'fas fa-chevron-down';
+    } else {
+        chatWindow.classList.add('hidden');
+        chatIcon.className = 'fas fa-comment-dots';
     }
-    window.toggleChat = toggleChat; // make global for HTML onclick
+}
 
-    // =========================
-    // Scroll chat to bottom
-    // =========================
-    function scrollToBottom() {
-        const chatMessages = document.getElementById("chat-messages");
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+// 2. මැසේජ් එකක් යැවීම
+async function sendMessage() {
+    const message = userInput.value.trim();
+    if (message === "") return;
+
+    appendMessage('user', message);
+    userInput.value = '';
+
+    // Loading indicator එකක් පෙන්වීම
+    const loadingId = 'loading-' + Date.now();
+    appendMessage('ai', 'Thinking...', loadingId);
+
+    try {
+        const response = await fetch('http://localhost:8080/api/bot/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: message })
+        });
+
+        const data = await response.text();
+        document.getElementById(loadingId).innerHTML = data;
+
+    } catch (error) {
+        document.getElementById(loadingId).innerText = "Backend connection failed.";
+        console.error("Error:", error);
+    }
+}
+
+// 3. Quick buttons පාවිච්චි කිරීම
+function sendQuickMessage(text) {
+    userInput.value = text;
+    sendMessage();
+}
+
+// 4. Message Bubble එකක් Screen එකට දැමීම
+function appendMessage(role, text, id = null) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = role === 'user' ? 'self-end w-full flex justify-end' : 'self-start w-full flex justify-start';
+
+    const innerDiv = document.createElement('div');
+    if (id) innerDiv.id = id;
+
+    if (role === 'user') {
+        innerDiv.className = "bg-[#8b1d41] text-white p-3 rounded-2xl rounded-tr-none max-w-[85%] text-sm shadow-md";
+    } else {
+        innerDiv.className = "bg-white border border-gray-200 text-gray-800 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-sm shadow-sm";
     }
 
-    // =========================
-    // Add message bubble
-    // =========================
-    function addMessage(message, sender) {
-        const chatMessages = document.getElementById("chat-messages");
-        const bubble = document.createElement("div");
-        bubble.classList.add("chat-bubble");
-        if(sender === "bot") {
-            bubble.classList.add("bot-bubble");
-        } else {
-            bubble.classList.add("user-bubble");
-        }
-        bubble.textContent = message;
-        chatMessages.appendChild(bubble);
-        scrollToBottom();
-    }
+    innerDiv.innerHTML = text; // Table එක පෙන්වීමට innerHTML අත්‍යවශ්‍යයි
+    msgDiv.appendChild(innerDiv);
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
 
-    // =========================
-    // Typing indicator
-    // =========================
-    function showTyping(show) {
-        const typingIndicator = document.getElementById("typing-indicator");
-        typingIndicator.style.display = show ? "block" : "none";
-        scrollToBottom();
-    }
-
-    // =========================
-    // Handle sending chat
-    // =========================
-    async function handleChatSubmit(event) {
-        if(event) event.preventDefault();
-
-        const input = document.getElementById("user-input");
-        const message = input.value.trim();
-        if(!message) return;
-
-        addMessage(message, "user"); // add user message
-        input.value = "";
-        showTyping(true);
-
-        try {
-            const response = await fetch("http://localhost:8080/api/chat", {
-                method: "POST",
-                credentials: "include", // required if backend allowCredentials=true
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ message })
-            });
-
-            const data = await response.json();
-            showTyping(false);
-
-            if(data.reply) {
-                addMessage(data.reply, "bot");
-            } else if(data.message) {
-                addMessage("Server Error: " + data.message, "bot");
-            }
-
-        } catch(err) {
-            showTyping(false);
-            addMessage("Network Error: Could not reach server.", "bot");
-            console.error(err);
-        }
-    }
-    window.handleChatSubmit = handleChatSubmit; // global for form onsubmit
-
-    // =========================
-    // Quick buttons
-    // =========================
-    function sendQuickMessage(message) {
-        const input = document.getElementById("user-input");
-        input.value = message;
-        handleChatSubmit();
-    }
-    window.sendQuickMessage = sendQuickMessage; // global for onclick
-
-    // =========================
-    // Optional: open chat on page load
-    // =========================
-    const chatWindow = document.getElementById("chat-window");
-    chatWindow.classList.remove("hidden"); // remove if you want it hidden first
-
-});
+// 5. Form Submit එක පාලනය
+function handleChatSubmit(event) {
+    event.preventDefault();
+    sendMessage();
+}
