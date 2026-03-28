@@ -62,10 +62,12 @@ async function handlePayment(e) {
     // 🔴 වැදගත්: Backend එකේ 'paid' field එක Boolean (true/false) නිසා,
     // "PAID" වෙනුවට true ලෙස යැවිය යුතුය.
     // එසේම Spring Boot එකට අවශ්‍ය සියලුම fields මෙහි ඇති බව තහවුරු කරමු.
+    // 🔴 Add passenger email to the payload
     const updateData = {
-        id: currentBooking.id, // ID එක තිබේ නම් එයද යවමු
+        id: currentBooking.id,
         pnr: currentBooking.pnr,
         passenger: currentBooking.passenger,
+        email: currentBooking.email || "",      // ✅ ADD THIS LINE
         flightNumber: currentBooking.flightNumber,
         origin: currentBooking.origin,
         destination: currentBooking.destination,

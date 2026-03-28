@@ -120,8 +120,10 @@ async function bookSeatAndProceed() {
     const passengerName = `${passenger.title || ""} ${passenger.firstName || ""} ${passenger.lastName || ""}`.trim();
 
     // DTO mapping
+    // DTO mapping
     const bookingDTO = {
         passenger: passengerName,
+        email: passenger.email || "",       // ✅ add this line
         flightNumber: flight.flightNumber,
         seat: flight.selectedSeat,
         departureDate: departureDate,
