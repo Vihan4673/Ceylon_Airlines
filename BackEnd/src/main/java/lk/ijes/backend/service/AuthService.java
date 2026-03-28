@@ -30,6 +30,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     // application.properties eke dapu Client ID ekama methanata damma
+    private static final String GOOGLE_CLIENT_ID = "29624464708-i2hhl9f3bv3h77s9l9r9gb87ohmo1ccj.apps.googleusercontent.com";
 
     // ================= NORMAL LOGIN =================
     public AuthResponseDTO authenticate(AuthDTO authDTO) {
