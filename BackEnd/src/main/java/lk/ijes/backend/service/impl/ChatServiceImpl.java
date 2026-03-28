@@ -18,7 +18,7 @@ import java.util.Map;
 public class ChatServiceImpl implements ChatService {
 
     private final WebClient webClient;
-    private final String API_KEY = "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"; // ✅ Replace with your valid OpenAI key
+    private final String API_KEY = ""; // ✅ Replace with your valid OpenAI key
     private final ChatRepository chatRepository;
 
     public ChatServiceImpl(ChatRepository chatRepository) {
