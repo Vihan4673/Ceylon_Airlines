@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/bookings")
 public class BookingController {
@@ -41,27 +41,28 @@ public class BookingController {
                     .body(new APIResponse<>(400, "Failed to create booking: " + e.getMessage(), null));
         }
     }
-
-    // ================= UPDATE BOOKING =================
-    @PutMapping("/{id}")
-    public ResponseEntity<APIResponse<BookingDTO>> updateBooking(
-            @PathVariable Long id,
+    // ================= UPDATE BOOKING BY PNR =================
+    @PutMapping("/pnr/{pnr}")
+    public ResponseEntity<APIResponse<BookingDTO>> updateBookingByPnr(
+            @PathVariable String pnr,
             @Valid @RequestBody BookingDTO bookingDTO) {
 
         try {
+            // bookingDate එක null නම් වර්තමාන දිනය ලබා දෙමු
             if (bookingDTO.getBookingDate() == null) {
                 bookingDTO.setBookingDate(LocalDate.now());
             }
 
-            BookingDTO updatedBooking = bookingService.updateBooking(id, bookingDTO);
+            // 🔴 වැදගත්: BookingService එකේ updateBookingByPnr ලෙස අලුත් method එකක් තිබිය යුතුය
+            BookingDTO updatedBooking = bookingService.updateBookingByPnr(pnr, bookingDTO);
 
             return ResponseEntity.ok(
-                    new APIResponse<>(200, "Booking updated successfully", updatedBooking)
+                    new APIResponse<>(200, "Booking updated to PAID successfully", updatedBooking)
             );
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new APIResponse<>(400, "Failed to update booking: " + e.getMessage(), null));
+                    .body(new APIResponse<>(400, "Failed to update booking by PNR: " + e.getMessage(), null));
         }
     }
 

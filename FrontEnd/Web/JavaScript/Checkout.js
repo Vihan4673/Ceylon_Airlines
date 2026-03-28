@@ -6,7 +6,10 @@ function getFlightState() {
 }
 
 function getPassenger() {
-    return JSON.parse(localStorage.getItem("passengerInfo")) || {};
+    return JSON.parse(
+        localStorage.getItem("passengerInfo") ||
+        localStorage.getItem("currentPassenger")
+    ) || {};
 }
 
 // =====================================================
@@ -30,11 +33,6 @@ function setText(id, value) {
     if (el) el.innerText = value || "";
 }
 
-function generatePNR() {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
-}
-
 // =====================================================
 // UPDATE UI
 // =====================================================
@@ -43,9 +41,7 @@ function updateFlightSummary() {
 
     setText(
         "flight-route",
-        `${flight.from || ""} to ${flight.to || ""} - ${formatFullDate(
-            flight.date || flight.flightDate
-        )}`
+        `${flight.from || ""} to ${flight.to || ""} - ${formatFullDate(flight.date || flight.flightDate)}`
     );
     setText("departure-code", flight.from);
     setText("arrival-code", flight.to);
@@ -74,9 +70,7 @@ function updatePassengerDetails() {
     const passenger = getPassenger();
     const nameEl = document.querySelector(".card span.font-bold.text-blue-900");
     if (nameEl)
-        nameEl.innerText = `${passenger.title || ""} ${passenger.firstName || ""} ${
-            passenger.lastName || ""
-        }`.trim();
+        nameEl.innerText = `${passenger.title || ""} ${passenger.firstName || ""} ${passenger.lastName || ""}`.trim();
 
     const info = document.querySelectorAll(".text-xs.text-gray-500");
     if (info.length >= 3) {
@@ -106,49 +100,36 @@ function updateHero() {
 }
 
 // =====================================================
-// BOOKING FUNCTION (FIXED 🔥)
+// BOOKING FUNCTION (FIXED FOR PNR HANDLING 🔥)
 // =====================================================
 async function bookSeatAndProceed() {
     const flight = getFlightState();
     const passenger = getPassenger();
 
-    console.log("Flight object 👉", flight); // DEBUG
-
     if (!flight.flightNumber) return alert("Select flight first!");
     if (!flight.selectedSeat) return alert("Select seat first!");
 
-    // ✅ Ensure departureDate exists
-    const departureDate = flight.departureDate || flight.date || flight.flightDate;
+    // ✅ Date formatting
+    let rawDate = flight.departureDate || flight.date || flight.flightDate;
+    if (!rawDate) return alert("❌ Flight date missing!");
 
-    if (!departureDate) {
-        alert("❌ Flight date missing!");
-        console.error("Flight data:", flight);
-        return;
-    }
+    let departureDate = (typeof rawDate === "string" && rawDate.includes("-"))
+        ? rawDate
+        : new Date(rawDate).toISOString().split("T")[0];
 
+    const passengerName = `${passenger.title || ""} ${passenger.firstName || ""} ${passenger.lastName || ""}`.trim();
+
+    // DTO mapping
     const bookingDTO = {
-        passenger: `${passenger.title || ""} ${passenger.firstName || ""} ${
-            passenger.lastName || ""
-        }`.trim(),
+        passenger: passengerName,
         flightNumber: flight.flightNumber,
         seat: flight.selectedSeat,
-
-        // ✅ Correct date format for backend
-        departureDate: new Date(departureDate).toISOString().split("T")[0],
-
-        // ✅ Ensure enum uppercase
+        departureDate: departureDate,
         travelClass: (flight.type || "ECONOMY").toUpperCase(),
-
         price: parseFloat(flight.price?.toString().replace(/[^0-9.-]+/g, "")) || 0,
-
         origin: flight.from || "",
-        destination: flight.to || "",
-
-        paid: false,
-        status: "CONFIRMED"
+        destination: flight.to || ""
     };
-
-    console.log("Booking DTO 👉", bookingDTO); // DEBUG before sending
 
     try {
         const res = await fetch("http://localhost:8080/api/v1/bookings", {
@@ -157,59 +138,24 @@ async function bookSeatAndProceed() {
             body: JSON.stringify(bookingDTO)
         });
 
-        let data = null;
-        try {
-            data = await res.json();
-        } catch (e) {
-            console.warn("No JSON response");
-        }
+        const result = await res.json();
 
-        if (res.ok) {
-            alert("✅ Booking created!");
-            if (data?.data) {
-                localStorage.setItem("currentBooking", JSON.stringify(data.data));
-                goToPayment(data.data.id);
-            }
+        if (res.ok && result.data) {
+            alert("✅ Booking created successfully!");
+
+            // 🔥 ඉතා වැදගත්: Backend එකෙන් එන සැබෑ PNR එක මෙතනදී සේව් කරනවා
+            // DB එකේ ID එක (14) සහ PNR එක ("K6ATPF") දෙකම අපි Payment එකට ගෙනියනවා
+            localStorage.setItem("bookingIdForPayment", result.data.id);
+            localStorage.setItem("currentBookingPNR", result.data.pnr);
+
+            // Redirect to Payment
+            window.location.href = "../Pages/Pyment.html";
         } else {
-            alert(data?.message || "Booking failed!");
+            alert(result.message || "Booking failed!");
         }
     } catch (err) {
-        console.error(err);
+        console.error("Booking Error:", err);
         alert("❌ Server not reachable!");
-    }
-}
-
-// =====================================================
-// PAYMENT PAGE REDIRECT
-// =====================================================
-function goToPayment(bookingId) {
-    localStorage.setItem("bookingIdForPayment", bookingId);
-    window.location.href = "../Pages/Pyment.html";
-}
-
-// =====================================================
-// PAYMENT SUCCESS FLOW
-// =====================================================
-async function markBookingPaid() {
-    const bookingId = localStorage.getItem("bookingIdForPayment");
-    if (!bookingId) return;
-
-    try {
-        const res = await fetch(`http://localhost:8080/api/v1/bookings/${bookingId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ paymentStatus: "PAID" })
-        });
-        const data = await res.json();
-        if (res.ok) {
-            alert("Payment successful! Booking updated.");
-            localStorage.removeItem("bookingIdForPayment");
-        } else {
-            alert(data.message || "Failed to update payment status.");
-        }
-    } catch (err) {
-        console.error(err);
-        alert("Server error during payment update!");
     }
 }
 
@@ -223,5 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateHero();
 
     const checkoutBtn = document.querySelector(".btn-primary");
-    if (checkoutBtn) checkoutBtn.addEventListener("click", bookSeatAndProceed);
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener("click", bookSeatAndProceed);
+    }
 });

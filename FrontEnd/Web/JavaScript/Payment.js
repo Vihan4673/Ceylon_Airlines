@@ -1,62 +1,140 @@
 // =====================================================
-// GET DATA FROM LOCAL STORAGE
+// CONFIGURATION & GLOBAL VARIABLES
 // =====================================================
-const passenger = JSON.parse(localStorage.getItem("passengerInfo")) || {};
-const flightState = JSON.parse(localStorage.getItem("selectedFlight")) || {};
+const API_BASE = "http://localhost:8080/api/v1/bookings";
+let currentBooking = null;
 
 // =====================================================
-// FORMAT DATE
+// 1. INIT PAGE: GET DATA VIA PNR
 // =====================================================
-function formatFullDate(dateStr) {
-    if (!dateStr) return "Date not available";
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-GB", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-    });
-}
+async function initPage() {
+    const savedPnr = localStorage.getItem("currentBookingPNR");
 
-// =====================================================
-// TEMPORARY PNR GENERATOR
-// =====================================================
-function generatePNR() {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
-}
-
-// =====================================================
-// INIT PAGE & SHOW SUMMARY
-// =====================================================
-function initPage() {
-    const bookingId = localStorage.getItem("bookingIdForPayment");
-    if (!bookingId) {
-        alert("❌ No booking found. Please select a flight first.");
+    if (!savedPnr) {
+        console.error("❌ PNR not found in localStorage");
+        alert("Booking session expired. Redirecting to checkout...");
+        window.location.href = "../Pages/Checkout.html";
         return;
     }
 
-    const totalPrice = parseFloat(flightState.price?.toString().replace(/[^0-9.-]+/g, "")) || 0;
+    try {
+        const response = await fetch(`${API_BASE}`);
+        const result = await response.json();
 
-    setText("total-amount", `$${totalPrice.toFixed(2)}`);
-    setText("btn-text", `Pay $${totalPrice.toFixed(2)}`);
-    setText("summary-pnr", generatePNR());
-    setText("summary-name", `${passenger.title || ""} ${passenger.firstName || ""} ${passenger.lastName || ""}`.trim());
-    setText("summary-from", flightState.from || "Unknown");
-    setText("summary-to", flightState.to || "Unknown");
+        if (response.ok && result.data) {
+            const matched = result.data.find(b => b.pnr === savedPnr);
+
+            if (matched) {
+                currentBooking = matched;
+                console.log("✅ Booking Synced:", currentBooking);
+                renderBookingDetails(currentBooking);
+            } else {
+                console.error("❌ PNR not found in Database.");
+                alert("Booking details not found. Please try again.");
+            }
+        }
+    } catch (error) {
+        console.error("❌ Sync Error:", error);
+    }
 }
 
 // =====================================================
-// HELPER FUNCTION
+// 2. HANDLE PAYMENT (FIXED PAYLOAD)
 // =====================================================
+async function handlePayment(e) {
+    e.preventDefault();
+
+    const savedPnr = localStorage.getItem("currentBookingPNR");
+
+    if (!currentBooking || !savedPnr) {
+        alert("Please wait until booking data is loaded...");
+        return;
+    }
+
+    const btn = document.getElementById('submit-btn');
+    const spinner = document.getElementById('btn-spinner');
+    const btnText = document.getElementById('btn-text');
+
+    btn.disabled = true;
+    spinner?.classList.remove('hidden');
+    btnText?.classList.add('hidden');
+
+    // 🔴 වැදගත්: Backend එකේ 'paid' field එක Boolean (true/false) නිසා,
+    // "PAID" වෙනුවට true ලෙස යැවිය යුතුය.
+    // එසේම Spring Boot එකට අවශ්‍ය සියලුම fields මෙහි ඇති බව තහවුරු කරමු.
+    const updateData = {
+        id: currentBooking.id, // ID එක තිබේ නම් එයද යවමු
+        pnr: currentBooking.pnr,
+        passenger: currentBooking.passenger,
+        flightNumber: currentBooking.flightNumber,
+        origin: currentBooking.origin,
+        destination: currentBooking.destination,
+        seat: currentBooking.seat,
+        departureDate: currentBooking.departureDate,
+        travelClass: currentBooking.travelClass,
+        price: currentBooking.price,
+        bookingDate: currentBooking.bookingDate,
+        paid: true,           // ✅ Boolean True
+        status: "CONFIRMED"   // ✅ String Status
+    };
+
+    console.log("🚀 Final Payload to Backend:", updateData);
+
+    try {
+        // Backend එකේ අලුත් Endpoint එක: /api/v1/bookings/pnr/{pnr}
+        const res = await fetch(`${API_BASE}/pnr/${savedPnr}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(updateData)
+        });
+
+        const responseJson = await res.json();
+
+        if (res.ok) {
+            console.log("✅ Update Success!");
+            alert("✅ Payment Successful! Your ticket is confirmed.");
+
+            localStorage.removeItem("currentBookingPNR");
+            localStorage.removeItem("bookingIdForPayment");
+
+            document.getElementById("success-overlay")?.classList.remove("hidden");
+        } else {
+            // 400 Error එකක් ආවොත් මෙතනින් විස්තරය Console එකේ බලන්න
+            console.error("❌ Backend Error Details:", responseJson);
+            alert("Update Failed: " + (responseJson.message || "Invalid Data Format"));
+        }
+    } catch (err) {
+        console.error("❌ Network Error:", err);
+        alert("❌ Server not reachable.");
+    } finally {
+        btn.disabled = false;
+        spinner?.classList.add('hidden');
+        btnText?.classList.remove('hidden');
+    }
+}
+
+// =====================================================
+// UI & CARD HELPERS
+// =====================================================
+function renderBookingDetails(data) {
+    setText("summary-pnr", data.pnr);
+    setText("summary-name", data.passenger);
+    setText("summary-from", data.origin);
+    setText("summary-to", data.destination);
+
+    const price = parseFloat(data.price) || 0;
+    setText("total-amount", `$${price.toFixed(2)}`);
+    setText("btn-text", `Confirm & Pay $${price.toFixed(2)}`);
+}
+
 function setText(id, value) {
     const el = document.getElementById(id);
-    if (el) el.innerText = value || "";
+    if (el) el.innerText = value || "N/A";
 }
 
-// =====================================================
-// CARD FORM HELPERS
-// =====================================================
 function formatCardNumber(input) {
     let value = input.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
     let parts = [];
@@ -66,93 +144,34 @@ function formatCardNumber(input) {
 
 function formatExpiry(input) {
     let value = input.value.replace(/\D/g, '');
-    input.value = value.length > 2 ? value.substring(0, 2) + '/' + value.substring(2, 4) : value;
+    if (value.length >= 2) input.value = value.substring(0, 2) + '/' + value.substring(2, 4);
+}
+
+function updateCardPreview() {
+    const nameIn = document.getElementById('card-name').value;
+    const numIn = document.getElementById('card-number').value;
+    const expIn = document.getElementById('card-expiry').value;
+    const cvvIn = document.getElementById('card-cvv').value;
+
+    setText('view-name', nameIn.toUpperCase() || "YOUR NAME");
+    setText('view-number', numIn || "**** **** **** ****");
+    setText('view-expiry', expIn || "MM/YY");
+    const cvvView = document.getElementById('view-cvv');
+    if (cvvView) cvvView.innerText = cvvIn ? "*".repeat(cvvIn.length) : "***";
 }
 
 function flipCard(flipped) {
     const card = document.getElementById('card-preview');
-    flipped ? card.classList.add('flipped') : card.classList.remove('flipped');
-}
-
-function updateCardPreview() {
-    document.getElementById('view-name').innerText = document.getElementById('card-name').value || "Your Name";
-    document.getElementById('view-number').innerText = document.getElementById('card-number').value || "**** **** **** ****";
-    document.getElementById('view-expiry').innerText = document.getElementById('card-expiry').value || "MM/YY";
-    const cvv = document.getElementById('card-cvv').value;
-    document.getElementById('view-cvv').innerText = cvv ? "*".repeat(cvv.length) : "***";
+    if (card) flipped ? card.classList.add('flipped') : card.classList.remove('flipped');
 }
 
 // =====================================================
-// HANDLE PAYMENT & UPDATE BOOKING AS PAID
+// LISTENERS
 // =====================================================
-async function handlePayment(e) {
-    e.preventDefault();
-
-    const btn = document.getElementById('submit-btn');
-    const text = document.getElementById('btn-text');
-    const spinner = document.getElementById('btn-spinner');
-
-    btn.disabled = true;
-    text.classList.add('hidden');
-    spinner.classList.remove('hidden');
-
-    const bookingId = localStorage.getItem("bookingIdForPayment");
-    if (!bookingId) {
-        alert("❌ Booking ID missing! Please go back and select a flight.");
-        btn.disabled = false;
-        text.classList.remove('hidden');
-        spinner.classList.add('hidden');
-        return;
-    }
-
-    const paymentData = {
-        cardName: document.getElementById("card-name").value.trim(),
-        cardNumber: document.getElementById("card-number").value.trim(),
-        cardExpiry: document.getElementById("card-expiry").value.trim(),
-        cardCVV: document.getElementById("card-cvv").value.trim(),
-        paid: true,
-        status: "CONFIRMED"
-    };
-
-    try {
-        const res = await fetch(`http://localhost:8080/api/v1/bookings/${bookingId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include", // important for cookies/session
-            body: JSON.stringify(paymentData)
-        });
-
-        let data = {};
-        try { data = await res.json(); } catch(e) { console.warn("No JSON returned"); }
-
-        if (res.ok) {
-            alert("✅ Payment successful! Booking updated.");
-            localStorage.removeItem("bookingIdForPayment");
-            localStorage.setItem("currentBooking", JSON.stringify(data.data || {}));
-            document.getElementById("success-overlay")?.classList.remove("hidden");
-        } else {
-            console.error("Payment failed:", data);
-            alert(data.message || "Payment failed!");
-        }
-
-    } catch(err) {
-        console.error("Server error:", err);
-        alert("❌ Server error during payment update!");
-    } finally {
-        btn.disabled = false;
-        text.classList.remove('hidden');
-        spinner.classList.add('hidden');
-    }
-}
-
-// =====================================================
-// INIT
-// =====================================================
-window.onload = initPage;
-
+document.addEventListener("DOMContentLoaded", initPage);
 document.getElementById('payment-form')?.addEventListener('submit', handlePayment);
-document.getElementById('card-number')?.addEventListener('input', function(){ formatCardNumber(this); updateCardPreview(); });
-document.getElementById('card-expiry')?.addEventListener('input', function(){ formatExpiry(this); updateCardPreview(); });
+document.getElementById('card-number')?.addEventListener('input', function() { formatCardNumber(this); updateCardPreview(); });
+document.getElementById('card-expiry')?.addEventListener('input', function() { formatExpiry(this); updateCardPreview(); });
 document.getElementById('card-name')?.addEventListener('input', updateCardPreview);
 document.getElementById('card-cvv')?.addEventListener('input', updateCardPreview);
 document.getElementById('card-cvv')?.addEventListener('focus', () => flipCard(true));
