@@ -159,11 +159,12 @@
       <!-- User Profile -->
       <div class="flex items-center gap-3">
         <div class="hidden md:flex flex-col text-right">
-          <span class="text-xs font-bold text-slate-800">Admin User</span>
-          <span class="text-[10px] text-slate-400 uppercase tracking-tighter">System Overseer</span>
+          <span id="user-name" class="text-xs font-bold text-slate-800"></span>
+          <span id="user-role" class="text-[10px] text-slate-400 uppercase tracking-tighter"></span>
         </div>
         <div class="relative group cursor-pointer">
-          <img src="https://ui-avatars.com/api/?name=Admin&background=8A1538&color=fff" class="w-10 h-10 rounded-2xl border-2 border-white shadow-md">
+          <img id="user-avatar" src="https://ui-avatars.com/api/?name=Admin&background=8A1538&color=fff"
+               class="w-10 h-10 rounded-2xl border-2 border-white shadow-md">
           <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full"></div>
         </div>
       </div>
@@ -254,6 +255,34 @@
 
   // Handle errors or iframe reloads
   frame.onerror = () => hideLoader();
+
+
+
+
+  // =====================================================
+  // DYNAMIC USER PROFILE
+  // =====================================================
+  function updateUserProfile() {
+    const user = JSON.parse(localStorage.getItem("user")) || {};
+
+    const nameEl = document.getElementById("user-name");
+    const roleEl = document.getElementById("user-role");
+    const avatarEl = document.getElementById("user-avatar");
+
+    const fullName = user.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : "Admin User";
+    const role = user.role ? user.role.toUpperCase() : "SYSTEM OVERSEER";
+
+    if (nameEl) nameEl.innerText = fullName;
+    if (roleEl) roleEl.innerText = role;
+
+    if (avatarEl) {
+      const initials = user.firstName ? user.firstName.charAt(0).toUpperCase() : "A";
+      avatarEl.src = `https://ui-avatars.com/api/?name=${initials}&background=8A1538&color=fff`;
+    }
+  }
+
+  // Call on page load
+  document.addEventListener("DOMContentLoaded", updateUserProfile);
 </script>
 </body>
 </html>
