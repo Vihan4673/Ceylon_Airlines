@@ -48,7 +48,6 @@ function sendQuickMessage(text) {
     sendMessage();
 }
 
-// 4. Message Bubble එකක් Screen එකට දැමීම
 function appendMessage(role, text, id = null) {
     const msgDiv = document.createElement('div');
     msgDiv.className = role === 'user' ? 'self-end w-full flex justify-end' : 'self-start w-full flex justify-start';
@@ -72,4 +71,5 @@ function appendMessage(role, text, id = null) {
 function handleChatSubmit(event) {
     event.preventDefault();
     sendMessage();
+
 }
