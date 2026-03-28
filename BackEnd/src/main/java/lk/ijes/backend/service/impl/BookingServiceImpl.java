@@ -39,7 +39,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (booking.getStatus() == null) booking.setStatus("CONFIRMED");
-        if (booking.getPaid() == null) booking.setPaid(Boolean.valueOf("PENDING")); // String එකක් නම් PENDING දාන්න
+        if (booking.getPaid() == null) booking.setPaid(false);
 
         Booking savedBooking = bookingRepository.save(booking);
         return modelMapper.map(savedBooking, BookingDTO.class);
@@ -60,21 +60,21 @@ public class BookingServiceImpl implements BookingService {
     // 🔥🔥🔥 ================= UPDATE BOOKING BY PNR (NEW) ================= 🔥🔥🔥
     @Override
     public BookingDTO updateBookingByPnr(String pnr, BookingDTO bookingDTO) {
-        // 1. PNR එකෙන් record එක හොයාගන්න (Repository එකේ findByPnr තියෙන්න ඕනේ)
         Booking booking = bookingRepository.findByPnr(pnr)
                 .orElseThrow(() -> new RuntimeException("Booking not found with PNR: " + pnr));
 
-        // 2. දත්ත Update කිරීම (විශේෂයෙන් Paid status එක)
         if (bookingDTO.getPaid() != null) {
-            booking.setPaid(bookingDTO.getPaid()); // "PAID" ලෙස සෙට් වෙයි
+            booking.setPaid(bookingDTO.getPaid());
         }
 
         if (bookingDTO.getStatus() != null) {
-            booking.setStatus(bookingDTO.getStatus()); // "CONFIRMED" ලෙස සෙට් වෙයි
+            booking.setStatus(bookingDTO.getStatus());
         }
 
-        // අනෙකුත් දත්තත් update කරන්න අවශ්‍ය නම් මෙතනින් කරන්න පුළුවන්
-        // updateBookingFields(booking, bookingDTO);
+        // ✅ Also update email if present
+        if (bookingDTO.getEmail() != null) {
+            booking.setEmail(bookingDTO.getEmail());
+        }
 
         Booking updatedBooking = bookingRepository.save(booking);
         return modelMapper.map(updatedBooking, BookingDTO.class);
@@ -107,8 +107,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     // ================= HELPERS =================
-
-    // Field update කරන logic එක එක තැනකට ගත්තා duplicate නොවෙන්න
     private void updateBookingFields(Booking booking, BookingDTO bookingDTO) {
         booking.setPassenger(bookingDTO.getPassenger());
         booking.setSeat(bookingDTO.getSeat());
@@ -121,6 +119,11 @@ public class BookingServiceImpl implements BookingService {
         if (bookingDTO.getPaid() != null) booking.setPaid(bookingDTO.getPaid());
         if (bookingDTO.getStatus() != null) booking.setStatus(bookingDTO.getStatus());
         if (bookingDTO.getDepartureDate() != null) booking.setDepartureDate(bookingDTO.getDepartureDate());
+
+        // ✅ Also update email here for general updates
+        if (bookingDTO.getEmail() != null) {
+            booking.setEmail(bookingDTO.getEmail());
+        }
     }
 
     private String generatePNR() {

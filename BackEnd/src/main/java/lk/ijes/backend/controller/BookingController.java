@@ -3,6 +3,7 @@ package lk.ijes.backend.controller;
 import jakarta.validation.Valid;
 import lk.ijes.backend.dto.BookingDTO;
 import lk.ijes.backend.service.BookingService;
+import lk.ijes.backend.service.EmailService; // ✅ EmailService import
 import lk.ijes.backend.util.APIResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,12 +14,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-//@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/bookings")
 public class BookingController {
 
     private final BookingService bookingService;
+    private final EmailService emailService; // ✅ inject EmailService
 
     // ================= CREATE BOOKING =================
     @PostMapping
@@ -26,7 +27,6 @@ public class BookingController {
             @Valid @RequestBody BookingDTO bookingDTO) {
 
         try {
-            // bookingDate auto set
             if (bookingDTO.getBookingDate() == null) {
                 bookingDTO.setBookingDate(LocalDate.now());
             }
@@ -41,20 +41,29 @@ public class BookingController {
                     .body(new APIResponse<>(400, "Failed to create booking: " + e.getMessage(), null));
         }
     }
-    // ================= UPDATE BOOKING BY PNR =================
+
+    // ================= UPDATE BOOKING BY PNR (Payment Success) =================
     @PutMapping("/pnr/{pnr}")
     public ResponseEntity<APIResponse<BookingDTO>> updateBookingByPnr(
             @PathVariable String pnr,
             @Valid @RequestBody BookingDTO bookingDTO) {
 
         try {
-            // bookingDate එක null නම් වර්තමාන දිනය ලබා දෙමු
             if (bookingDTO.getBookingDate() == null) {
                 bookingDTO.setBookingDate(LocalDate.now());
             }
 
-            // 🔴 වැදගත්: BookingService එකේ updateBookingByPnr ලෙස අලුත් method එකක් තිබිය යුතුය
             BookingDTO updatedBooking = bookingService.updateBookingByPnr(pnr, bookingDTO);
+
+            // 🔥 Payment success එකේදී Email යවන්න
+            if (updatedBooking.getPaid() != null && updatedBooking.getPaid()) {
+                try {
+                    emailService.sendBookingConfirmation(updatedBooking.getEmail(), updatedBooking);
+                    System.out.println("✅ Email sent to: " + updatedBooking.getEmail());
+                } catch (Exception mailError) {
+                    System.err.println("❌ Email sending failed: " + mailError.getMessage());
+                }
+            }
 
             return ResponseEntity.ok(
                     new APIResponse<>(200, "Booking updated to PAID successfully", updatedBooking)

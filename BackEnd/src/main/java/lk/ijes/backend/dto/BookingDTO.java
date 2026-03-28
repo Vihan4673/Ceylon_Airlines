@@ -44,4 +44,8 @@ public class BookingDTO {
 
     @NotBlank(message = "Destination cannot be empty")
     private String destination;
+
+    // ✅ Added email field
+    @NotBlank(message = "Email cannot be empty")
+    private String email;
 }

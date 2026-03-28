@@ -49,4 +49,8 @@ public class Booking {
 
     @Column(nullable = false)
     private String destination;
+
+    // ✅ Added email field
+    @Column(nullable = false)
+    private String email;
 }
