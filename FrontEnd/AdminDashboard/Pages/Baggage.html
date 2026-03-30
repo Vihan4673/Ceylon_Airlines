@@ -14,11 +14,11 @@
         .status-pill.active { background-color: #8b1d41; color: white; border-color: #8b1d41; box-shadow: 0 4px 12px rgba(139, 29, 65, 0.2); }
         .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -10px rgba(0,0,0,0.1); }
+        input:read-only { background-color: #f1f5f9; cursor: not-allowed; color: #64748b; }
     </style>
 </head>
 <body class="min-h-screen pb-20">
 
-<!-- Header -->
 <header class="bg-white border-b sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <div class="flex items-center gap-3">
@@ -44,7 +44,6 @@
 
 <main class="max-w-7xl mx-auto px-6 py-8">
 
-    <!-- Stats Row -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
             <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center"><i class="fas fa-suitcase"></i></div>
@@ -64,7 +63,6 @@
         </div>
     </div>
 
-    <!-- Filter & Search -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div class="flex bg-white p-1 rounded-2xl border border-gray-100 shadow-sm overflow-x-auto max-w-full no-scrollbar">
             <button onclick="setFilter('All')" id="f-All" class="filter-btn px-6 py-2 rounded-xl text-xs font-bold transition-all bg-gray-900 text-white">All Flights</button>
@@ -76,7 +74,6 @@
         </div>
     </div>
 
-    <!-- Baggage List -->
     <div id="baggageList" class="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <div class="col-span-full py-20 text-center bg-white rounded-[3rem] border-2 border-dashed border-gray-200">
             <div class="text-gray-300 text-5xl mb-4"><i class="fas fa-box-open"></i></div>
@@ -85,40 +82,52 @@
     </div>
 </main>
 
-<!-- Modal -->
 <div id="modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-md">
     <div class="bg-white rounded-[3rem] w-full max-w-lg overflow-hidden shadow-2xl animate-fade">
         <div class="primary-color p-8 text-white relative">
             <button onclick="closeModal()" class="absolute right-8 top-8 opacity-60 hover:opacity-100 transition"><i class="fas fa-times text-xl"></i></button>
             <h3 class="text-2xl font-extrabold mb-1">Add New Baggage</h3>
-            <p class="text-white/60 text-sm font-medium">Create a new tracking record for a passenger.</p>
+            <p class="text-white/60 text-sm font-medium">Auto-fill via PNR for faster check-in.</p>
         </div>
         <form id="baggageForm" class="p-8 space-y-5">
             <div class="grid grid-cols-2 gap-4">
                 <div class="col-span-2">
-                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Passport Number (Used as ID)</label>
-                    <input type="text" id="fPassport" required placeholder="Ex: N1234567" class="w-full px-5 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-[#8b1d41]/20 outline-none font-bold text-gray-700">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Enter PNR Number</label>
+                    <div class="relative">
+                        <input type="text" id="fPNR" required oninput="handlePNRLookup(this.value)" placeholder="Ex: ABC123" class="w-full px-5 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-[#8b1d41]/20 outline-none font-bold text-gray-700 uppercase">
+                        <div id="pnrLoader" class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-primary-color animate-spin">
+                            <i class="fas fa-circle-notch"></i>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-span-2">
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Passenger Name</label>
-                    <input type="text" id="fName" required placeholder="Ex: Kamal Perera" class="w-full px-5 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-[#8b1d41]/20 outline-none font-bold text-gray-700">
+                    <input type="text" id="fName" readonly placeholder="Auto-filled from PNR" class="w-full px-5 py-4 border-0 rounded-2xl outline-none font-bold">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Passport Number</label>
+                    <input type="text" id="fPassport" readonly placeholder="Auto-filled" class="w-full px-5 py-4 border-0 rounded-2xl outline-none font-bold">
                 </div>
                 <div>
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Flight Number</label>
-                    <input type="text" id="fFlight" required placeholder="Ex: UL-101" class="w-full px-5 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-[#8b1d41]/20 outline-none font-bold text-gray-700 uppercase">
+                    <input type="text" id="fFlight" readonly placeholder="Auto-filled" class="w-full px-5 py-4 border-0 rounded-2xl outline-none font-bold">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Bag Tag (Option)</label>
-                    <input type="text" id="fTag" placeholder="Ex: BAG-001" class="w-full px-5 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-[#8b1d41]/20 outline-none font-bold text-gray-700">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Bag Count</label>
+                    <input type="number" id="fBagCount" required min="1" value="1" class="w-full px-5 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-[#8b1d41]/20 outline-none font-bold text-gray-700">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Generated Bag Tag</label>
+                    <input type="text" id="fTag" readonly placeholder="Auto-generated" class="w-full px-5 py-4 border-0 rounded-2xl outline-none font-bold text-[#8b1d41]">
                 </div>
             </div>
-            <button type="submit" class="w-full primary-color text-white py-5 rounded-3xl font-bold text-lg shadow-xl shadow-[#8b1d41]/30 hover:-translate-y-1 transition-all active:scale-95">Save & Start Tracking</button>
+            <button type="submit" id="submitBtn" class="w-full primary-color text-white py-5 rounded-3xl font-bold text-lg shadow-xl shadow-[#8b1d41]/30 hover:-translate-y-1 transition-all active:scale-95 disabled:opacity-50">Save & Start Tracking</button>
         </form>
     </div>
 </div>
 
-<!-- Load JS module -->
-<script type="module" src="../js/Baggage.js"></script>
 
+
+<script type="module" src="../js/Baggage.js"></script>
 </body>
 </html>

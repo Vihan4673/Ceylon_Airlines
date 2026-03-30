@@ -1,9 +1,15 @@
+// Global variable ekak thiyagannawa update karana flight ID eka track karanna
+let currentEditFlightId = null;
+
 function toggleModal(id, show) {
     const modal = document.getElementById(id);
     if (!modal) return;
     if (show === true) modal.classList.remove('hidden');
-    else if (show === false) modal.classList.add('hidden');
-    else modal.classList.toggle('hidden');
+    else if (show === false) {
+        modal.classList.add('hidden');
+        currentEditFlightId = null; // Modal eka close weddi ID eka reset karanawa
+        clearFlightForm();
+    } else modal.classList.toggle('hidden');
 }
 
 function showToast(title, msg, isError = false) {
@@ -59,12 +65,62 @@ function convertDateTimeToISO(dateStr, timeStr) {
     return dt.toISOString();
 }
 
+// ISO Date string ekakin input type="date" ekata ona format eka gannawa (YYYY-MM-DD)
+function formatDateForInput(isoStr) {
+    if (!isoStr) return '';
+    return isoStr.split('T')[0];
+}
+
+// ISO Date string ekakin input type="time" ekata ona format eka gannawa (HH:MM)
+function formatTimeForInput(isoStr) {
+    if (!isoStr) return '';
+    const d = new Date(isoStr);
+    return d.toTimeString().slice(0, 5);
+}
+
 function clearFlightForm() {
     ['flightNumber','totalSeats','economyFare','businessFare','departure','arrival','departureTime','arrivalTime','flightDate','duration']
         .forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = '';
         });
+    currentEditFlightId = null;
+    const modalTitle = document.querySelector('#flight-modal h3');
+    if (modalTitle) modalTitle.innerText = 'Schedule New Flight';
+}
+
+// --- EDIT FLIGHT FUNCTION ---
+async function editFlight(id) {
+    try {
+        const response = await fetch(`http://localhost:8080/api/v1/flights/searchFlight/${id}`);
+        const result = await response.json();
+
+        if (response.ok && result.data) {
+            const flight = result.data;
+            currentEditFlightId = flight.id; // Meka thamai update ekedi use wenne
+
+            // Form ekata data fill karanawa
+            document.getElementById('flightNumber').value = flight.flightNumber;
+            document.getElementById('totalSeats').value = flight.totalSeats;
+            document.getElementById('economyFare').value = flight.economyFare;
+            document.getElementById('businessFare').value = flight.businessFare;
+            document.getElementById('departure').value = flight.departure;
+            document.getElementById('arrival').value = flight.arrival;
+            document.getElementById('flightDate').value = formatDateForInput(flight.flightDate);
+            document.getElementById('departureTime').value = formatTimeForInput(flight.departureTime);
+            document.getElementById('arrivalTime').value = formatTimeForInput(flight.arrivalTime);
+            document.getElementById('duration').value = flight.duration;
+
+            // Modal title eka wenas karanawa
+            const modalTitle = document.querySelector('#flight-modal h3');
+            if (modalTitle) modalTitle.innerText = 'Update Flight Details';
+
+            toggleModal('flight-modal', true);
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('Error', 'Could not fetch flight details.', true);
+    }
 }
 
 async function handleSubmitFlight() {
@@ -79,14 +135,10 @@ async function handleSubmitFlight() {
     const flightDateEl = document.getElementById('flightDate');
     const durationEl = document.getElementById('duration');
 
-    if (!flightNumberEl || !totalSeatsEl || !economyFareEl || !businessFareEl || !departureEl || !arrivalEl || !departureTimeEl || !arrivalTimeEl || !flightDateEl || !durationEl) {
-        showToast('Error', 'Flight form elements missing.', true);
-        return;
-    }
-
     const duration = calculateDuration();
 
     const data = {
+        id: currentEditFlightId, // Update ekak nam ID eka yanawa, Save ekak nam null yanawa
         flightNumber: flightNumberEl.value.trim(),
         bookedSeats: 0,
         totalSeats: parseInt(totalSeatsEl.value) || 0,
@@ -97,32 +149,37 @@ async function handleSubmitFlight() {
         flightDate: flightDateEl.value,
         departureTime: convertDateTimeToISO(flightDateEl.value, departureTimeEl.value),
         arrivalTime: convertDateTimeToISO(flightDateEl.value, arrivalTimeEl.value),
-        duration: duration, // <-- now sent to backend
+        duration: duration,
         status: 'On Time'
     };
 
-    if (!data.flightNumber || !data.departure || !data.arrival || !data.totalSeats || (!data.economyFare && !data.businessFare)) {
+    if (!data.flightNumber || !data.departure || !data.arrival || !data.totalSeats) {
         showToast('Validation Error', 'Please fill all required fields.', true);
         return;
     }
 
+    // currentEditFlightId thiyenawa nam PUT, natham POST
+    const url = currentEditFlightId
+        ? 'http://localhost:8080/api/v1/flights/updateFlight'
+        : 'http://localhost:8080/api/v1/flights/saveFlight';
+
+    const method = currentEditFlightId ? 'PUT' : 'POST';
+
     try {
-        const response = await fetch('http://localhost:8080/api/v1/flights/saveFlight', {
-            method: 'POST',
+        const response = await fetch(url, {
+            method: method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
 
-        let result = null;
-        try { result = await response.json(); } catch (_) {}
-
         if (response.ok) {
             toggleModal('flight-modal', false);
-            showToast('Flight Scheduled', `Flight ${data.flightNumber} added successfully.`);
+            showToast('Success', `Flight ${currentEditFlightId ? 'updated' : 'added'} successfully.`);
             await loadFlights();
             clearFlightForm();
         } else {
-            showToast('Error', result?.message || `Server returned ${response.status}`, true);
+            const result = await response.json();
+            showToast('Error', result?.message || `Error: ${response.status}`, true);
         }
     } catch (err) {
         console.error(err);
@@ -133,9 +190,7 @@ async function handleSubmitFlight() {
 async function loadFlights() {
     try {
         const response = await fetch('http://localhost:8080/api/v1/flights/getAllFlight');
-        let result = null;
-        try { result = await response.json(); } catch(_) {}
-        if (!response.ok) throw new Error(result?.message || 'Failed to fetch flights');
+        const result = await response.json();
 
         const tbody = document.querySelector('#flight-table-body');
         if (!tbody) return;
@@ -178,8 +233,12 @@ async function loadFlights() {
                 </td>
                 <td class="px-8 py-5 text-right">
                     <div class="flex justify-end gap-2">
-                        <button class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all"><i class="fas fa-edit text-xs"></i></button>
-                        <button onclick="deleteFlight(${flight.id})" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all"><i class="fas fa-trash text-xs"></i></button>
+                        <button onclick="editFlight(${flight.id})" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all">
+                            <i class="fas fa-edit text-xs"></i>
+                        </button>
+                        <button onclick="deleteFlight(${flight.id})" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all">
+                            <i class="fas fa-trash text-xs"></i>
+                        </button>
                     </div>
                 </td>
             `;
@@ -201,13 +260,9 @@ async function deleteFlight(id) {
     if (!confirm('Are you sure you want to delete this flight?')) return;
     try {
         const response = await fetch(`http://localhost:8080/api/v1/flights/deleteFlight/${id}`, { method: 'DELETE' });
-        let result = null;
-        try { result = await response.json(); } catch(_) {}
         if (response.ok) {
             showToast('Deleted', 'Flight removed successfully.');
             await loadFlights();
-        } else {
-            showToast('Error', result?.message || `Server returned ${response.status}`, true);
         }
     } catch (err) {
         console.error(err);
@@ -225,5 +280,7 @@ function filterFlights() {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadFlights();
-    window.onclick = (e) => { if(e.target.id === 'flight-modal') toggleModal('flight-modal', false); }
+    window.onclick = (e) => {
+        if(e.target.id === 'flight-modal') toggleModal('flight-modal', false);
+    }
 });

@@ -1,198 +1,304 @@
-// ================= BASE URL =================
+// =====================================================
+// CONFIGURATION & GLOBAL STATES
+// =====================================================
 const API_URL = "http://localhost:8080/api/v1/bookings";
-let bookings = [];
-let currentPNR = "";
+const PASSENGER_API = "http://localhost:8080/api/v1/passengers";
+const SEAT_API = "http://localhost:8080/api/v1/seats";
 
-// ================= NOTIFICATION =================
-function showNotification(msg, isError = false) {
-    const n = document.getElementById('notification');
-    n.innerText = msg;
-    n.style.backgroundColor = isError ? '#ef4444' : '#10b981';
-    n.style.display = 'block';
-    setTimeout(() => n.style.display = 'none', 3000);
+let bookings = [];
+let occupiedSeats = [];
+
+// =====================================================
+// INITIALIZATION
+// =====================================================
+document.addEventListener("DOMContentLoaded", () => {
+    loadBookings();
+
+    // Flight Number එක ටයිප් කර ඉවර වූ පසු Seat Map එක refresh කිරීම
+    document.getElementById('m-flightNumber').addEventListener('blur', (e) => {
+        if(e.target.value) fetchOccupiedSeats(e.target.value);
+    });
+});
+
+// =====================================================
+// PASSPORT LOOKUP LOGIC (🔥 FIXED)
+// =====================================================
+async function lookupPassenger() {
+    const passport = document.getElementById('m-passport').value;
+    const nameInput = document.getElementById('m-passenger');
+    const emailInput = document.getElementById('m-email');
+
+    if (!passport) {
+        alert("Please enter a passport number!");
+        return;
+    }
+
+    nameInput.placeholder = "Searching database...";
+
+    try {
+        // Backend එකේ passport එකෙන් search කරන endpoint එකට call කිරීම
+        // සටහන: ඔයාගේ Controller එකේ searchPassengerByPassport ලෙස endpoint එකක් තිබිය යුතුය.
+        const response = await fetch(`${PASSENGER_API}/passport/${passport}`);
+        const result = await response.json();
+
+        if (response.ok && result.data) {
+            // නම සැකසීම (Title, First Name, Last Name එකතු කර)
+            const fullName = `${result.data.title || ''} ${result.data.firstName || ''} ${result.data.lastName || ''}`.trim();
+            nameInput.value = fullName;
+            emailInput.value = result.data.email || "";
+            console.log("Passenger found:", result.data);
+        } else {
+            alert("Passenger record not found. Please enter details manually.");
+            nameInput.value = "";
+            nameInput.placeholder = "Enter Full Name";
+        }
+    } catch (error) {
+        console.error("Lookup error:", error);
+        alert("Could not connect to Passenger Service.");
+    }
 }
 
-// ================= RENDER TABLE =================
-function renderTable() {
-    const tbody = document.getElementById('booking-table-body');
-    const countDisplay = document.getElementById('total-count');
-    const revenueDisplay = document.getElementById('total-revenue');
-    const seatDisplay = document.getElementById('active-seats');
+// =====================================================
+// SEAT SELECTION LOGIC (🔥 DB CONNECTED)
+// =====================================================
 
-    tbody.innerHTML = '';
-    let totalRev = 0;
+async function fetchOccupiedSeats(flightNo) {
+    if (!flightNo) return;
 
-    bookings.forEach((booking, index) => {
-        totalRev += booking.price;
-        const paidBadge = booking.paid
-            ? '<span class="status-badge bg-emerald-100 text-emerald-700">Paid</span>'
-            : '<span class="status-badge bg-amber-100 text-amber-700">Unpaid</span>';
+    try {
+        const response = await fetch(`${SEAT_API}/flight-number/${encodeURIComponent(flightNo)}`);
+        const result = await response.json();
 
-        const row = `
-            <tr class="hover:bg-slate-50/80 transition-all group border-b border-slate-50">
-                <td class="px-6 py-5">
-                    <div class="flex flex-col">
-                        <span class="font-mono font-black text-[#8A1538] text-sm tracking-tighter">${booking.pnr}</span>
-                        <span class="text-[10px] font-bold text-slate-500 mt-0.5 uppercase tracking-widest">Flight: ${booking.flightNumber}</span>
-                    </div>
-                </td>
-                <td class="px-6 py-5">
-                    <div class="flex flex-col">
-                        <span class="font-bold text-slate-800">${booking.passenger}</span>
-                        <div class="flex items-center gap-1 text-[10px] text-slate-500 mt-1 font-semibold uppercase tracking-tighter">
-                            <span>${booking.origin}</span>
-                            <i class="fa-solid fa-arrow-right text-[8px] text-slate-300"></i>
-                            <span>${booking.destination}</span>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-6 py-5">
-                    <div class="flex flex-col">
-                        <span class="text-xs font-bold text-slate-700">${booking.travelClass} Class | Seat ${booking.seat}</span>
-                        <span class="text-[10px] font-bold text-slate-400 mt-0.5 uppercase">Departs: ${booking.departureDate}</span>
-                    </div>
-                </td>
-                <td class="px-6 py-5">
-                    <div class="flex flex-col">
-                        <span class="font-black text-slate-800 text-sm">$${booking.price.toFixed(2)}</span>
-                        <div class="mt-1 flex items-center gap-2">
-                            ${paidBadge}
-                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${booking.status}</span>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-6 py-5 text-right">
-                    <div class="flex justify-end gap-1">
-                        <button class="p-2 text-slate-300 hover:text-[#8A1538] transition-colors"><i class="fa-solid fa-file-invoice"></i></button>
-                        <button onclick="deleteBooking(${booking.id})" class="p-2 text-slate-300 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash-can"></i></button>
-                    </div>
-                </td>
-            </tr>
-        `;
-        tbody.insertAdjacentHTML('beforeend', row);
+        // Booked කර ඇති seat IDs පමණක් Array එකකට ගැනීම
+        if (result.status === 200 && result.data) {
+            occupiedSeats = result.data
+                .filter(s => s.booked === true)
+                .map(s => s.seatId);
+        } else {
+            occupiedSeats = [];
+        }
+    } catch (err) {
+        console.error("Seat fetch error:", err);
+        occupiedSeats = [];
+    }
+    initSeatMap();
+}
+
+function initSeatMap() {
+    const grid = document.getElementById('seat-grid');
+    if(!grid) return;
+    grid.innerHTML = '';
+
+    const cols = ['A', 'B', 'C', 'D'];
+    const rows = 10;
+
+    for (let i = 1; i <= rows; i++) {
+        cols.forEach(col => {
+            const seatId = `${i}${col}`;
+            const isBooked = occupiedSeats.includes(seatId);
+
+            const seatDiv = document.createElement('div');
+            // Tailwind classes dynamic ලෙස ඇතුළත් කිරීම
+            seatDiv.className = `seat-btn w-10 h-10 rounded-xl border-2 flex items-center justify-center text-[10px] font-black transition-all cursor-pointer 
+                ${isBooked ? 'bg-slate-200 text-slate-400 border-slate-100 cursor-not-allowed' : 'bg-white text-slate-900 border-slate-100 hover:border-[#8A1538] hover:text-[#8A1538]'}`;
+
+            seatDiv.innerText = seatId;
+
+            if (!isBooked) {
+                seatDiv.onclick = () => selectSeat(seatId, seatDiv);
+            }
+            grid.appendChild(seatDiv);
+        });
+    }
+}
+
+function selectSeat(id, element) {
+    // කලින් select කර තිබූ seat එක reset කිරීම
+    document.querySelectorAll('.seat-btn').forEach(el => {
+        if(!el.classList.contains('bg-slate-200')) { // Booked නොවන ඒවා පමණක්
+            el.classList.remove('bg-[#8A1538]', 'text-white', 'border-[#8A1538]');
+            el.classList.add('bg-white', 'text-slate-900', 'border-slate-100');
+        }
     });
 
-    countDisplay.innerText = bookings.length;
-    seatDisplay.innerText = bookings.length;
-    revenueDisplay.innerText = `$${totalRev.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+    // අලුත් seat එක highlight කිරීම
+    element.classList.remove('bg-white', 'text-slate-900');
+    element.classList.add('bg-[#8A1538]', 'text-white', 'border-[#8A1538]');
+
+    document.getElementById('m-seat').value = id;
+    document.getElementById('selected-seat-label').innerText = `SEAT: ${id}`;
 }
 
-// ================= GENERATE PNR =================
-function generatePNR() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let result = 'CEY';
-    for (let i = 0; i < 3; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
+// =====================================================
+// CORE CRUD OPERATIONS
+// =====================================================
+
+async function loadBookings() {
+    try {
+        const res = await fetch(API_URL);
+        const result = await res.json();
+        if (res.ok) {
+            bookings = result.data || [];
+            renderTable();
+        }
+    } catch (err) {
+        console.error("Load bookings error:", err);
     }
-    currentPNR = result;
-    document.getElementById('pnr-display').innerText = result;
 }
 
-// ================= MODAL =================
-function openModal() {
-    document.getElementById('bookingModal').classList.remove('hidden');
-    generatePNR();
-    document.getElementById('m-departureDate').valueAsDate = new Date();
-}
-
-function closeModal() {
-    document.getElementById('bookingModal').classList.add('hidden');
-    ['m-passenger','m-origin','m-destination','m-flightNumber','m-seat','m-price'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('m-paid').checked = false;
-}
-
-// ================= SAVE BOOKING =================
 async function saveBooking() {
-    const bookingDate = new Date().toISOString().split('T')[0]; // Current date
+    const pnr = document.getElementById('pnr-display').innerText;
+    const seatId = document.getElementById('m-seat').value;
+    const flightNo = document.getElementById('m-flightNumber').value;
+    const isPaid = document.getElementById('m-paid').checked;
+
     const data = {
-        pnr: currentPNR,
+        pnr: pnr,
         passenger: document.getElementById('m-passenger').value,
-        flightNumber: document.getElementById('m-flightNumber').value,
-        seat: document.getElementById('m-seat').value.toUpperCase(),
-        bookingDate: bookingDate,
+        email: document.getElementById('m-email').value,
+        flightNumber: flightNo,
+        origin: document.getElementById('m-origin').value,
+        destination: document.getElementById('m-destination').value,
         departureDate: document.getElementById('m-departureDate').value,
         travelClass: document.getElementById('m-travelClass').value,
+        seat: seatId,
         price: parseFloat(document.getElementById('m-price').value) || 0,
-        paid: document.getElementById('m-paid').checked,
-        status: document.getElementById('m-paid').checked ? 'CONFIRMED' : 'PENDING',
-        origin: document.getElementById('m-origin').value,
-        destination: document.getElementById('m-destination').value
+        paid: isPaid,
+        status: "CONFIRMED",
+        bookingDate: new Date().toISOString().split('T')[0]
     };
 
-    // Validation
-    if (!data.passenger || !data.flightNumber || !data.seat || !data.departureDate || !data.origin || !data.destination) {
-        showNotification("Please fill all required fields!", true);
+    if (!data.passenger || !data.seat || !data.flightNumber) {
+        alert("Required: Name, Flight Number and Seat Selection!");
         return;
     }
 
     try {
+        // 1. Booking එක Save කිරීම
         const res = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
 
-        const result = await res.json();
         if (res.ok) {
-            bookings.unshift(result.data);
-            renderTable();
+            // 2. Seat එක Booked ලෙස DB එකේ Update කිරීම
+            await fetch(`${SEAT_API}/book`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    seatId: seatId,
+                    flightNumber: flightNo,
+                    passengerName: data.passenger
+                })
+            });
+
+            alert("Ticket Issued Successfully!");
             closeModal();
-            showNotification("Ticket Issued!");
+            loadBookings();
         } else {
-            showNotification(result.message || "Booking Failed", true);
+            alert("Failed to save booking. Check console for details.");
         }
     } catch (err) {
-        console.error(err);
-        showNotification("Server Error", true);
+        console.error("Save error:", err);
+        alert("Server error. Connection failed.");
     }
 }
 
-// ================= DELETE BOOKING =================
 async function deleteBooking(id) {
-    if(!confirm("Are you sure you want to VOID this booking?")) return;
-
+    if (!confirm("Void this ticket? This action cannot be undone.")) return;
     try {
         const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-        const result = await res.json();
         if (res.ok) {
-            bookings = bookings.filter(b => b.id !== id);
-            renderTable();
-            showNotification("Booking Removed", true);
-        } else {
-            showNotification(result.message || "Failed to delete", true);
+            alert("Booking removed from registry.");
+            loadBookings();
         }
-    } catch(err) {
-        console.error(err);
-        showNotification("Server Error", true);
+    } catch (err) {
+        alert("Delete failed.");
     }
 }
 
-// ================= FILTER TABLE =================
+// =====================================================
+// UI RENDER HELPERS
+// =====================================================
+
+function renderTable() {
+    const tbody = document.getElementById('booking-table-body');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+
+    let totalRevenue = 0;
+
+    bookings.forEach(b => {
+        totalRevenue += b.price;
+        const row = `
+            <tr class="hover:bg-slate-50 transition-all">
+                <td class="px-10 py-6">
+                    <span class="font-mono font-black text-[#8A1538] text-lg">${b.pnr}</span><br>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${b.flightNumber}</span>
+                </td>
+                <td class="px-10 py-6">
+                    <span class="font-black text-slate-800">${b.passenger}</span><br>
+                    <span class="text-[10px] text-slate-400 font-medium">${b.email}</span>
+                </td>
+                <td class="px-10 py-6">
+                    <span class="text-xs font-black text-slate-600">${b.origin} ✈ ${b.destination}</span><br>
+                    <span class="text-[9px] font-black text-[#8A1538] uppercase">${b.travelClass} • SEAT ${b.seat}</span>
+                </td>
+                <td class="px-10 py-6">
+                    <span class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase ${b.paid ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}">
+                        ${b.paid ? 'PAID' : 'PENDING'}
+                    </span>
+                </td>
+                <td class="px-10 py-6 text-right">
+                    <button onclick="deleteBooking(${b.id})" class="w-10 h-10 rounded-xl bg-slate-50 text-slate-300 hover:bg-red-50 hover:text-red-500 transition-all shadow-sm">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+        tbody.innerHTML += row;
+    });
+
+    document.getElementById('total-revenue').innerText = `$${totalRevenue.toLocaleString()}`;
+    document.getElementById('total-count').innerText = bookings.length;
+    document.getElementById('active-seats').innerText = bookings.length;
+}
+
+// =====================================================
+// MODAL CONTROLS
+// =====================================================
+
+function openModal() {
+    document.getElementById('bookingModal').classList.remove('hidden');
+    generatePNR();
+
+    // Default Seat Map load (එවෙලේම flight එකක් තියෙනවා නම්)
+    const flight = document.getElementById('m-flightNumber').value;
+    if(flight) fetchOccupiedSeats(flight);
+    else initSeatMap();
+}
+
+function closeModal() {
+    document.getElementById('bookingModal').classList.add('hidden');
+    // Form එක clear කිරීම
+    const fields = ['m-passenger', 'm-email', 'm-flightNumber', 'm-origin', 'm-destination', 'm-departureDate', 'm-seat', 'm-price', 'm-passport'];
+    fields.forEach(f => {
+        const el = document.getElementById(f);
+        if(el) el.value = '';
+    });
+    document.getElementById('m-paid').checked = false;
+    document.getElementById('selected-seat-label').innerText = "No Seat Selected";
+}
+
+function generatePNR() {
+    const pnr = "CEY-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+    document.getElementById('pnr-display').innerText = pnr;
+}
+
 function filterTable() {
-    const input = document.getElementById("searchInput").value.toUpperCase();
-    const rows = document.getElementById("booking-table-body").getElementsByTagName("tr");
-
-    for (let i = 0; i < rows.length; i++) {
-        const rowContent = rows[i].textContent.toUpperCase();
-        rows[i].style.display = rowContent.indexOf(input) > -1 ? "" : "none";
-    }
+    const q = document.getElementById('table-search').value.toUpperCase();
+    document.querySelectorAll("#booking-table-body tr").forEach(tr => {
+        tr.style.display = tr.innerText.toUpperCase().includes(q) ? "" : "none";
+    });
 }
-
-// ================= LOAD BOOKINGS ON PAGE LOAD =================
-async function loadBookings() {
-    try {
-        const res = await fetch(API_URL);
-        const result = await res.json();
-        if(res.ok) {
-            bookings = result.data || [];
-            renderTable();
-        } else {
-            showNotification(result.message || "Failed to fetch bookings", true);
-        }
-    } catch(err) {
-        console.error(err);
-        showNotification("Server Error", true);
-    }
-}
-
-window.onload = loadBookings;

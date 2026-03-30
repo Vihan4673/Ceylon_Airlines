@@ -3,208 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ceylon Airlines | Booking Registry</title>
+    <title>Ceylon Airlines | Premium Booking Registry</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }
-        .custom-card { @apply bg-white rounded-[1.5rem] border border-slate-200 shadow-sm; }
-        .btn-primary { background: #8A1538; @apply text-white px-6 py-2.5 rounded-xl font-bold transition-all hover:bg-[#6b102b] active:scale-95 flex items-center gap-2; }
-        .input-field { @apply w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#8A1538] focus:border-transparent outline-none transition-all text-sm font-medium; }
-        .label-text { @apply text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1 block ml-1; }
-        .status-badge { @apply px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter; }
 
-        /* Modal Animation */
-        .modal-enter { animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        @keyframes modalIn {
-            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #f8fafc;
+        }
+
+        /* Modern Glass Cards */
+        .custom-card {
+            @apply bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/40 transition-all hover:shadow-2xl hover:shadow-slate-300/40;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8A1538 0%, #5a0d24 100%);
+            @apply text-white px-8 py-4 rounded-2xl font-black transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-3 shadow-lg shadow-red-900/20 uppercase tracking-widest text-xs;
+        }
+
+        .input-field {
+            @apply w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-[#8A1538]/5 focus:border-[#8A1538] outline-none transition-all text-sm font-bold text-slate-700;
+        }
+
+        .label-text {
+            @apply text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 mb-2 block ml-3;
+        }
+
+        /* Seat Grid Logic */
+        #seat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
-
-        #notification {
-            position: fixed; top: 20px; right: 20px; padding: 16px 24px;
-            border-radius: 16px; color: white; z-index: 2000; display: none;
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-            animation: modalIn 0.3s ease;
-        }
+        .animate-fade { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     </style>
 </head>
 
 <body class="antialiased text-slate-800">
 
-<div id="notification"></div>
-
-<main class="p-6 min-h-screen max-w-[1600px] mx-auto">
-
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+<main class="p-8 min-h-screen max-w-[1600px] mx-auto">
+    <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
         <div>
-            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Booking Registry</h2>
-            <p class="text-sm text-slate-500 font-medium">Full manifest control & passenger inventory management</p>
+            <span class="text-[#8A1538] font-black tracking-[0.4em] text-[10px] uppercase bg-red-50 px-4 py-2 rounded-full border border-red-100">Terminal Control Console</span>
+            <h2 class="text-5xl font-black tracking-tight text-slate-900 mt-4">Booking Registry</h2>
+            <p class="text-slate-500 font-medium mt-2">Manage global flight manifests and real-time inventory</p>
         </div>
-        <button onclick="openModal()" class="btn-primary shadow-lg shadow-red-900/20">
-            <i class="fa-solid fa-plus-circle"></i>
+        <button onclick="openModal()" class="btn-primary">
+            <i class="fa-solid fa-plus-circle text-lg"></i>
             Issue New Ticket
         </button>
     </div>
 
-    <!-- Stats Dashboard -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div class="custom-card p-5 border-l-4 border-l-[#8A1538]">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Revenue (USD)</p>
-            <h3 id="total-revenue" class="text-2xl font-black text-slate-900 mt-1">$0.00</h3>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+        <div class="custom-card p-8 border-l-[12px] border-l-[#8A1538]">
+            <p class="label-text !ml-0">Total Revenue</p>
+            <h3 id="total-revenue" class="text-3xl font-black text-slate-900 tracking-tighter">$0.00</h3>
         </div>
-        <div class="custom-card p-5">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Bookings</p>
-            <h3 id="total-count" class="text-2xl font-black text-slate-900 mt-1">0</h3>
+        <div class="custom-card p-8">
+            <p class="label-text !ml-0">Total Bookings</p>
+            <h3 id="total-count" class="text-3xl font-black text-slate-900">0</h3>
         </div>
-        <div class="custom-card p-5">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Seats</p>
-            <div class="flex items-center gap-2 mt-1">
-                <h3 id="active-seats" class="text-2xl font-black text-slate-900">0</h3>
-                <span class="text-xs font-bold text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-md">Live</span>
+        <div class="custom-card p-8">
+            <p class="label-text !ml-0">Active Seats</p>
+            <div class="flex items-center gap-3">
+                <h3 id="active-seats" class="text-3xl font-black text-slate-900">0</h3>
+                <span class="px-3 py-1 bg-emerald-100 text-emerald-600 text-[9px] font-black rounded-full uppercase">Live Sync</span>
             </div>
         </div>
-        <div class="custom-card p-5">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">System Status</p>
-            <div class="flex items-center gap-2 mt-2">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-xs font-bold text-slate-600">Syncing with Backend</span>
+        <div class="custom-card p-8 bg-slate-900 text-white border-none shadow-slate-900/20">
+            <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">System Health</p>
+            <div class="flex items-center gap-3 mt-2">
+                <div class="w-3 h-3 bg-green-400 rounded-full animate-ping shadow-[0_0_15px_rgba(74,222,128,0.5)]"></div>
+                <span class="font-bold text-lg tracking-tight">Operational</span>
             </div>
         </div>
     </div>
 
-    <!-- Table Container -->
-    <div class="custom-card">
-        <div class="p-4 bg-slate-50/50 border-b flex flex-wrap justify-between items-center gap-4">
-            <div class="flex gap-3 flex-1">
-                <div class="relative w-full max-w-sm">
-                    <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                    <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search PNR, Passenger or Route..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#8A1538]/10 bg-white">
-                </div>
-            </div>
-            <div class="flex items-center gap-2">
-                <button class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200 flex items-center gap-2">
-                    <i class="fa-solid fa-download"></i> Export Registry
-                </button>
+    <div class="custom-card overflow-hidden">
+        <div class="p-8 bg-slate-50/50 border-b flex items-center justify-between">
+            <div class="relative w-full max-w-md">
+                <i class="fa-solid fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="table-search" onkeyup="filterTable()" placeholder="Search PNR, Flight, or Passenger..." class="w-full pl-14 pr-6 py-4 bg-white border border-slate-200 rounded-[1.5rem] outline-none focus:ring-4 focus:ring-[#8A1538]/5 font-medium transition-all">
             </div>
         </div>
-
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
+            <table class="w-full text-left">
                 <thead>
-                <tr class="bg-white border-b text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    <th class="px-6 py-5">Flight & PNR</th>
-                    <th class="px-6 py-5">Passenger & Route</th>
-                    <th class="px-6 py-5">Class & Schedule</th>
-                    <th class="px-6 py-5">Financials</th>
-                    <th class="px-6 py-5 text-right">Actions</th>
+                <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b bg-slate-50/30">
+                    <th class="px-10 py-6">Flight Details</th>
+                    <th class="px-10 py-6">Passenger Details</th>
+                    <th class="px-10 py-6">Route & Class</th>
+                    <th class="px-10 py-6">Status</th>
+                    <th class="px-10 py-6 text-right">Actions</th>
                 </tr>
                 </thead>
                 <tbody id="booking-table-body" class="divide-y divide-slate-100">
-                <!-- Data will be loaded here -->
                 </tbody>
             </table>
         </div>
     </div>
 </main>
 
-<!-- Modal aligned with BookingDTO -->
-<div id="bookingModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden modal-enter max-h-[90vh] flex flex-col">
-        <div class="p-8 bg-[#8A1538] text-white flex justify-between items-center shrink-0">
-            <div>
-                <h3 class="text-2xl font-extrabold tracking-tight">Issue Ticket</h3>
-                <p class="text-red-100 text-xs font-medium mt-0.5 uppercase tracking-widest">DTO Compliant Entry System</p>
-            </div>
-            <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
+<div id="bookingModal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-50 hidden flex items-center justify-center p-6">
+    <div class="bg-white w-full max-w-6xl rounded-[3.5rem] shadow-2xl overflow-hidden animate-fade flex flex-col md:flex-row h-[92vh] border border-white/20">
 
-        <div class="p-8 space-y-6 overflow-y-auto">
-            <!-- PNR SECTION -->
-            <div class="flex items-center justify-between bg-slate-50 p-5 rounded-2xl border border-dashed border-slate-300">
+        <div class="flex-1 p-12 overflow-y-auto no-scrollbar border-r border-slate-100">
+            <div class="mb-12 flex justify-between items-start">
                 <div>
-                    <label class="label-text">Reference PNR</label>
-                    <span id="pnr-display" class="font-mono font-black text-2xl text-[#8A1538]">CEY----</span>
+                    <h3 class="text-4xl font-black text-slate-900 tracking-tighter">Issue Ticket</h3>
+                    <p class="text-slate-400 font-medium mt-1 uppercase text-[10px] tracking-widest">Global Reservation System</p>
                 </div>
-                <button onclick="generatePNR()" class="text-[10px] font-black bg-white border px-4 py-2 rounded-xl shadow-sm hover:bg-slate-50 transition-all text-slate-600">AUTO GENERATE</button>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-red-500 transition-colors">
+                    <i class="fa-solid fa-circle-xmark text-3xl"></i>
+                </button>
             </div>
 
-            <!-- PASSENGER INFO -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="md:col-span-2">
-                    <label class="label-text">Passenger Name (as per DTO)</label>
-                    <input type="text" id="m-passenger" placeholder="e.g. Kamal Perera" class="input-field">
-                </div>
-                <div>
-                    <label class="label-text">Origin City</label>
-                    <input type="text" id="m-origin" placeholder="Colombo (CMB)" class="input-field">
-                </div>
-                <div>
-                    <label class="label-text">Destination City</label>
-                    <input type="text" id="m-destination" placeholder="Singapore (SIN)" class="input-field">
-                </div>
-            </div>
-
-            <!-- FLIGHT SPECS -->
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="label-text">Flight Number</label>
-                    <input type="text" id="m-flightNumber" placeholder="UL-501" class="input-field font-mono">
-                </div>
-                <div>
-                    <label class="label-text">Departure Date</label>
-                    <input type="date" id="m-departureDate" class="input-field">
-                </div>
-                <div>
-                    <label class="label-text">Seat Assignment</label>
-                    <input type="text" id="m-seat" placeholder="24C" class="input-field font-mono uppercase">
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="md:col-span-2">
-                    <label class="label-text">Travel Class</label>
-                    <select id="m-travelClass" class="input-field appearance-none font-bold">
-                        <option value="Economy">Economy Class</option>
-                        <option value="Business">Business Class</option>
-                        <option value="First">First Class</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="label-text">Ticket Price (USD)</label>
-                    <input type="number" id="m-price" placeholder="0.00" class="input-field">
-                </div>
-            </div>
-
-            <!-- PAYMENT STATUS -->
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                <label class="flex items-center gap-3 cursor-pointer">
-                    <input type="checkbox" id="m-paid" class="w-5 h-5 accent-[#8A1538] rounded-md">
-                    <div>
-                        <span class="text-xs font-black uppercase text-slate-600 block">Mark as Paid</span>
-                        <span class="text-[10px] text-slate-400">Triggers 'CONFIRMED' status in registry</span>
+            <div class="space-y-8">
+                <div class="p-8 bg-gradient-to-br from-slate-50 to-white rounded-[2.5rem] border border-slate-200 shadow-sm relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-[#8A1538]/5 rounded-full -mr-16 -mt-16 transition-all group-hover:scale-110"></div>
+                    <label class="label-text">Passenger Verification</label>
+                    <div class="flex gap-4 relative">
+                        <input type="text" id="m-passport" placeholder="ENTER PASSPORT NUMBER" class="flex-1 px-6 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-[#8A1538]/10 font-black tracking-widest uppercase">
+                        <button onclick="lookupPassenger()" class="bg-slate-900 text-white px-8 rounded-2xl font-black hover:bg-black transition-all shadow-lg shadow-slate-900/20 active:scale-95">
+                            VERIFY
+                        </button>
                     </div>
-                </label>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="label-text">Full Name (Manifest)</label>
+                        <input type="text" id="m-passenger" class="input-field" placeholder="Search passport to auto-fill">
+                    </div>
+                    <div>
+                        <label class="label-text">Contact Email</label>
+                        <input type="email" id="m-email" class="input-field" placeholder="passenger@world.com">
+                    </div>
+                    <div>
+                        <label class="label-text">Flight Assignment</label>
+                        <input type="text" id="m-flightNumber" class="input-field font-mono text-[#8A1538]" placeholder="e.g. UL 225">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="label-text">Origin Port</label>
+                        <input type="text" id="m-origin" class="input-field" placeholder="CMB">
+                    </div>
+                    <div>
+                        <label class="label-text">Destination Port</label>
+                        <input type="text" id="m-destination" class="input-field" placeholder="SIN">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="label-text">Departure Schedule</label>
+                        <input type="date" id="m-departureDate" class="input-field">
+                    </div>
+                    <div>
+                        <label class="label-text">Cabin Class</label>
+                        <select id="m-travelClass" class="input-field cursor-pointer appearance-none">
+                            <option value="Economy">Economy</option>
+                            <option value="Business">Business</option>
+                            <option value="First Class">First Class</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div class="p-6 bg-slate-50 rounded-[2rem] border border-slate-200">
+                        <label class="label-text">Gross Fare (USD)</label>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl font-black text-slate-400">$</span>
+                            <input type="number" id="m-price" class="bg-transparent w-full text-2xl font-black text-slate-900 outline-none" placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-slate-50 rounded-[2rem] border border-slate-200 flex items-center justify-between">
+                        <div>
+                            <label class="label-text !mb-0">Payment Status</label>
+                            <span id="payment-text" class="text-[10px] font-black text-amber-600 uppercase tracking-wider">Settlement Pending</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="m-paid" class="sr-only peer" onchange="document.getElementById('payment-text').innerText = this.checked ? 'Payment Completed' : 'Settlement Pending'; document.getElementById('payment-text').className = this.checked ? 'text-[10px] font-black text-emerald-600 uppercase tracking-wider' : 'text-[10px] font-black text-amber-600 uppercase tracking-wider'">
+                            <div class="w-16 h-8 bg-slate-300 rounded-full peer peer-checked:after:translate-x-8 after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-10 bg-gradient-to-br from-slate-900 to-black text-white rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+                    <div class="relative z-10">
+                        <p class="text-[10px] font-black uppercase text-red-400 tracking-[0.3em]">System Reference (PNR)</p>
+                        <h4 id="pnr-display" class="text-4xl font-mono font-black tracking-widest mt-2">CEY-XXXXXX</h4>
+                    </div>
+                    <button onclick="generatePNR()" class="relative z-10 h-14 w-14 bg-white/10 hover:bg-white/20 rounded-2xl flex items-center justify-center transition-all">
+                        <i class="fa-solid fa-sync text-xl"></i>
+                    </button>
+                    <div class="absolute -right-4 -bottom-4 opacity-10">
+                        <i class="fa-solid fa-plane text-9xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 flex items-center gap-6">
+                <button onclick="closeModal()" class="px-8 py-5 font-black text-slate-400 uppercase tracking-widest text-xs hover:text-slate-900 transition-all">Discard</button>
+                <button onclick="saveBooking()" class="flex-1 btn-primary justify-center !text-sm !py-5">Finalize Manifest</button>
             </div>
         </div>
 
-        <div class="p-8 bg-slate-50 border-t flex gap-4 shrink-0">
-            <button onclick="closeModal()" class="flex-1 py-3 text-slate-500 font-bold hover:bg-slate-200 rounded-xl transition-all uppercase text-xs tracking-widest">Discard</button>
-            <button onclick="saveBooking()" class="flex-[2] btn-primary justify-center shadow-xl shadow-red-900/20 uppercase text-xs tracking-widest py-4">
-                Finalize & Save DTO
-            </button>
+        <div class="w-full md:w-[450px] bg-slate-50 p-12 flex flex-col items-center">
+            <div class="text-center mb-10">
+                <h4 class="text-2xl font-black text-slate-900">Seat Allocation</h4>
+                <p id="selected-seat-label" class="text-[#8A1538] text-[10px] font-black uppercase tracking-[0.2em] mt-2 px-4 py-1 bg-red-50 rounded-full inline-block border border-red-100">No Seat Selected</p>
+                <input type="hidden" id="m-seat">
+            </div>
+
+            <div class="w-56 h-24 bg-white border-2 border-slate-200 rounded-t-[120px] mb-6 relative flex items-center justify-center shadow-sm">
+                <div class="w-16 h-2 bg-slate-100 rounded-full"></div>
+            </div>
+
+            <div class="bg-white p-8 rounded-[3.5rem] border-x-[10px] border-slate-200 shadow-inner">
+                <div id="seat-grid">
+                </div>
+            </div>
+
+            <div class="mt-10 grid grid-cols-3 gap-6">
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-6 h-6 bg-white border-2 border-slate-200 rounded-lg"></div>
+                    <span class="text-[8px] font-black uppercase text-slate-400 tracking-tighter">Free</span>
+                </div>
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-6 h-6 bg-slate-200 rounded-lg"></div>
+                    <span class="text-[8px] font-black uppercase text-slate-400 tracking-tighter">Booked</span>
+                </div>
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-6 h-6 bg-[#8A1538] rounded-lg shadow-lg shadow-red-900/30"></div>
+                    <span class="text-[8px] font-black uppercase text-slate-400 tracking-tighter">Selected</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<script src ="../js/Booking.js">
-
-</script>
+<script src="../js/Booking.js"></script>
 
 </body>
 </html>

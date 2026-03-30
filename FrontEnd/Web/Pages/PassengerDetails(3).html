@@ -5,280 +5,232 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Passenger Details | Ceylon Air</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
         :root {
             --airline-blue: #005eb8;
-            --airline-dark: #003366;
+            --airline-dark: #002b5c;
+            --bg-soft: #f8fafc;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f3f7fa;
+            background-color: var(--bg-soft);
+            color: #1e293b;
         }
 
-        .step-gradient {
-            background: linear-gradient(90deg, var(--airline-blue) 0%, var(--airline-dark) 100%);
+        .nav-gradient {
+            background: linear-gradient(135deg, #002b5c 0%, #005eb8 100%);
         }
 
         .input-field {
-            transition: all 0.2s ease-in-out;
-            border: 1.5px solid #e2e8f0;
-            background-color: #f8fafc;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #e2e8f0;
+            background-color: #ffffff;
         }
 
         .input-field:focus {
             border-color: var(--airline-blue);
-            background-color: white;
-            box-shadow: 0 0 0 4px rgba(0, 94, 184, 0.1);
+            box-shadow: 0 0 0 4px rgba(0, 94, 184, 0.08);
+            outline: none;
         }
 
         .floating-card {
             background: white;
-            border-radius: 1.5rem;
-            border: 1px solid #eef2f6;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 24px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 20px -10px rgba(0, 0, 0, 0.03);
         }
 
-        .floating-card:hover {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        .label-style {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            margin-bottom: 0.6rem;
+            display: block;
         }
 
-        .custom-checkbox {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--airline-blue);
+        .gender-option input:checked + div {
+            border-color: var(--airline-blue);
+            background-color: #f0f7ff;
+            color: var(--airline-blue);
         }
 
-        .progress-bar {
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            background: #60a5fa;
-            width: 50%; /* Current Step */
-            transition: width 1s ease-in-out;
+        .price-chip {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
-<body class="text-slate-800">
+<body class="antialiased">
 
-<!-- Top Navigation / Progress -->
-<nav class="step-gradient text-white sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-6">
-            <div class="bg-white/10 p-2.5 rounded-xl backdrop-blur-md border border-white/10">
-                <i class="fa-solid fa-plane-departure text-xl"></i>
+<nav class="nav-gradient text-white sticky top-0 z-50 shadow-xl">
+    <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
+        <div class="flex items-center gap-5">
+            <div class="bg-amber-400 text-blue-900 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fa-solid fa-plane-up text-lg"></i>
             </div>
             <div>
-                <div class="flex items-center gap-3">
-                    <p id="navFromCode" class="font-extrabold text-lg leading-none">---</p>
-                    <i class="fas fa-arrow-right text-[10px] opacity-50"></i>
-                    <p id="navToCode" class="font-extrabold text-lg leading-none">---</p>
+                <div class="flex items-center gap-2">
+                    <span id="navFromCode" class="font-900 text-xl tracking-tighter">---</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] text-amber-400"></i>
+                    <span id="navToCode" class="font-900 text-xl tracking-tighter">---</span>
                 </div>
-                <p class="text-[10px] font-bold uppercase tracking-widest opacity-60 mt-1">Passenger Information</p>
+                <p class="text-[9px] font-bold uppercase tracking-[0.2em] opacity-70">Secured Checkout</p>
             </div>
         </div>
 
-        <div class="hidden lg:flex items-center gap-10 text-[10px] font-bold uppercase tracking-[0.15em]">
-            <span class="opacity-40">01 Flight</span>
-            <span class="flex items-center gap-2 text-blue-300">
-                <span class="bg-blue-400 text-white w-5 h-5 rounded-full flex items-center justify-center text-[9px]">02</span>
-                Details
-            </span>
-            <span class="opacity-40">03 Extras</span>
-            <span class="opacity-40">04 Payment</span>
-        </div>
-
-        <div class="flex items-center gap-4 bg-white/10 px-5 py-2.5 rounded-xl border border-white/10">
+        <div class="price-chip px-5 py-2.5 rounded-2xl flex items-center gap-4">
             <div class="text-right">
-                <p class="text-[9px] font-bold opacity-60 uppercase tracking-tighter">Current Total</p>
-                <p class="text-lg font-black leading-none">LKR <span id="navTotal">0</span></p>
+                <p class="text-[9px] font-black uppercase opacity-60">Payable Amount</p>
+                <p class="text-xl font-900 leading-none">LKR <span id="navTotal">0</span></p>
             </div>
-            <i class="fa-solid fa-cart-shopping opacity-60"></i>
+            <div class="h-8 w-[1px] bg-white/20"></div>
+            <i class="fa-solid fa-shield-halved text-amber-400"></i>
         </div>
-    </div>
-    <div class="progress-bar">
-        <div class="progress-fill"></div>
     </div>
 </nav>
 
-<main class="max-w-4xl mx-auto px-6 py-12">
+<main class="max-w-3xl mx-auto px-6 py-16">
+    <header class="mb-12 text-center md:text-left">
+        <h1 class="text-4xl font-900 text-slate-900 tracking-tight mb-3">Who is traveling?</h1>
+        <p class="text-slate-500 font-medium">Please enter names exactly as they appear on your passport.</p>
+    </header>
 
-    <div class="mb-10">
-        <h1 class="text-3xl font-black text-[#003366] tracking-tight">Passenger Details</h1>
-        <p class="text-slate-500 mt-2 font-medium flex items-center gap-2">
-            <i class="fas fa-info-circle text-blue-500"></i>
-            Please enter details exactly as shown on your travel document.
-        </p>
-    </div>
+    <form id="passengerForm" class="space-y-10">
 
-    <form id="passengerForm" class="space-y-8">
-
-        <!-- Section: Personal Info -->
-        <div class="floating-card p-8 lg:p-10">
-            <div class="flex items-center gap-4 mb-8">
-                <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
-                    <i class="fa-solid fa-user-tag"></i>
+        <div class="floating-card p-8 md:p-12">
+            <div class="flex items-center gap-4 mb-10 border-b border-slate-50 pb-6">
+                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-id-card"></i>
                 </div>
-                <h2 class="text-xl font-extrabold text-[#003366]">Personal Information</h2>
+                <h2 class="text-2xl font-800 text-slate-800">Identity Details</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                <div class="md:col-span-3">
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Title*</label>
-                    <div class="relative">
-                        <select id="title" class="w-full input-field rounded-xl px-4 py-3.5 appearance-none focus:outline-none font-bold text-slate-700">
-                            <option value="Mr">Mr</option>
-                            <option value="Mrs">Mrs</option>
-                            <option value="Ms">Ms</option>
-                            <option value="Dr">Dr</option>
-                        </select>
-                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[10px]"></i>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                <div class="md:col-span-4">
+                    <label class="label-style">Title</label>
+                    <select id="title" class="w-full input-field rounded-2xl px-5 py-4 font-bold text-slate-700 appearance-none cursor-pointer">
+                        <option value="Mr">Mr</option><option value="Mrs">Mrs</option><option value="Ms">Ms</option><option value="Dr">Dr</option>
+                    </select>
                 </div>
 
-                <div class="md:col-span-9">
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">First Name (as per passport)*</label>
-                    <input type="text" id="firstName" placeholder="e.g. MOHAMED" class="w-full input-field rounded-xl px-5 py-3.5 focus:outline-none font-bold uppercase">
+                <div class="md:col-span-8">
+                    <label class="label-style">First Name</label>
+                    <input type="text" id="firstName" placeholder="MOHAMED" class="w-full input-field rounded-2xl px-6 py-4 font-bold uppercase tracking-wide" required>
                 </div>
 
                 <div class="md:col-span-12">
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Last Name (as per passport)*</label>
-                    <input type="text" id="lastName" placeholder="e.g. PERERA" class="w-full input-field rounded-xl px-5 py-3.5 focus:outline-none font-bold uppercase">
+                    <label class="label-style">Last Name</label>
+                    <input type="text" id="lastName" placeholder="PERERA" class="w-full input-field rounded-2xl px-6 py-4 font-bold uppercase tracking-wide" required>
                 </div>
 
                 <div class="md:col-span-6">
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Gender*</label>
-                    <div class="flex gap-4">
-                        <label class="flex-1 flex items-center justify-center gap-3 border-2 border-slate-50 rounded-xl py-3.5 px-4 cursor-pointer hover:bg-white hover:border-blue-200 transition font-bold text-sm bg-slate-50">
-                            <input type="radio" name="gender" value="Male" class="accent-[#005eb8]" required> Male
+                    <label class="label-style">Gender</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="gender-option cursor-pointer">
+                            <input type="radio" name="gender" value="Male" class="sr-only" required>
+                            <div class="border-2 border-slate-100 rounded-2xl py-4 text-center font-bold text-sm transition-all hover:border-blue-200">Male</div>
                         </label>
-                        <label class="flex-1 flex items-center justify-center gap-3 border-2 border-slate-50 rounded-xl py-3.5 px-4 cursor-pointer hover:bg-white hover:border-blue-200 transition font-bold text-sm bg-slate-50">
-                            <input type="radio" name="gender" value="Female" class="accent-[#005eb8]"> Female
+                        <label class="gender-option cursor-pointer">
+                            <input type="radio" name="gender" value="Female" class="sr-only">
+                            <div class="border-2 border-slate-100 rounded-2xl py-4 text-center font-bold text-sm transition-all hover:border-blue-200">Female</div>
                         </label>
                     </div>
                 </div>
 
                 <div class="md:col-span-6">
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Date of Birth*</label>
-                    <input type="date" id="dob" class="w-full input-field rounded-xl px-5 py-3.5 focus:outline-none font-bold text-slate-600">
+                    <label class="label-style">Date of Birth</label>
+                    <input type="date" id="dob" class="w-full input-field rounded-2xl px-6 py-4 font-bold text-slate-600" required>
                 </div>
             </div>
         </div>
 
-        <!-- Section: Contact Info -->
-        <div class="floating-card p-8 lg:p-10 border-l-4 border-l-green-500">
-            <div class="flex items-center gap-4 mb-8">
-                <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
-                    <i class="fa-solid fa-envelope-open-text"></i>
+        <div class="floating-card p-8 md:p-12 border-t-8 border-t-emerald-500">
+            <div class="flex items-center gap-4 mb-10">
+                <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-address-book"></i>
                 </div>
-                <h2 class="text-xl font-extrabold text-[#003366]">Contact Details</h2>
+                <h2 class="text-2xl font-800 text-slate-800">Contact Information</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="md:col-span-2">
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Email Address*</label>
-                    <input type="email" id="email" placeholder="example@mail.com" class="w-full input-field rounded-xl px-5 py-3.5 focus:outline-none font-bold">
+            <div class="space-y-8">
+                <div>
+                    <label class="label-style">Email Address</label>
+                    <input type="email" id="email" placeholder="traveller@example.com" class="w-full input-field rounded-2xl px-6 py-4 font-bold" required>
+                    <p class="text-[10px] text-slate-400 mt-2 font-medium">Your e-ticket will be sent here.</p>
                 </div>
 
-                <div class="md:col-span-2">
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Mobile Number*</label>
-                    <input type="text" id="mobile" placeholder="+94 7X XXX XXXX" class="w-full input-field rounded-xl px-5 py-3.5 focus:outline-none font-bold">
+                <div>
+                    <label class="label-style">Mobile Number</label>
+                    <input type="text" id="mobile" placeholder="+94 7X XXX XXXX" class="w-full input-field rounded-2xl px-6 py-4 font-bold" required>
                 </div>
-            </div>
-
-            <div class="mt-8 p-5 bg-green-50/50 rounded-2xl border border-green-100 flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-green-500 shadow-sm">
-                        <i class="fab fa-whatsapp text-xl"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-black text-green-800">WhatsApp Notification</p>
-                        <p class="text-[10px] text-green-600/70 font-medium">Get real-time flight status and updates</p>
-                    </div>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" checked class="sr-only peer">
-                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
-                </label>
             </div>
         </div>
 
-        <!-- Section: Passport -->
-        <div class="floating-card p-8 lg:p-10">
-            <div class="flex items-center gap-4 mb-8">
-                <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
+        <div class="floating-card p-8 md:p-12">
+            <div class="flex items-center gap-4 mb-10">
+                <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl">
                     <i class="fa-solid fa-passport"></i>
                 </div>
-                <h2 class="text-xl font-extrabold text-[#003366]">Passport Information</h2>
+                <h2 class="text-2xl font-800 text-slate-800">Travel Document</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="md:col-span-2">
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Passport Number*</label>
-                    <input type="text" id="passportNumber" placeholder="N0000000" class="w-full input-field rounded-xl px-5 py-3.5 focus:outline-none font-bold uppercase tracking-widest">
+                    <label class="label-style">Passport Number</label>
+                    <input type="text" id="passportNumber" placeholder="N0000000" class="w-full input-field rounded-2xl px-6 py-4 font-bold uppercase tracking-widest" required>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Nationality*</label>
-                    <input type="text" id="nationality" placeholder="e.g. SRI LANKAN" class="w-full input-field rounded-xl px-5 py-3.5 focus:outline-none font-bold uppercase">
+                    <label class="label-style">Nationality</label>
+                    <input type="text" id="nationality" placeholder="SRI LANKAN" class="w-full input-field rounded-2xl px-6 py-4 font-bold uppercase" required>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Expiry Date*</label>
-                    <input type="date" id="passportExpiry" class="w-full input-field rounded-xl px-5 py-3.5 focus:outline-none font-bold text-slate-600">
+                    <label class="label-style">Expiry Date</label>
+                    <input type="date" id="passportExpiry" class="w-full input-field rounded-2xl px-6 py-4 font-bold text-slate-600" required>
                 </div>
             </div>
         </div>
 
-        <!-- Consent & Action -->
-        <div class="space-y-6 pt-6">
-            <label class="flex items-start gap-4 cursor-pointer group bg-white/50 p-4 rounded-xl hover:bg-white transition">
-                <input type="checkbox" id="privacyConsent" class="custom-checkbox mt-1">
-                <span class="text-[11px] font-medium text-slate-500 group-hover:text-slate-800 leading-relaxed">
-                    I confirm that the names provided match the travel documents. I have read and accepted the
-                    <a href="#" class="text-blue-600 font-bold underline">Terms of Booking</a> and
-                    <a href="#" class="text-blue-600 font-bold underline">Privacy Policy</a>.
+        <div class="pt-10 border-t border-slate-200">
+            <label class="flex items-start gap-4 cursor-pointer mb-10 group">
+                <input type="checkbox" id="privacyConsent" class="w-5 h-5 rounded accent-blue-600 mt-1">
+                <span class="text-xs font-medium text-slate-500 group-hover:text-slate-800 leading-relaxed">
+                    I confirm that the names provided match my travel documents. I have read and accepted the
+                    <a href="#" class="text-blue-600 font-bold underline decoration-blue-200">Booking Terms</a>.
                 </span>
             </label>
 
-            <div class="flex flex-col md:flex-row justify-between items-center gap-6 pt-4">
-                <button type="button" class="w-full md:w-auto flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-800 transition py-4 px-6">
-                    <i class="fa-solid fa-chevron-left"></i> Change Flight
+            <div class="flex flex-col md:flex-row gap-4">
+                <button type="button" onclick="history.back()" class="flex-1 text-slate-400 font-bold uppercase text-[10px] tracking-widest py-5 hover:text-slate-900 transition">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Back to Flights
                 </button>
-                <button type="submit" class="w-full md:w-auto bg-[#005eb8] hover:bg-[#003366] text-white px-16 py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-3">
-                    Next: Add Extras <i class="fa-solid fa-arrow-right"></i>
+                <button type="submit" class="flex-[2] bg-slate-900 text-white py-5 rounded-2xl font-black uppercase text-xs tracking-widest shadow-2xl shadow-slate-200 hover:bg-blue-600 transition-all active:scale-95 flex items-center justify-center gap-3">
+                    Continue to Extras <i class="fa-solid fa-arrow-right text-amber-400"></i>
                 </button>
             </div>
         </div>
     </form>
 </main>
 
-<footer class="py-16 border-t border-slate-200 mt-20">
-    <div class="max-w-7xl mx-auto px-6 text-center">
-        <p class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300">© 2025 Ceylon Air | Secure Checkout Powered by SL-Airlines</p>
-    </div>
+<footer class="py-12 text-center border-t border-slate-100 mt-10">
+    <p class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300">© 2026 Ceylon Air | Secure SSL Encryption</p>
 </footer>
 
 <script src="../JavaScript/PassengerDetails.js"></script>
 
-<!-- Script to sync navigation details from localStorage -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const selectedFlight = JSON.parse(localStorage.getItem('selectedFlight'));
         if (selectedFlight) {
-            if (document.getElementById('navFromCode')) document.getElementById('navFromCode').innerText = selectedFlight.from;
-            if (document.getElementById('navToCode')) document.getElementById('navToCode').innerText = selectedFlight.to;
-            if (document.getElementById('navTotal')) document.getElementById('navTotal').innerText = selectedFlight.price;
+            if(document.getElementById('navFromCode')) document.getElementById('navFromCode').innerText = selectedFlight.from || 'CMB';
+            if(document.getElementById('navToCode')) document.getElementById('navToCode').innerText = selectedFlight.to || 'DXB';
+            if(document.getElementById('navTotal')) document.getElementById('navTotal').innerText = selectedFlight.price || '0';
         }
     });
 </script>

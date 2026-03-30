@@ -1,6 +1,5 @@
 const API_BASE_URL = "http://localhost:8080/api/v1/passengers";
 
-
 // ================= 🔐 GET AUTH TOKEN =================
 function getAuthToken() {
     const token = localStorage.getItem("token");
@@ -16,7 +15,7 @@ function getAuthToken() {
 // ================= 📅 DATE CONVERTER =================
 function convertToISO(dateStr) {
     if (!dateStr) return null;
-    return dateStr; // HTML Date picker (YYYY-MM-DD) input eka Backend ekata kelinma galapenawa
+    return dateStr;
 }
 
 // ================= 🚀 FETCH ALL PASSENGERS =================
@@ -28,7 +27,7 @@ async function fetchPassengers() {
         const res = await fetch(`${API_BASE_URL}/getAllPassengers`, {
             method: "GET",
             headers: {
-                "Authorization": `Bearer ${token}`, // ✅ JWT Token eka attach kala
+                "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
             }
         });
@@ -76,7 +75,7 @@ async function savePassenger() {
         return;
     }
 
-    // Backend PassengerDTO ekata 100% match wenna ona names tika
+    // Backend DTO ekata 100% match wenna ona
     const passengerDTO = {
         title: title,
         firstName: firstName,
@@ -85,7 +84,9 @@ async function savePassenger() {
         dateOfBirth: dobRaw,
         email: email,
         phoneNumber: mobile,
-        documentNumber: passportNumber,
+        // ✅ Passport number eka "passportNumber" widiyata save kala (Checkout ekata lesi wenna)
+        passportNumber: passportNumber,
+        documentNumber: passportNumber, // Backend compatibility
         nationality: nationality,
         expiryDate: expiryRaw
     };
@@ -97,7 +98,7 @@ async function savePassenger() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}` // ✅ Token eka attach kala
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify(passengerDTO)
         });
@@ -106,7 +107,9 @@ async function savePassenger() {
 
         if (res.ok) {
             alert("Passenger details saved successfully!");
+            // ✅ LocalStorage ekata "currentPassenger" widiyata sampurna data set ekama damma
             localStorage.setItem("currentPassenger", JSON.stringify(passengerDTO));
+            // ✅ Checkout page ekata yama
             window.location.href = "Checkout page.html";
         } else {
             alert(result.message || "Save failed.");
@@ -125,7 +128,7 @@ async function deletePassenger(id) {
     try {
         const res = await fetch(`${API_BASE_URL}/deletePassenger/${id}`, {
             method: "DELETE",
-            headers: { "Authorization": `Bearer ${token}` } // ✅ Token eka attach kala
+            headers: { "Authorization": `Bearer ${token}` }
         });
 
         if (res.ok) {
@@ -146,9 +149,9 @@ function renderPassengers(passengers) {
         <tr class="hover:bg-slate-50 border-b border-slate-100">
             <td class="px-6 py-4 font-bold text-slate-700">${p.title} ${p.firstName} ${p.lastName}</td>
             <td class="px-6 py-4 text-sm">${p.nationality}</td>
-            <td class="px-6 py-4 font-mono text-xs">${p.passportNumber}</td>
+            <td class="px-6 py-4 font-mono text-xs">${p.documentNumber || p.passportNumber}</td>
             <td class="px-6 py-4 text-xs">${p.email}</td>
-            <td class="px-6 py-4 text-xs font-bold">${p.passportExpiry}</td>
+            <td class="px-6 py-4 text-xs font-bold">${p.expiryDate || p.passportExpiry}</td>
             <td class="px-6 py-4 text-right">
                 <button onclick="deletePassenger(${p.id})" class="text-red-500 hover:underline">Delete</button>
             </td>
@@ -158,14 +161,12 @@ function renderPassengers(passengers) {
 
 // ================= 🚦 INITIALIZE =================
 document.addEventListener("DOMContentLoaded", () => {
-    // Form submission handle kirima
     const form = document.getElementById("passengerForm");
     form?.addEventListener("submit", (e) => {
         e.preventDefault();
         savePassenger();
     });
 
-    // Table ekak thiyena page ekaka nam data fetch karanna
     if (document.getElementById("passenger-table")) {
         fetchPassengers();
     }

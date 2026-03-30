@@ -1,12 +1,14 @@
-
-const API_BASE = "http://localhost:8080/api/v1/baggages"; // your Spring Boot API base
+// ================= CONFIG =================
+const API_BASE = "http://localhost:8080/api/v1/baggages";
+const BOOKING_API = "http://localhost:8080/api/v1/bookings";
 let allBaggages = [];
 let activeFilter = "All";
 
-
+// ================= FETCH ALL BAGGAGES =================
 async function fetchBaggages() {
     try {
         const res = await fetch(`${API_BASE}/all`);
+        if (!res.ok) throw new Error("Failed to fetch baggages");
         allBaggages = await res.json();
         renderBaggages();
         updateStats();
@@ -15,16 +17,19 @@ async function fetchBaggages() {
     }
 }
 
+// ================= RENDER BAGGAGE CARDS =================
 window.renderBaggages = () => {
     const list = document.getElementById("baggageList");
-    const search = document.getElementById("searchInput").value.toLowerCase();
+    const searchInput = document.getElementById("searchInput");
+    const search = searchInput ? searchInput.value.toLowerCase() : "";
 
     let filtered = activeFilter === "All" ? allBaggages : allBaggages.filter(b => b.flightNo === activeFilter);
 
     if (search) {
         filtered = filtered.filter(b =>
-            b.passenger.toLowerCase().includes(search) ||
-            b.passportNo.toLowerCase().includes(search)
+            (b.passenger || '').toLowerCase().includes(search) ||
+            (b.passportNo || '').toLowerCase().includes(search) ||
+            (b.tagId || '').toLowerCase().includes(search)
         );
     }
 
@@ -44,17 +49,17 @@ window.renderBaggages = () => {
                     <i class="fas fa-passport text-gray-400"></i>
                 </div>
                 <div>
-                    <h4 class="text-xl font-black text-gray-800 tracking-tight">${b.passenger}</h4>
+                    <h4 class="text-xl font-black text-gray-800 tracking-tight">${b.passenger || 'N/A'}</h4>
                     <div class="flex items-center gap-2 mt-1">
                         <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Passport:</span>
-                        <span class="text-xs font-bold text-[#8b1d41]">${b.passportNo}</span>
+                        <span class="text-xs font-bold text-[#8b1d41]">${b.passportNo || 'N/A'}</span>
                     </div>
                 </div>
             </div>
             <div class="flex flex-wrap gap-3 mb-8">
                 <div class="bg-gray-50 px-4 py-2 rounded-xl border border-gray-100">
                     <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Flight No</p>
-                    <p class="text-xs font-black text-gray-700">${b.flightNo}</p>
+                    <p class="text-xs font-black text-gray-700">${b.flightNo || 'N/A'}</p>
                 </div>
                 <div class="bg-gray-50 px-4 py-2 rounded-xl border border-gray-100">
                     <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Tag ID</p>
@@ -78,9 +83,12 @@ window.renderBaggages = () => {
     renderFilterButtons();
 };
 
+// ================= FILTER BUTTONS =================
 function renderFilterButtons() {
-    const flights = [...new Set(allBaggages.map(b => b.flightNo))];
+    const flights = [...new Set(allBaggages.map(b => b.flightNo).filter(f => f))];
     const container = document.getElementById("dynamicFilters");
+    if(!container) return;
+
     container.innerHTML = flights.map(f => `
         <button onclick="setFilter('${f}')" id="f-${f}" class="filter-btn px-6 py-2 rounded-xl text-xs font-bold transition-all ${activeFilter === f ? 'bg-gray-900 text-white' : 'text-gray-400 hover:text-gray-600'}">
             ${f}
@@ -90,72 +98,146 @@ function renderFilterButtons() {
 
 window.setFilter = (f) => {
     activeFilter = f;
-    document.querySelectorAll(".filter-btn").forEach(b => {
-        b.classList.remove("bg-gray-900", "text-white");
-        b.classList.add("text-gray-400");
-    });
-    const btn = document.getElementById(`f-${f}`);
-    if (btn) btn.classList.add("bg-gray-900", "text-white");
     renderBaggages();
 };
 
-
+// ================= STATS =================
 function updateStats() {
-    document.getElementById("statTotal").innerText = allBaggages.length;
-    document.getElementById("statScan").innerText = allBaggages.filter(b => b.status === "Scanning").length;
-    document.getElementById("statLoad").innerText = allBaggages.filter(b => b.status === "Loaded").length;
-    document.getElementById("statArrived").innerText = allBaggages.filter(b => b.status === "Arrived").length;
+    const total = document.getElementById("statTotal");
+    const scan = document.getElementById("statScan");
+    const load = document.getElementById("statLoad");
+    const arrived = document.getElementById("statArrived");
+
+    if(total) total.innerText = allBaggages.length;
+    if(scan) scan.innerText = allBaggages.filter(b => b.status === "Scanning").length;
+    if(load) load.innerText = allBaggages.filter(b => b.status === "Loaded").length;
+    if(arrived) arrived.innerText = allBaggages.filter(b => b.status === "Arrived").length;
 }
 
-
+// ================= STATUS UPDATE =================
 window.updateStatus = async (id, status) => {
     try {
-        await fetch(`${API_BASE}/status/${id}?status=${status}`, { method: "PATCH" });
-        await fetchBaggages();
+        const res = await fetch(`${API_BASE}/status/${id}?status=${status}`, { method: "PATCH" });
+        if(res.ok) await fetchBaggages();
     } catch (err) {
         console.error("Status update failed:", err);
     }
 };
 
+// ================= DELETE BAGGAGE =================
 window.deleteItem = async (id) => {
     if (!confirm("Delete this baggage record permanently?")) return;
     try {
-        await fetch(`${API_BASE}/delete/${id}`, { method: "DELETE" });
-        await fetchBaggages();
+        const res = await fetch(`${API_BASE}/delete/${id}`, { method: "DELETE" });
+        if(res.ok) await fetchBaggages();
     } catch (err) {
         console.error("Delete failed:", err);
     }
 };
 
+// ================= MODAL CONTROLS =================
 window.openModal = () => document.getElementById("modal").classList.remove("hidden");
-window.closeModal = () => document.getElementById("modal").classList.add("hidden");
+window.closeModal = () => {
+    document.getElementById("modal").classList.add("hidden");
+    const form = document.getElementById("baggageForm");
+    if(form) form.reset();
+};
 
+// ================= PNR LOOKUP (FIXED PASSPORT FETCH) =================
+window.handlePNRLookup = async (pnr) => {
+    const loader = document.getElementById("pnrLoader");
+    const nameInput = document.getElementById("fName");
+    const passportInput = document.getElementById("fPassport");
+    const flightInput = document.getElementById("fFlight");
+    const tagInput = document.getElementById("fTag");
 
-const form = document.getElementById("baggageForm");
-if (form) {
-    form.onsubmit = async (e) => {
-        e.preventDefault();
-        const data = {
-            passportNo: document.getElementById("fPassport").value.trim().toUpperCase(),
-            passenger: document.getElementById("fName").value.trim(),
-            flightNo: document.getElementById("fFlight").value.trim().toUpperCase(),
-            tagId: document.getElementById("fTag").value.trim().toUpperCase(),
-            status: "Checked"
-        };
+    if (pnr.length < 3) {
+        [nameInput, passportInput, flightInput, tagInput].forEach(i => i.value = '');
+        return;
+    }
 
-        try {
-            await fetch(`${API_BASE}/save`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data)
-            });
-            closeModal();
-            e.target.reset();
-            fetchBaggages();
-        } catch (err) {
-            console.error("Failed to save baggage:", err);
+    loader.classList.remove("hidden");
+    try {
+        const res = await fetch(`${BOOKING_API}/pnr/${pnr}`);
+        if (!res.ok) throw new Error("PNR not found");
+
+        const responseData = await res.json();
+        const booking = responseData.data || responseData;
+
+        // ✅ DB එකේ තියෙන Passport Number එකම ගන්නවා (Generate කරන්නේ නැත)
+        const dbPassport = booking.passportNumber || booking.passportNo || '';
+
+        nameInput.value = booking.passenger || '';
+        flightInput.value = booking.flightNumber || '';
+        passportInput.value = dbPassport;
+
+        // Tag ID එක පමණක් Flight No සහ Passport No ඇසුරෙන් create කරයි
+        if(flightInput.value && passportInput.value) {
+            tagInput.value = generateTag(passportInput.value, flightInput.value);
         }
-    };
+
+    } catch (err) {
+        console.error("PNR lookup failed:", err);
+        // වැරදි PNR එකක් ගැහුවොත් fields හිස් කරයි
+        [nameInput, passportInput, flightInput, tagInput].forEach(i => i.value = '');
+    } finally {
+        loader.classList.add("hidden");
+    }
+};
+
+// ================= BAG TAG GENERATION =================
+function generateTag(passport, flight) {
+    if (!passport || !flight) return '';
+    const random = Math.floor(1000 + Math.random() * 9000);
+    const flightPart = flight.replace(/\s+/g, '').substring(0, 3).toUpperCase();
+    const passPart = passport.toString().slice(-4).toUpperCase();
+    return `${flightPart}-${passPart}-${random}`;
 }
 
-fetchBaggages();
+// ================= FORM SUBMISSION =================
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("baggageForm");
+    if (form) {
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+
+            const data = {
+                pnr: document.getElementById("fPNR").value.trim().toUpperCase(),
+                passportNo: document.getElementById("fPassport").value.trim(),
+                passenger: document.getElementById("fName").value.trim(),
+                flightNo: document.getElementById("fFlight").value.trim(),
+                tagId: document.getElementById("fTag").value.trim(),
+                bagCount: parseInt(document.getElementById("fBagCount").value) || 1,
+                status: "Checked"
+            };
+
+            if(!data.pnr || !data.passportNo || !data.flightNo) {
+                alert("Please perform a valid PNR lookup first!");
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/save`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    closeModal();
+                    fetchBaggages();
+                } else {
+                    const errorText = await res.text();
+                    alert("Error: " + errorText);
+                }
+            } catch (err) {
+                console.error("Submission error:", err);
+            }
+        };
+    }
+
+    fetchBaggages();
+});

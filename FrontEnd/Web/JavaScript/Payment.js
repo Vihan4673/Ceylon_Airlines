@@ -22,11 +22,12 @@ async function initPage() {
         const result = await response.json();
 
         if (response.ok && result.data) {
+            // DB එකෙන් අපේ PNR එකට අදාළ දත්ත සොයයි (මෙහි දැන් passportNumber ද ඇත)
             const matched = result.data.find(b => b.pnr === savedPnr);
 
             if (matched) {
                 currentBooking = matched;
-                console.log("✅ Booking Synced:", currentBooking);
+                console.log("✅ Booking Synced (with Passport):", currentBooking);
                 renderBookingDetails(currentBooking);
             } else {
                 console.error("❌ PNR not found in Database.");
@@ -59,15 +60,14 @@ async function handlePayment(e) {
     spinner?.classList.remove('hidden');
     btnText?.classList.add('hidden');
 
-    // 🔴 වැදගත්: Backend එකේ 'paid' field එක Boolean (true/false) නිසා,
-    // "PAID" වෙනුවට true ලෙස යැවිය යුතුය.
-    // එසේම Spring Boot එකට අවශ්‍ය සියලුම fields මෙහි ඇති බව තහවුරු කරමු.
-    // 🔴 Add passenger email to the payload
+    // 🔴 Final Payload: Backend එකේ BookingDTO එකට ගැලපෙන ලෙස සකස් කර ඇත.
     const updateData = {
         id: currentBooking.id,
         pnr: currentBooking.pnr,
         passenger: currentBooking.passenger,
-        email: currentBooking.email || "",      // ✅ ADD THIS LINE
+        email: currentBooking.email || "",
+        // ✅ Passport Number එක මෙහිදී payload එකට එක් වේ
+        passportNumber: currentBooking.passportNumber || "",
         flightNumber: currentBooking.flightNumber,
         origin: currentBooking.origin,
         destination: currentBooking.destination,
@@ -76,14 +76,13 @@ async function handlePayment(e) {
         travelClass: currentBooking.travelClass,
         price: currentBooking.price,
         bookingDate: currentBooking.bookingDate,
-        paid: true,           // ✅ Boolean True
+        paid: true,           // ✅ Boolean True (Payment done)
         status: "CONFIRMED"   // ✅ String Status
     };
 
-    console.log("🚀 Final Payload to Backend:", updateData);
+    console.log("🚀 Final Payload to Backend (Updating Paid Status):", updateData);
 
     try {
-        // Backend එකේ අලුත් Endpoint එක: /api/v1/bookings/pnr/{pnr}
         const res = await fetch(`${API_BASE}/pnr/${savedPnr}`, {
             method: "PUT",
             headers: {
@@ -96,7 +95,7 @@ async function handlePayment(e) {
         const responseJson = await res.json();
 
         if (res.ok) {
-            console.log("✅ Update Success!");
+            console.log("✅ Payment & DB Update Success!");
             alert("✅ Payment Successful! Your ticket is confirmed.");
 
             localStorage.removeItem("currentBookingPNR");
@@ -104,7 +103,6 @@ async function handlePayment(e) {
 
             document.getElementById("success-overlay")?.classList.remove("hidden");
         } else {
-            // 400 Error එකක් ආවොත් මෙතනින් විස්තරය Console එකේ බලන්න
             console.error("❌ Backend Error Details:", responseJson);
             alert("Update Failed: " + (responseJson.message || "Invalid Data Format"));
         }
@@ -126,6 +124,9 @@ function renderBookingDetails(data) {
     setText("summary-name", data.passenger);
     setText("summary-from", data.origin);
     setText("summary-to", data.destination);
+
+    // UI එකේ Passport එක පෙන්වීමට තැනක් ඇත්නම්:
+    setText("summary-passport", data.passportNumber);
 
     const price = parseFloat(data.price) || 0;
     setText("total-amount", `$${price.toFixed(2)}`);
@@ -172,8 +173,17 @@ function flipCard(flipped) {
 // =====================================================
 document.addEventListener("DOMContentLoaded", initPage);
 document.getElementById('payment-form')?.addEventListener('submit', handlePayment);
-document.getElementById('card-number')?.addEventListener('input', function() { formatCardNumber(this); updateCardPreview(); });
-document.getElementById('card-expiry')?.addEventListener('input', function() { formatExpiry(this); updateCardPreview(); });
+
+document.getElementById('card-number')?.addEventListener('input', function() {
+    formatCardNumber(this);
+    updateCardPreview();
+});
+
+document.getElementById('card-expiry')?.addEventListener('input', function() {
+    formatExpiry(this);
+    updateCardPreview();
+});
+
 document.getElementById('card-name')?.addEventListener('input', updateCardPreview);
 document.getElementById('card-cvv')?.addEventListener('input', updateCardPreview);
 document.getElementById('card-cvv')?.addEventListener('focus', () => flipCard(true));

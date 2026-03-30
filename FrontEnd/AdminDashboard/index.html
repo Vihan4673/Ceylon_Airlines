@@ -3,182 +3,226 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ceylon Airlines | Pro Admin Control</title>
+  <title>Ceylon Airlines | Executive Admin Control</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
     :root {
       --primary: #8A1538;
       --primary-dark: #6a102b;
-      --secondary: #1e293b;
+      --sidebar-bg: #0f172a;
+      --accent: #fbbf24;
     }
 
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #f1f5f9;
+      background-color: #f8fafc;
       color: #1e293b;
       overflow-x: hidden;
     }
 
+    /* Modern Sidebar Transitions */
+    .sidebar-link {
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
     .sidebar-link.active {
-      background-color: var(--primary);
+      background: linear-gradient(135deg, var(--primary) 0%, #b01c48 100%);
       color: white !important;
-      box-shadow: 0 10px 15px -3px rgba(138, 21, 56, 0.3);
+      box-shadow: 0 10px 25px -5px rgba(138, 21, 56, 0.4);
     }
 
-    .sidebar-link i {
-      transition: transform 0.3s ease;
+    .sidebar-link:not(.active):hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      transform: translateX(4px);
+      color: white !important;
     }
 
-    .sidebar-link:hover i {
-      transform: translateX(3px);
+    /* Iframe Container Glassmorphism */
+    .content-canvas {
+      height: calc(100vh - 120px);
+      border-radius: 2.5rem;
+      background: white;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+      border: 1px solid rgba(226, 232, 240, 0.8);
     }
 
-    /* Smooth iframe transition */
     iframe {
       width: 100%;
-      height: calc(100vh - 180px); /* Default for mobile */
+      height: 100%;
       border: none;
-      transition: opacity 0.3s ease;
     }
 
-    @media (min-width: 768px) {
-      iframe {
-        height: calc(100vh - 130px);
-      }
+    /* Custom Scrollbar for Sidebar */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
     }
 
-    /* Mobile Sidebar Overlay */
-    #sidebar-overlay {
-      display: none;
+    /* Loading Spinner Animation */
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
+    .loader-spin {
+      animation: spin-slow 1s linear infinite;
+    }
+
+    /* Smooth sidebar overlay */
     #sidebar-overlay.active {
       display: block;
+      animation: fadeIn 0.3s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   </style>
 </head>
 <body class="antialiased">
 
 <!-- Mobile Overlay -->
-<div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-30 lg:hidden"></div>
+<div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-30 lg:hidden hidden"></div>
 
 <!-- Sidebar -->
-<aside id="sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full lg:translate-x-0 shadow-2xl lg:shadow-none">
-  <div class="h-full px-4 py-8 overflow-y-auto bg-[#0f172a] text-white flex flex-col">
-    <!-- Logo -->
-    <div class="flex items-center justify-between mb-10 px-2">
-      <div class="flex items-center gap-3">
-        <div class="bg-gradient-to-br from-[#8A1538] to-[#6a102b] p-2 rounded-xl text-white shadow-lg">
-          <i class="fas fa-plane-departure text-xl"></i>
-        </div>
-        <h1 class="text-xl font-bold tracking-tight">Ceylon<span class="text-[#8A1538]">Air</span></h1>
+<aside id="sidebar" class="fixed top-0 left-0 z-40 w-72 h-screen transition-transform -translate-x-full lg:translate-x-0 bg-[#0f172a] text-white overflow-hidden flex flex-col shadow-2xl">
+  <!-- Brand Area -->
+  <div class="p-8">
+    <div class="flex items-center gap-3">
+      <div class="w-11 h-11 bg-gradient-to-tr from-white to-slate-200 rounded-2xl flex items-center justify-center shadow-lg transform -rotate-3">
+        <i class="fas fa-paper-plane text-[#8A1538] text-xl"></i>
       </div>
-      <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white">
-        <i class="fas fa-times text-xl"></i>
-      </button>
+      <div class="leading-none">
+        <h1 class="text-2xl font-extrabold tracking-tighter">CEYLON<span class="text-[#8A1538]">AIR</span></h1>
+        <p class="text-[9px] font-bold text-slate-500 tracking-[0.3em] uppercase mt-1">Global Terminal</p>
+      </div>
     </div>
+  </div>
 
-    <!-- Navigation -->
-    <nav class="space-y-1 flex-1" id="main-nav">
-      <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4 mb-2">Main Menu</p>
-
-      <a href="Pages/dashboard.html" target="contentFrame" onclick="updateUI('Overview', this)" class="sidebar-link active flex items-center p-3 rounded-xl transition-all group">
-        <i class="fas fa-th-large w-6 text-center"></i>
-        <span class="ml-3 font-semibold text-sm">Overview</span>
-      </a>
-
-      <a href="Pages/FlightAdd.html" target="contentFrame" onclick="updateUI('Flight Operations', this)" class="sidebar-link flex items-center p-3 rounded-xl transition-all group text-slate-400 hover:text-white">
-        <i class="fas fa-route w-6 text-center"></i>
-        <span class="ml-3 font-semibold text-sm">Flights</span>
-      </a>
-
-      <a href="Pages/booking.html" target="contentFrame" onclick="updateUI('Booking Registry', this)" class="sidebar-link flex items-center p-3 rounded-xl transition-all group text-slate-400 hover:text-white">
-        <i class="fas fa-calendar-check w-6 text-center"></i>
-        <span class="ml-3 font-semibold text-sm">Bookings</span>
-      </a>
-
-      <a href="Pages/Baggage.html" target="contentFrame" onclick="updateUI('Baggage Handling', this)" class="sidebar-link flex items-center p-3 rounded-xl transition-all group text-slate-400 hover:text-white">
-        <i class="fas fa-suitcase w-6 text-center"></i>
-        <span class="ml-3 font-semibold text-sm">Baggage</span>
-      </a>
-
-      <a href="Pages/passengers.html" target="contentFrame" onclick="updateUI('Passenger Oversight', this)" class="sidebar-link flex items-center p-3 rounded-xl transition-all group text-slate-400 hover:text-white">
-        <i class="fas fa-user-shield w-6 text-center"></i>
-        <span class="ml-3 font-semibold text-sm">Passengers</span>
-      </a>
-
-      <div class="pt-4">
-        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4 mb-2">Content</p>
-        <a href="Pages/ad.html" target="contentFrame" onclick="updateUI('Ad Management', this)" class="sidebar-link flex items-center p-3 rounded-xl transition-all group text-slate-400 hover:text-white">
-          <i class="fas fa-ad w-6 text-center"></i>
-          <span class="ml-3 font-semibold text-sm">Advertisements</span>
+  <!-- Main Navigation -->
+  <nav class="flex-1 px-4 py-2 space-y-8 overflow-y-auto custom-scrollbar">
+    <!-- Group: Flight Operations -->
+    <div>
+      <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-4 mb-4">Operations</p>
+      <div class="space-y-1">
+        <a href="Pages/dashboard.html" target="contentFrame" onclick="updateUI('Overview', this)" class="sidebar-link active flex items-center px-4 py-3.5 rounded-2xl transition-all">
+          <i class="fas fa-th-large w-6 text-center text-sm"></i>
+          <span class="ml-3 font-bold text-sm">Overview</span>
         </a>
-        <a href="Pages/destination.html" target="contentFrame" onclick="updateUI('Destinations', this)" class="sidebar-link flex items-center p-3 rounded-xl transition-all group text-slate-400 hover:text-white">
-          <i class="fas fa-map-marker-alt w-6 text-center"></i>
-          <span class="ml-3 font-semibold text-sm">Destinations</span>
+        <a href="Pages/FlightAdd.html" target="contentFrame" onclick="updateUI('Flight Operations', this)" class="sidebar-link flex items-center px-4 py-3.5 rounded-2xl text-slate-400 transition-all">
+          <i class="fas fa-route w-6 text-center text-sm"></i>
+          <span class="ml-3 font-bold text-sm">Flights</span>
+        </a>
+        <a href="Pages/booking.html" target="contentFrame" onclick="updateUI('Booking Registry', this)" class="sidebar-link flex items-center px-4 py-3.5 rounded-2xl text-slate-400 transition-all">
+          <i class="fas fa-calendar-check w-6 text-center text-sm"></i>
+          <span class="ml-3 font-bold text-sm">Bookings</span>
         </a>
       </div>
-    </nav>
-
-    <!-- Footer Menu -->
-    <div class="mt-auto pt-6 border-t border-slate-800">
-      <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4 mb-2">System</p>
-      <a href="Pages/Settings.html" class="flex items-center p-3 text-slate-400 hover:text-white transition-all">
-        <i class="fas fa-cog w-6 text-center"></i>
-        <span class="ml-3 font-semibold text-sm">Settings</span>
-      </a>
-      <a href="#" class="flex items-center p-3 text-red-400 hover:text-red-300 transition-all">
-        <i class="fas fa-sign-out-alt w-6 text-center"></i>
-        <span class="ml-3 font-semibold text-sm">Logout</span>
-      </a>
     </div>
+
+    <!-- Group: Passenger Services -->
+    <div>
+      <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-4 mb-4">Services</p>
+      <div class="space-y-1">
+        <a href="Pages/Baggage.html" target="contentFrame" onclick="updateUI('Baggage Handling', this)" class="sidebar-link flex items-center px-4 py-3.5 rounded-2xl text-slate-400 transition-all">
+          <i class="fas fa-suitcase w-6 text-center text-sm"></i>
+          <span class="ml-3 font-bold text-sm">Baggage</span>
+        </a>
+        <a href="Pages/passengers.html" target="contentFrame" onclick="updateUI('Passenger Oversight', this)" class="sidebar-link flex items-center px-4 py-3.5 rounded-2xl text-slate-400 transition-all">
+          <i class="fas fa-user-shield w-6 text-center text-sm"></i>
+          <span class="ml-3 font-bold text-sm">Passengers</span>
+        </a>
+        <a href="Pages/BagegesReport.html" target="contentFrame" onclick="updateUI('Baggage Reports', this)" class="sidebar-link flex items-center px-4 py-3.5 rounded-2xl text-slate-400 transition-all group">
+          <i class="fas fa-file-contract w-6 text-center text-sm group-hover:text-amber-400"></i>
+          <span class="ml-3 font-bold text-sm">Baggages Report</span>
+          <span class="ml-auto bg-amber-500 text-[9px] px-2 py-0.5 rounded-full text-white font-black animate-pulse">NEW</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Group: Content Management -->
+    <div>
+      <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-4 mb-4">Marketing</p>
+      <div class="space-y-1">
+        <a href="Pages/ad.html" target="contentFrame" onclick="updateUI('Ad Management', this)" class="sidebar-link flex items-center px-4 py-3.5 rounded-2xl text-slate-400 transition-all">
+          <i class="fas fa-ad w-6 text-center text-sm"></i>
+          <span class="ml-3 font-bold text-sm">Advertisements</span>
+        </a>
+        <a href="Pages/destination.html" target="contentFrame" onclick="updateUI('Destinations', this)" class="sidebar-link flex items-center px-4 py-3.5 rounded-2xl text-slate-400 transition-all">
+          <i class="fas fa-map-marker-alt w-6 text-center text-sm"></i>
+          <span class="ml-3 font-bold text-sm">Destinations</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Footer Menu -->
+  <div class="p-6 bg-slate-900/50 mt-auto border-t border-slate-800">
+    <a href="Pages/Settings.html" target="contentFrame" onclick="updateUI('System Settings', this)" class="flex items-center px-4 py-3 text-slate-400 hover:text-white transition-all rounded-xl mb-2">
+      <i class="fas fa-cog w-6 text-center text-sm"></i>
+      <span class="ml-3 font-bold text-sm">Settings</span>
+    </a>
+    <a href="#" onclick="handleLogout(event)" class="flex items-center px-4 py-3 text-red-400/80 hover:text-red-400 transition-all rounded-xl">
+      <i class="fas fa-sign-out-alt w-6 text-center text-sm"></i>
+      <span class="ml-3 font-bold text-sm">Sign Out</span>
+    </a>
   </div>
 </aside>
 
-<!-- Main Content Area -->
-<div class="lg:ml-64 min-h-screen flex flex-col">
+<!-- Main Wrapper -->
+<div class="lg:ml-72 min-h-screen flex flex-col relative">
 
-  <!-- Top Nav -->
-  <header class="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 md:px-8 md:py-4">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <button onclick="toggleSidebar()" class="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg">
-          <i class="fas fa-bars text-xl"></i>
-        </button>
-        <div>
-          <h2 id="view-title" class="text-lg md:text-2xl font-black text-slate-800 leading-tight">System Dashboard</h2>
-          <div class="hidden sm:flex items-center gap-2 text-[10px] md:text-xs text-slate-500">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Operational Mode: Real-time
-          </div>
+  <!-- Floating Header -->
+  <header class="h-24 px-6 lg:px-12 flex items-center justify-between sticky top-0 z-20 bg-[#f8fafc]/80 backdrop-blur-xl">
+    <div class="flex items-center gap-6">
+      <button onclick="toggleSidebar()" class="lg:hidden w-12 h-12 flex items-center justify-center bg-white rounded-2xl shadow-sm text-slate-600 border border-slate-100">
+        <i class="fas fa-bars text-lg"></i>
+      </button>
+      <div>
+        <h2 id="view-title" class="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight leading-none">System Dashboard</h2>
+        <div class="flex items-center gap-2 mt-2">
+          <span class="flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Live System Network</span>
         </div>
       </div>
+    </div>
 
-      <!-- User Profile -->
-      <div class="flex items-center gap-3">
-        <div class="hidden md:flex flex-col text-right">
-          <span id="user-name" class="text-xs font-bold text-slate-800"></span>
-          <span id="user-role" class="text-[10px] text-slate-400 uppercase tracking-tighter"></span>
-        </div>
-        <div class="relative group cursor-pointer">
+    <!-- User Profile Area -->
+    <div class="flex items-center gap-6">
+      <div class="hidden md:flex flex-col text-right">
+        <span id="user-name" class="text-sm font-black text-slate-900"></span>
+        <span id="user-role" class="text-[10px] font-bold text-[#8A1538] uppercase tracking-widest"></span>
+      </div>
+      <div class="relative group">
+        <div class="p-1 bg-white rounded-2xl shadow-sm border border-slate-100 cursor-pointer hover:border-[#8A1538]/30 transition-all">
           <img id="user-avatar" src="https://ui-avatars.com/api/?name=Admin&background=8A1538&color=fff"
-               class="w-10 h-10 rounded-2xl border-2 border-white shadow-md">
-          <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full"></div>
+               class="w-11 h-11 rounded-xl object-cover">
         </div>
+        <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-4 border-white rounded-full"></div>
       </div>
     </div>
   </header>
 
-  <!-- Iframe Wrapper -->
-  <main class="flex-1 p-4 md:p-6 lg:p-8">
-    <div class="bg-white rounded-[2rem] shadow-sm overflow-hidden border border-slate-200 h-full relative">
+  <!-- Content Canvas -->
+  <main class="flex-1 px-4 pb-6 lg:px-12 lg:pb-12">
+    <div class="content-canvas overflow-hidden relative">
       <!-- Loading Indicator -->
-      <div id="frame-loader" class="absolute inset-0 bg-white z-10 flex items-center justify-center transition-opacity duration-300 pointer-events-none opacity-0">
-        <div class="flex flex-col items-center gap-4">
-          <div class="w-10 h-10 border-4 border-[#8A1538]/20 border-t-[#8A1538] rounded-full animate-spin"></div>
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Loading View...</span>
+      <div id="frame-loader" class="absolute inset-0 bg-white/90 backdrop-blur-md z-10 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="flex flex-col items-center gap-6">
+          <div class="w-16 h-16 border-[6px] border-slate-100 border-t-[#8A1538] rounded-full loader-spin"></div>
+          <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] animate-pulse">Initializing Interface</p>
         </div>
       </div>
 
@@ -187,15 +231,15 @@
   </main>
 </div>
 
-<!-- Toast -->
-<div id="toast" class="fixed bottom-6 right-6 z-[100] transform translate-y-32 opacity-0 transition-all duration-500">
-  <div class="bg-slate-900 text-white px-6 py-4 rounded-[1.5rem] shadow-2xl flex items-center gap-4 border border-white/10">
-    <div class="w-8 h-8 bg-[#8A1538] rounded-full flex items-center justify-center">
-      <i class="fas fa-info text-[10px]"></i>
+<!-- Toast System -->
+<div id="toast" class="fixed bottom-8 right-8 z-[100] transform translate-y-32 opacity-0 transition-all duration-700">
+  <div class="bg-slate-900/95 backdrop-blur-md text-white px-8 py-5 rounded-[2rem] shadow-2xl flex items-center gap-5 border border-white/10">
+    <div class="w-10 h-10 bg-[#8A1538] rounded-2xl flex items-center justify-center shadow-lg transform rotate-6">
+      <i class="fas fa-check text-xs"></i>
     </div>
     <div>
-      <p class="text-xs font-bold" id="toast-title">Success</p>
-      <p class="text-[10px] text-slate-400" id="toast-msg">Operation completed.</p>
+      <p class="text-sm font-black" id="toast-title">Success</p>
+      <p class="text-[11px] text-slate-400 font-medium" id="toast-msg">Operation completed successfully.</p>
     </div>
   </div>
 </div>
@@ -208,35 +252,31 @@
 
   function toggleSidebar() {
     sidebar.classList.toggle('-translate-x-full');
+    overlay.classList.toggle('hidden');
     overlay.classList.toggle('active');
   }
 
   function showLoader() {
-    loader.classList.remove('opacity-0');
+    loader.classList.remove('opacity-0', 'pointer-events-none');
   }
 
   function hideLoader() {
-    loader.classList.add('opacity-0');
+    loader.classList.add('opacity-0', 'pointer-events-none');
   }
 
   function updateUI(title, element) {
-    // Show loader when changing views
     showLoader();
-
-    // Update Title
     document.getElementById('view-title').innerText = title;
 
-    // Manage Sidebar active states
-    const links = document.querySelectorAll('.sidebar-link');
-    links.forEach(link => {
-      link.classList.remove('active', 'text-white');
+    // Link States
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+      link.classList.remove('active');
       link.classList.add('text-slate-400');
     });
 
     element.classList.add('active');
     element.classList.remove('text-slate-400');
 
-    // Auto-close sidebar on mobile after clicking
     if (window.innerWidth < 1024) {
       toggleSidebar();
     }
@@ -250,27 +290,19 @@
     toast.classList.remove('translate-y-32', 'opacity-0');
     setTimeout(() => {
       toast.classList.add('translate-y-32', 'opacity-0');
-    }, 3000);
+    }, 4000);
   }
 
-  // Handle errors or iframe reloads
   frame.onerror = () => hideLoader();
 
-
-
-
-  // =====================================================
-  // DYNAMIC USER PROFILE
-  // =====================================================
   function updateUserProfile() {
     const user = JSON.parse(localStorage.getItem("user")) || {};
-
     const nameEl = document.getElementById("user-name");
     const roleEl = document.getElementById("user-role");
     const avatarEl = document.getElementById("user-avatar");
 
-    const fullName = user.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : "Admin User";
-    const role = user.role ? user.role.toUpperCase() : "SYSTEM OVERSEER";
+    const fullName = user.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : "Executive Admin";
+    const role = user.role ? user.role.toUpperCase() : "FLEET OVERSEER";
 
     if (nameEl) nameEl.innerText = fullName;
     if (roleEl) roleEl.innerText = role;
@@ -281,8 +313,22 @@
     }
   }
 
-  // Call on page load
   document.addEventListener("DOMContentLoaded", updateUserProfile);
+
+
+
+  function handleLogout(event) {
+    event.preventDefault(); // Page eka jump wena eka nawatthanawa
+
+    // Logout confirm karanna (Optional)
+    if (confirm("Are you sure you want to sign out?")) {
+      // Mehariya thamayi session clear karana code danne
+      // Udaharana: localStorage.clear();
+
+      // Home page ekata redirect kirima
+      window.location.href = "../Web/Pages/LoginPage.html";
+    }
+  }
 </script>
 </body>
 </html>

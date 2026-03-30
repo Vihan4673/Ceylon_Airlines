@@ -6,6 +6,7 @@ function getFlightState() {
 }
 
 function getPassenger() {
+    // Passenger details ලබා ගැනීමේදී ප්‍රමුඛතාවය අනුව localStorage එක පරීක්ෂා කරයි
     return JSON.parse(
         localStorage.getItem("passengerInfo") ||
         localStorage.getItem("currentPassenger")
@@ -38,6 +39,7 @@ function setText(id, value) {
 // =====================================================
 function updateFlightSummary() {
     const flight = getFlightState();
+    const totalPriceFormatted = calculateTotalPrice(flight);
 
     setText(
         "flight-route",
@@ -54,29 +56,49 @@ function updateFlightSummary() {
     setText("summary-seat-number", flight.selectedSeat || "Not selected");
     setText("footer-seat-id", flight.selectedSeat || "--");
     setText("fare-class", `🎫 ${(flight.type || "ECO").toUpperCase()} FLEX`);
-    setText("total-price", `LKR ${calculateTotalPrice(flight)}`);
+
+    setText("total-price", `LKR ${totalPriceFormatted}`);
+    setText("total-price-display", totalPriceFormatted);
 }
 
 function calculateTotalPrice(flight) {
     const totalPassengers =
-        (parseInt(flight.adults || 0)) +
+        (parseInt(flight.adults || 1)) +
         (parseInt(flight.children || 0)) +
         (parseInt(flight.infants || 0));
-    const price = parseFloat(flight.price?.toString().replace(/[^0-9.-]+/g, "")) || 0;
-    return (totalPassengers * price).toLocaleString("en-LK");
+
+    const priceStr = flight.price ? flight.price.toString().replace(/[^0-9.-]+/g, "") : "0";
+    const price = parseFloat(priceStr) || 0;
+
+    const grandTotal = totalPassengers * price;
+
+    return grandTotal.toLocaleString("en-LK", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
 }
 
 function updatePassengerDetails() {
     const passenger = getPassenger();
-    const nameEl = document.querySelector(".card span.font-bold.text-blue-900");
+    const nameEl = document.querySelector(".card span.font-bold.text-blue-900") || document.querySelector(".font-900.text-lg.text-slate-800");
+
     if (nameEl)
         nameEl.innerText = `${passenger.title || ""} ${passenger.firstName || ""} ${passenger.lastName || ""}`.trim();
 
-    const info = document.querySelectorAll(".text-xs.text-gray-500");
-    if (info.length >= 3) {
-        info[0].innerText = passenger.email || "N/A";
-        info[1].innerText = passenger.phoneNumber || "N/A";
-        info[2].innerText = passenger.type || "Adult";
+    const emailDiv = document.querySelector(".fa-envelope")?.parentElement;
+    const phoneDiv = document.querySelector(".fa-phone")?.parentElement;
+
+    // Passport UI display
+    const passportDiv = document.querySelector(".fa-id-card")?.parentElement || document.querySelector(".fa-passport")?.parentElement;
+
+    if (emailDiv) emailDiv.innerHTML = `<i class="fa-solid fa-envelope mr-1"></i> ${passenger.email || "N/A"}`;
+    if (phoneDiv) phoneDiv.innerHTML = `<i class="fa-solid fa-phone mr-1"></i> ${passenger.phoneNumber || passenger.mobile || "N/A"}`;
+
+    // ✅ Passport number එක පෙන්වීම
+    if (passportDiv) {
+        // Passenger object එකේ ඇති ඕනෑම passport field එකකින් දත්ත ලබාගනී
+        const passNo = passenger.passportNumber || passenger.documentNumber || passenger.passport || "N/A";
+        passportDiv.innerHTML = `<i class="fa-solid fa-id-card mr-1"></i> ${passNo}`;
     }
 }
 
@@ -100,7 +122,7 @@ function updateHero() {
 }
 
 // =====================================================
-// BOOKING FUNCTION (FIXED FOR PNR HANDLING 🔥)
+// BOOKING FUNCTION (FIXED FOR PASSPORT SAVING 🔥)
 // =====================================================
 async function bookSeatAndProceed() {
     const flight = getFlightState();
@@ -109,7 +131,7 @@ async function bookSeatAndProceed() {
     if (!flight.flightNumber) return alert("Select flight first!");
     if (!flight.selectedSeat) return alert("Select seat first!");
 
-    // ✅ Date formatting
+    // Date formatting
     let rawDate = flight.departureDate || flight.date || flight.flightDate;
     if (!rawDate) return alert("❌ Flight date missing!");
 
@@ -119,11 +141,14 @@ async function bookSeatAndProceed() {
 
     const passengerName = `${passenger.title || ""} ${passenger.firstName || ""} ${passenger.lastName || ""}`.trim();
 
-    // DTO mapping
-    // DTO mapping
+    // ✅ Passport number එක Passenger details වලින් ලබා ගැනීම (ප්‍රමුඛතාවය අනුව)
+    const passportNo = passenger.passportNumber || passenger.documentNumber || passenger.passport || "N/A";
+
     const bookingDTO = {
         passenger: passengerName,
-        email: passenger.email || "",       // ✅ add this line
+        email: passenger.email || "",
+        // ✅ මෙන්න මෙතැනදී Passport Number එක DB එකේ save වීමට DTO එකට එක් වේ
+        passportNumber: passportNo,
         flightNumber: flight.flightNumber,
         seat: flight.selectedSeat,
         departureDate: departureDate,
@@ -144,13 +169,8 @@ async function bookSeatAndProceed() {
 
         if (res.ok && result.data) {
             alert("✅ Booking created successfully!");
-
-            // 🔥 ඉතා වැදගත්: Backend එකෙන් එන සැබෑ PNR එක මෙතනදී සේව් කරනවා
-            // DB එකේ ID එක (14) සහ PNR එක ("K6ATPF") දෙකම අපි Payment එකට ගෙනියනවා
             localStorage.setItem("bookingIdForPayment", result.data.id);
             localStorage.setItem("currentBookingPNR", result.data.pnr);
-
-            // Redirect to Payment
             window.location.href = "../Pages/Pyment.html";
         } else {
             alert(result.message || "Booking failed!");

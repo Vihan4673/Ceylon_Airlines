@@ -6,334 +6,345 @@
     <title>Ceylone Airlines - Explore the Pearl of the Indian Ocean</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="../CSS/HomePage.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #8b1d41;
+            --gold: #C5A059;
+        }
 
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
         }
 
+        /* Hero Section Premium Update */
         .hero-section {
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.2)),
             url('https://images.unsplash.com/photo-1542296332-2e4473faf563?auto=format&fit=crop&q=80&w=1920');
-
             background-size: cover;
             background-position: center;
-            height: 600px;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
         }
 
-        .booking-widget {
-            margin-top: -100px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        /* Header Premium Styling */
+        header {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .primary-color { background-color: #8b1d41; } /* Deep Maroon - Inspired by the original design */
-        .primary-hover:hover { background-color: #6a1632; }
-        .text-primary { color: #8b1d41; }
+        header.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 10px 0;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+        }
+        header.scrolled .nav-link, header.scrolled .text-white { color: #1e293b; }
+        header.scrolled .border-white { border-color: var(--primary); color: var(--primary); }
+
+        .nav-link {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+        }
 
         .nav-link:after {
             content: '';
-            display: block;
+            position: absolute;
             width: 0;
             height: 2px;
-            background: #fff;
-            transition: width .3s;
+            bottom: -5px;
+            left: 0;
+            background: var(--gold);
+            transition: width 0.3s ease;
         }
         .nav-link:hover:after { width: 100%; }
 
-        .card-zoom:hover img {
-            transform: scale(1.1);
+        /* Mega Menu Animation */
+        .mega-menu {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
         }
 
-        /* Baggage Timeline Styles */
-        .step-dot { width: 30px; height: 30px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; z-index: 10; font-size: 12px; transition: 0.3s; }
-        .step-dot.active { background: #8b1d41; color: white; }
-        .step-line { height: 4px; flex-grow: 1; background: #e2e8f0; position: relative; top: 13px; z-index: 0; }
-        .step-line.active { background: #8b1d41; }
+        /* Button Premium Styling */
+        .btn-premium {
+            background: linear-gradient(135deg, var(--gold) 0%, #A6803F 100%);
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(197, 160, 89, 0.3);
+        }
+        .btn-premium:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(197, 160, 89, 0.4);
+        }
 
+        .pin { animation: bounce 2s infinite; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
 
-        .hidden { display: none !important; }
-        #chat-messages table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
-        #chat-messages th { background: #8b1d41; color: white; padding: 8px; text-align: left; border: 1px solid #ddd; }
-        #chat-messages td { padding: 8px; border: 1px solid #ddd; background: white; }
+        .category-link {
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 8px 0;
+            transition: all 0.3s;
+            display: block;
+        }
+        .category-link:hover { color: var(--primary); padding-left: 10px; }
     </style>
 </head>
 <body class="bg-gray-50">
 
-<!-- Header / Navigation -->
-<header class="bg-white/10 backdrop-blur-md absolute top-0 w-full z-50 border-b border-white/20">
-    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center space-x-8">
-            <div class="text-white text-2xl font-bold tracking-tighter">
+<header id="mainHeader" class="fixed top-0 w-full z-50 py-5">
+    <div class="container mx-auto px-10 flex justify-between items-center">
+        <div class="flex items-center space-x-12">
+            <div class="text-white text-2xl font-black tracking-tighter" data-aos="fade-right">
                 <span class="text-yellow-400">CEYLONE</span> AIRLINES
             </div>
-            <nav class="hidden lg:flex space-x-6 text-white text-sm font-medium">
-                <a href="#" id="exploreBtn" class="nav-link">Explore</a>
-                <a href="#" class="nav-link">Book</a>
-                <a href="#" class="nav-link">Experience</a>
-                <a href="#" class="nav-link">Privilege Club</a>
+            <nav class="hidden lg:flex space-x-8 text-white">
+                <a href="#" id="exploreBtn" class="nav-link" data-aos="fade-down" data-aos-delay="100">Explore</a>
+                <a href="#" class="nav-link" data-aos="fade-down" data-aos-delay="200">Book</a>
+                <a href="#" class="nav-link" data-aos="fade-down" data-aos-delay="300">Experience</a>
+                <a href="#" class="nav-link" data-aos="fade-down" data-aos-delay="400">Privilege Club</a>
             </nav>
         </div>
-        <div class="flex items-center space-x-6 text-white text-sm">
-            <a href="#"><i class="fas fa-question-circle mr-1"></i> Help</a>
-            <a href="#"><i class="fas fa-search mr-1"></i></a>
-            <a href="#"><i class="fas fa-globe mr-1"></i> EN</a>
-            <div id="userNav" class="flex items-center space-x-4">
-                <!-- Default login button -->
-                <a id="loginBtn" href="LoginPage.html" class="border border-white px-4 py-2 rounded-full hover:bg-white hover:text-maroon-900 transition">
-                    Log in
-                </a>
+        <div class="flex items-center space-x-6 text-white text-xs font-bold uppercase tracking-widest" data-aos="fade-left">
+            <a href="#" class="hover:text-yellow-400 transition"><i class="fas fa-question-circle mr-2"></i> Help</a>
+            <a href="#" class="hover:text-yellow-400 transition"><i class="fas fa-globe mr-2"></i> EN</a>
 
-                <!-- User info (hidden initially) -->
-                <div id="userInfo" class="hidden items-center space-x-2">
-                    <img id="userPhoto" src="" alt="User Photo" class="w-8 h-8 rounded-full object-cover border border-white">
-                    <span id="userEmail" class="text-white font-semibold"></span>
-                    <button id="logoutBtn" class="text-white px-2 py-1 border border-white rounded hover:bg-white hover:text-maroon-900">Logout</button>
+            <div id="userNav" class="relative flex items-center space-x-4">
+            <a id="loginBtn" href="LoginPage.html" class="border border-white px-4 py-2 rounded-full hover:bg-white hover:text-maroon-900 transition">
+                Log in
+            </a>
+
+            <div id="userInfo" class="hidden items-center">
+                <img id="userPhoto" src="https://via.placeholder.com/32" alt="User Photo" class="w-10 h-10 rounded-full object-cover border-2 border-white cursor-pointer hover:opacity-80 transition">
+
+                <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 text-gray-800 top-10">
+                    <div class="px-4 py-2 border-b border-gray-100">
+                        <p id="userEmail" class="text-xs font-bold truncate"></p>
+                    </div>
+                    <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600 font-semibold">
+                        Logout
+                    </button>
                 </div>
             </div>
         </div>
-</div>
-</header>
-<!-- MAIN MEGA MENU CONTENT -->
-<div class="mega-menu fixed inset-0 bg-white z-50 hidden overflow-auto">
-    <div class="container mx-auto px-10 py-8 relative">
-        <!-- Close button -->
-        <span class="close-btn absolute top-6 right-6 text-gray-600 hover:text-red-900 cursor-pointer text-2xl font-bold">
-            &times;
-        </span>
-
-        <div class="grid grid-cols-12 gap-8">
-
-            <!-- Our Destinations with Map -->
-            <div class="col-span-4 border-r pr-8">
-                <h3 class="menu-title mb-4 text-lg font-bold">Our destinations</h3>
-                <div class="flex">
-                    <div class="w-3/4 relative h-64">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg"
-                             alt="World Map" class="w-full h-full object-cover rounded-md">
-                        <!-- Example Pins -->
-                        <i class="fas fa-map-marker-alt pin absolute text-red-600 text-xl" style="top: 35%; left: 20%;"></i>
-                        <i class="fas fa-map-marker-alt pin absolute text-red-600 text-xl" style="top: 30%; left: 45%;"></i>
-                        <i class="fas fa-map-marker-alt pin absolute text-red-600 text-xl" style="top: 55%; left: 50%;"></i>
-                        <i class="fas fa-map-marker-alt pin absolute text-red-600 text-xl" style="top: 45%; left: 75%;"></i>
-                        <i class="fas fa-map-marker-alt pin absolute text-red-600 text-xl" style="top: 65%; left: 30%;"></i>
-                    </div>
-                    <div class="w-1/4 pl-4 pt-4 flex flex-col space-y-2">
-                        <a href="#" class="category-link hover:text-red-900">Americas</a>
-                        <a href="#" class="category-link hover:text-red-900">Europe</a>
-                        <a href="#" class="category-link hover:text-red-900">Africa</a>
-                        <a href="#" class="category-link hover:text-red-900">Middle East</a>
-                        <a href="#" class="category-link hover:text-red-900">Asia and the Pacific</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Trending Section -->
-            <div class="col-span-3 border-r pr-8 flex space-x-4">
-                <div class="w-1/2">
-                    <img src="https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?auto=format&fit=crop&q=80&w=300"
-                         alt="Egypt" class="w-full h-40 object-cover rounded-md">
-                </div>
-                <div class="w-1/2 flex flex-col space-y-2">
-                    <h3 class="menu-title font-bold">Trending</h3>
-                    <a href="#" class="category-link hover:text-red-900">Cairo</a>
-                    <a href="#" class="category-link hover:text-red-900">Manila</a>
-                    <a href="#" class="category-link hover:text-red-900">Kathmandu</a>
-                    <a href="#" class="category-link hover:text-red-900">Istanbul</a>
-                    <a href="#" class="category-link hover:text-red-900">Maldives</a>
-                </div>
-            </div>
-
-            <!-- New Destinations Section -->
-            <div class="col-span-3 border-r pr-8 flex space-x-4">
-                <div class="w-1/2">
-                    <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&q=80&w=300"
-                         alt="City" class="w-full h-40 object-cover rounded-md">
-                </div>
-                <div class="w-1/2 flex flex-col space-y-2">
-                    <h3 class="menu-title font-bold">New destinations</h3>
-                    <a href="#" class="category-link hover:text-red-900">Toronto</a>
-                    <a href="#" class="category-link hover:text-red-900">Phnom Penh</a>
-                    <a href="#" class="category-link hover:text-red-900">Tokyo (Haneda)</a>
-                    <a href="#" class="category-link hover:text-red-900">AlUla</a>
-                    <a href="#" class="font-bold text-red-900 text-sm mt-2 block hover:underline">View all</a>
-                </div>
-            </div>
-
-            <!-- Visit Qatar Section -->
-            <div class="col-span-2 flex flex-col space-y-2">
-                <h3 class="menu-title font-bold">Visit Qatar</h3>
-                <a href="#" class="category-link hover:text-red-900">Qatar Stopover</a>
-                <a href="#" class="category-link hover:text-red-900">Experience Qatar</a>
-                <a href="#" class="category-link hover:text-red-900">Tours & activities</a>
-                <a href="#" class="category-link hover:text-red-900">Transit Tours</a>
-                <a href="#" class="category-link hover:text-red-900">Discover Qatar</a>
-            </div>
-
         </div>
     </div>
-</div>
-<!-- Hero Section -->
-<section class="hero-section flex items-center justify-start px-6 lg:px-24">
-    <div class="text-white max-w-2xl">
-        <h1 class="text-5xl font-bold mb-4">Explore Asia and Beyond</h1>
-        <p class="text-xl mb-8">Experience the warmth of Sri Lankan hospitality with premium comfort and world-class service.</p>
-        <button
-                onclick="window.location.href='SearchFlights1.html'"
-                class="bg-white/20 backdrop-blur-md border-2 border-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-black transition duration-300">
-            Book now
-        </button>
+</header>
+
+<section class="hero-section px-10 lg:px-24">
+    <div class="container mx-auto">
+        <div class="text-white max-w-3xl">
+            <span class="inline-block px-4 py-1 rounded-full bg-yellow-400 text-[#8b1d41] text-[10px] font-black uppercase tracking-widest mb-6" data-aos="fade-down">
+                World-Class Service
+            </span>
+            <h1 class="text-6xl md:text-8xl font-black mb-6 leading-none tracking-tighter" data-aos="fade-up" data-aos-delay="200">
+                Explore Asia <br> <span class="text-yellow-400">and Beyond.</span>
+            </h1>
+            <p class="text-xl md:text-2xl font-light mb-10 opacity-90 leading-relaxed max-w-xl" data-aos="fade-up" data-aos-delay="400">
+                Experience the warmth of Sri Lankan hospitality with premium comfort and world-class service.
+            </p>
+            <div class="flex gap-4" data-aos="zoom-in" data-aos-delay="600">
+                <button onclick="window.location.href='SearchFlights1.html'" class="btn-premium px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-widest">
+                    Book now
+                </button>
+                <button class="px-10 py-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/30 text-white font-black text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-all">
+                    View Deals
+                </button>
+            </div>
+        </div>
     </div>
 </section>
-<!-- Booking Widget -->
-<div class="container mx-auto px-4 booking-widget relative z-10 mt-16">
-    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
 
-        <!-- Tabs -->
-        <div class="flex bg-gray-50">
-            <button data-target="book-flight" class="tab-btn active-tab flex-1 py-4 flex items-center justify-center space-x-2 text-gray-600 hover:bg-white font-semibold transition">
-                <i class="fas fa-plane-departure text-sm"></i>
-                <span>Book a Flight</span>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    // Initialize AOS
+    AOS.init({
+        duration: 1000,
+        once: true,
+        easing: 'ease-out-cubic'
+    });
+
+    // Header scroll animation
+    window.addEventListener('scroll', () => {
+        const header = document.getElementById('mainHeader');
+        if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
+
+    // Explore Menu Toggle
+    const exploreBtn = document.getElementById('exploreBtn');
+    const megaMenu = document.querySelector('.mega-menu');
+    const closeBtn = document.querySelector('.close-btn');
+
+    exploreBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        megaMenu.classList.remove('hidden');
+    });
+
+    closeBtn.addEventListener('click', () => {
+        megaMenu.classList.add('hidden');
+    });
+</script>
+
+
+<div class="container mx-auto px-4 booking-widget relative z-10 mt-16" data-aos="fade-up">
+    <div class="bg-white rounded-[2.5rem] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.15)] overflow-hidden border border-gray-100">
+
+        <div class="flex bg-gray-50/80 backdrop-blur-md border-b border-gray-100 p-2 gap-2">
+            <button data-target="book-flight" class="tab-btn active-tab flex-1 py-4 px-2 flex flex-col md:flex-row items-center justify-center gap-3 rounded-2xl transition-all duration-300 font-bold text-[10px] md:text-xs uppercase tracking-[0.15em] text-gray-500 hover:bg-white hover:text-[#8b1d41]">
+                <i class="fas fa-plane-departure text-lg"></i>
+                <span class="block">Book a Flight</span>
             </button>
-            <button data-target="baggage-tracking" class="tab-btn flex-1 py-4 flex items-center justify-center space-x-2 text-gray-600 hover:bg-white font-semibold transition">
-                <i class="fas fa-suitcase-rolling text-sm"></i>
-                <span>Baggage Tracker</span>
+            <button data-target="baggage-tracking" class="tab-btn flex-1 py-4 px-2 flex flex-col md:flex-row items-center justify-center gap-3 rounded-2xl transition-all duration-300 font-bold text-[10px] md:text-xs uppercase tracking-[0.15em] text-gray-500 hover:bg-white hover:text-[#8b1d41]">
+                <i class="fas fa-suitcase-rolling text-lg"></i>
+                <span class="block">Baggage Tracker</span>
             </button>
-            <button data-target="manage-checkin" class="tab-btn flex-1 py-4 flex items-center justify-center space-x-2 text-gray-600 hover:bg-white font-semibold transition">
-                <i class="fas fa-tasks text-sm"></i>
-                <span>Manage / Check-in</span>
+            <button data-target="manage-checkin" class="tab-btn flex-1 py-4 px-2 flex flex-col md:flex-row items-center justify-center gap-3 rounded-2xl transition-all duration-300 font-bold text-[10px] md:text-xs uppercase tracking-[0.15em] text-gray-500 hover:bg-white hover:text-[#8b1d41]">
+                <i class="fas fa-tasks text-lg"></i>
+                <span class="block">Manage / Check-in</span>
             </button>
-            <button data-target="flight-status" class="tab-btn flex-1 py-4 flex items-center justify-center space-x-2 text-gray-600 hover:bg-white font-semibold transition">
-                <i class="fas fa-info-circle text-sm"></i>
-                <span>Flight Status</span>
+            <button data-target="flight-status" class="tab-btn flex-1 py-4 px-2 flex flex-col md:flex-row items-center justify-center gap-3 rounded-2xl transition-all duration-300 font-bold text-[10px] md:text-xs uppercase tracking-[0.15em] text-gray-500 hover:bg-white hover:text-[#8b1d41]">
+                <i class="fas fa-info-circle text-lg"></i>
+                <span class="block">Flight Status</span>
             </button>
         </div>
 
-        <!-- Tab Contents -->
-        <div class="p-6 lg:p-10">
+        <div class="p-6 lg:p-12">
+            <div id="book-flight" class="tab-content block animate-in fade-in duration-500">
+                <form id="flightForm" class="space-y-8">
 
-            <!-- Book Flight -->
-            <div id="book-flight" class="tab-content block">
-                <form id="flightForm" class="grid grid-cols-1 lg:grid-cols-5 gap-4 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-
-                    <!-- Trip Type -->
-                    <div class="col-span-1 lg:col-span-5 flex gap-6 mb-4">
-                        <label class="flex items-center gap-2"><input type="radio" name="trip" value="return" class="accent-[#8b1d41]" checked> Return</label>
-                        <label class="flex items-center gap-2"><input type="radio" name="trip" value="oneway" class="accent-[#8b1d41]"> One way</label>
-                        <label class="flex items-center gap-2"><input type="radio" name="trip" value="multicity" class="accent-[#8b1d41]"> Multi-city</label>
+                    <div class="flex flex-wrap gap-8 pb-4">
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="trip" value="return" class="w-5 h-5 accent-[#8b1d41]" checked>
+                            <span class="text-sm font-bold text-gray-600 group-hover:text-[#8b1d41] transition">Return Trip</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="trip" value="oneway" class="w-5 h-5 accent-[#8b1d41]">
+                            <span class="text-sm font-bold text-gray-600 group-hover:text-[#8b1d41] transition">One way</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="trip" value="multicity" class="w-5 h-5 accent-[#8b1d41]">
+                            <span class="text-sm font-bold text-gray-600 group-hover:text-[#8b1d41] transition">Multi-city</span>
+                        </label>
                     </div>
 
-                    <!-- FROM -->
-                    <div class="search-input-group p-4 relative">
-                        <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">From</label>
-                        <div class="flex items-center gap-2 border-b border-gray-200">
-                            <i class="fas fa-plane-departure text-gray-400"></i>
-                            <input type="text" id="fromLoc" placeholder="Departure city" class="w-full font-bold focus:outline-none text-gray-800">
-                        </div>
-                        <div class="swap-btn absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer hidden md:flex"><i class="fas fa-exchange-alt text-gray-400"></i></div>
-                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-0 border border-gray-100 rounded-[2rem] overflow-hidden bg-gray-50/30 shadow-inner">
 
-                    <!-- TO -->
-                    <div class="search-input-group p-4 relative">
-                        <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">To</label>
-                        <div class="flex items-center gap-2 border-b border-gray-200">
-                            <i class="fas fa-map-marker-alt text-gray-400"></i>
-                            <input type="text" id="toLoc" placeholder="Destination city" class="w-full font-bold focus:outline-none text-gray-800">
-                        </div>
-                    </div>
-
-                    <!-- DEPARTURE -->
-                    <div class="p-4">
-                        <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Departure</label>
-                        <input type="date" id="depDate" class="w-full font-bold text-gray-800 bg-transparent focus:outline-none cursor-pointer border-b border-gray-200">
-                    </div>
-
-                    <!-- RETURN -->
-                    <div class="p-4" id="returnContainer">
-                        <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Return</label>
-                        <input type="date" id="retDate" class="w-full font-bold text-gray-800 bg-transparent focus:outline-none cursor-pointer border-b border-gray-200">
-                    </div>
-
-                    <!-- PASSENGERS / CLASS -->
-                    <div class="p-4 cursor-pointer relative" id="passengerTrigger">
-                        <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Travelers / Class</label>
-                        <div class="flex justify-between items-center font-bold text-gray-800">
-                            <span id="passengerSummary">1 Adult, Economy</span>
-                            <i class="fas fa-chevron-down text-gray-400"></i>
+                        <div class="p-6 hover:bg-white transition-colors border-b lg:border-b-0 lg:border-r border-gray-100 relative group">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Origin</label>
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-plane-departure text-gray-300 group-hover:text-[#8b1d41] transition"></i>
+                                <input type="text" id="fromLoc" placeholder="From where?" class="w-full font-bold text-lg bg-transparent focus:outline-none text-gray-800 placeholder:text-gray-300">
+                            </div>
+                            <div class="swap-btn absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-white w-8 h-8 rounded-full border border-gray-100 shadow-md items-center justify-center cursor-pointer hover:rotate-180 transition-all duration-500 hidden lg:flex">
+                                <i class="fas fa-exchange-alt text-[10px] text-[#8b1d41]"></i>
+                            </div>
                         </div>
 
-                        <!-- Dropdown -->
-                        <div id="passengerDropdown" class="absolute top-full left-0 w-full bg-white shadow-lg rounded-xl mt-2 p-4 hidden">
-                            <div class="flex justify-between items-center mb-2">
-                                <span>Adults</span>
-                                <div class="flex items-center gap-2">
-                                    <button type="button" onclick="updateCount('adults',-1)">-</button>
-                                    <span id="adultsCount">1</span>
-                                    <button type="button" onclick="updateCount('adults',1)">+</button>
+                        <div class="p-6 hover:bg-white transition-colors border-b lg:border-b-0 lg:border-r border-gray-100 group">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Destination</label>
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-map-marker-alt text-gray-300 group-hover:text-[#8b1d41] transition"></i>
+                                <input type="text" id="toLoc" placeholder="Where to?" class="w-full font-bold text-lg bg-transparent focus:outline-none text-gray-800 placeholder:text-gray-300">
+                            </div>
+                        </div>
+
+                        <div class="p-6 hover:bg-white transition-colors border-b md:border-b-0 md:border-r border-gray-100 group">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Departure</label>
+                            <input type="date" id="depDate" class="w-full font-bold text-sm bg-transparent focus:outline-none cursor-pointer text-gray-800">
+                        </div>
+
+                        <div class="p-6 hover:bg-white transition-colors border-b md:border-b-0 md:border-r border-gray-100 group" id="returnContainer">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Return</label>
+                            <input type="date" id="retDate" class="w-full font-bold text-sm bg-transparent focus:outline-none cursor-pointer text-gray-800">
+                        </div>
+
+                        <div class="p-6 hover:bg-white transition-colors group relative" id="passengerTrigger">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Travelers / Class</label>
+                            <div class="flex justify-between items-center cursor-pointer">
+                                <span id="passengerSummary" class="font-bold text-sm text-gray-800">1 Adult, Economy</span>
+                                <i class="fas fa-chevron-down text-[10px] text-gray-400 group-hover:text-[#8b1d41]"></i>
+                            </div>
+
+                            <div id="passengerDropdown" class="absolute top-full left-0 w-72 bg-white shadow-2xl rounded-3xl mt-4 p-6 hidden z-50 border border-gray-100">
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-bold text-gray-700">Adults</span>
+                                        <div class="flex items-center gap-3 bg-gray-50 rounded-xl px-3 py-1">
+                                            <button type="button" class="text-[#8b1d41] font-bold" onclick="updateCount('adults',-1)">-</button>
+                                            <span id="adultsCount" class="w-4 text-center font-bold">1</span>
+                                            <button type="button" class="text-[#8b1d41] font-bold" onclick="updateCount('adults',1)">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-bold text-gray-700">Children</span>
+                                        <div class="flex items-center gap-3 bg-gray-50 rounded-xl px-3 py-1">
+                                            <button type="button" class="text-[#8b1d41] font-bold" onclick="updateCount('children',-1)">-</button>
+                                            <span id="childrenCount" class="w-4 text-center font-bold">0</span>
+                                            <button type="button" class="text-[#8b1d41] font-bold" onclick="updateCount('children',1)">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="pt-4 border-t border-gray-100">
+                                        <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Travel Class</label>
+                                        <select onchange="updateClass(this.value)" class="w-full bg-gray-50 border-none rounded-xl px-4 py-2 font-bold text-sm focus:ring-2 focus:ring-[#8b1d41]/10">
+                                            <option value="Economy">Economy</option>
+                                            <option value="Business">Business</option>
+                                            <option value="First">First</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex justify-between items-center mb-2">
-                                <span>Children</span>
-                                <div class="flex items-center gap-2">
-                                    <button type="button" onclick="updateCount('children',-1)">-</button>
-                                    <span id="childrenCount">0</span>
-                                    <button type="button" onclick="updateCount('children',1)">+</button>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center mb-2">
-                                <span>Infants</span>
-                                <div class="flex items-center gap-2">
-                                    <button type="button" onclick="updateCount('infants',-1)">-</button>
-                                    <span id="infantsCount">0</span>
-                                    <button type="button" onclick="updateCount('infants',1)">+</button>
-                                </div>
-                            </div>
-                            <div class="mt-2">
-                                <label class="block mb-1 font-bold text-gray-700">Class</label>
-                                <select onchange="updateClass(this.value)" class="w-full border border-gray-200 rounded px-2 py-1">
-                                    <option value="Economy">Economy</option>
-                                    <option value="Business">Business</option>
-                                    <option value="First">First</option>
-                                </select>
-                            </div>
                         </div>
                     </div>
 
-                    <!-- Search Button -->
-                    <div class="col-span-1 lg:col-span-5 mt-4 flex justify-end">
-                        <button type="button" id="searchBtn" class="bg-[#8b1d41] text-white px-10 py-3 rounded-full font-bold hover:bg-[#a31d45] transition">
+                    <div class="flex justify-center md:justify-end">
+                        <button type="button" id="searchBtn" class="bg-gradient-to-r from-[#8b1d41] to-[#6e1632] text-white px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-[#8b1d41]/20 hover:scale-105 active:scale-95 transition-all">
                             Search Flights
                         </button>
                     </div>
-
                 </form>
             </div>
 
-            <!-- Baggage Tracker -->
-            <div id="baggage-tracking" class="tab-content hidden animate-fade-in-up">
-                <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
+            <div id="baggage-tracking" class="tab-content hidden animate-in slide-in-from-bottom-4 duration-500">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                     <div>
-                        <h3 class="text-2xl font-bold mb-3 text-gray-900">Track Your Journey</h3>
-                        <p class="text-sm text-gray-500 mb-8">Enter your baggage tag number or passport to see the real-time status of your luggage.</p>
-                        <div class="flex space-x-3 mb-10">
-                            <input type="text" id="bagTagInput" placeholder="Passport Number" class="flex-1 border border-gray-200 rounded-xl p-4 focus:ring-2 focus:ring-[#8b1d41] outline-none font-bold placeholder:font-normal">
-                            <button id="trackBtn" class="bg-[#8b1d41] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#a31d45] shadow-lg">Track</button>
+                        <h3 class="text-3xl font-black text-gray-900 mb-4 tracking-tighter leading-tight">Track Your Journey <br><span class="text-[#8b1d41]">Real-time.</span></h3>
+                        <p class="text-gray-500 mb-8 max-w-sm leading-relaxed">Enter your details below to see the current status of your essentials.</p>
+
+                        <div class="flex flex-col sm:row gap-4 mb-10">
+                            <input type="text" id="bagTagInput" placeholder="Passport Number" class="flex-1 bg-gray-50 border border-gray-100 rounded-2xl p-5 focus:bg-white focus:ring-4 focus:ring-[#8b1d41]/5 focus:border-[#8b1d41] outline-none font-bold transition-all">
+                            <button id="trackBtn" class="bg-gray-900 text-white px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-[#8b1d41] transition-all shadow-lg">Track Now</button>
                         </div>
 
-                        <!-- Live Status -->
-                        <div id="liveStatus" class="hidden border border-gray-100 rounded-3xl p-8 bg-gray-50/50">
-                            <div class="flex justify-between mb-8">
-                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Status Update</span>
-                                <span class="text-xs font-bold text-green-600 bg-green-100 px-3 py-1 rounded-full uppercase" id="statusText">Checked</span>
+                        <div id="liveStatus" class="hidden bg-white border border-gray-100 rounded-[2rem] p-8 shadow-sm">
+                            <div class="flex justify-between items-center mb-10">
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Progress Update</span>
+                                <span class="text-[10px] font-black text-green-600 bg-green-50 px-3 py-1 rounded-full uppercase border border-green-100" id="statusText">Status</span>
                             </div>
-                            <div class="flex items-center justify-between px-2 mb-4">
-                                <div id="step-checked" class="step-dot active"><i class="fas fa-check"></i></div>
-                                <div id="line-1" class="step-line active flex-grow bg-gray-200"></div>
-                                <div id="step-flight" class="step-dot"><i class="fas fa-plane"></i></div>
-                                <div id="line-2" class="step-line flex-grow bg-gray-200"></div>
-                                <div id="step-arrival" class="step-dot"><i class="fas fa-suitcase"></i></div>
+                            <div class="relative px-4 mb-4">
+                                <div class="absolute top-[14px] left-6 right-6 h-[2px] bg-gray-100"></div>
+                                <div class="flex justify-between relative z-10">
+                                    <div id="step-checked" class="step-dot w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-[10px] border-4 border-white transition-all"><i class="fas fa-check"></i></div>
+                                    <div id="step-flight" class="step-dot w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-[10px] border-4 border-white transition-all"><i class="fas fa-plane"></i></div>
+                                    <div id="step-arrival" class="step-dot w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-[10px] border-4 border-white transition-all"><i class="fas fa-suitcase"></i></div>
+                                </div>
                             </div>
-                            <div class="flex justify-between text-[10px] font-black text-gray-400 uppercase tracking-[0.15em]">
+                            <div class="flex justify-between text-[9px] font-black text-gray-400 uppercase tracking-widest">
                                 <span>Checked</span>
                                 <span>On Flight</span>
                                 <span>Arrival</span>
@@ -341,402 +352,522 @@
                         </div>
                     </div>
 
-                    <!-- Missing Baggage -->
-                    <div class="bg-gray-50 rounded-3xl p-10 border border-gray-200 flex flex-col justify-center items-center text-center">
-                        <div class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-maroon-700 mb-6">
-                            <i class="fas fa-exclamation-triangle text-2xl"></i>
+                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-[2.5rem] p-12 text-center relative overflow-hidden group shadow-2xl">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                        <div class="relative z-10 flex flex-col items-center">
+                            <div class="w-20 h-20 bg-white/10 backdrop-blur-md rounded-3xl flex items-center justify-center text-yellow-400 mb-8 border border-white/10 group-hover:scale-110 transition-transform duration-500">
+                                <i class="fas fa-exclamation-triangle text-3xl"></i>
+                            </div>
+                            <h4 class="text-2xl font-black text-white mb-4 tracking-tight">Missing Baggage?</h4>
+                            <p class="text-gray-400 text-sm mb-10 leading-relaxed max-w-xs">Our 24/7 priority support team is here to help you locate your items instantly.</p>
+                            <button onclick="openReportModal()" class="w-full bg-white text-gray-900 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-[#C5A059] hover:text-white transition-all shadow-xl">
+                                Report Lost Item
+                            </button>
                         </div>
-                        <h4 class="text-xl font-bold mb-4 text-gray-900">Missing Baggage?</h4>
-                        <p class="text-sm text-gray-600 mb-8">Report any issues immediately for priority handling.</p>
-                        <button onclick="document.getElementById('reportModal').classList.remove('hidden')" class="w-full border-2 border-[#8b1d41] text-[#8b1d41] py-4 rounded-2xl font-bold hover:bg-[#8b1d41] hover:text-white transition-all duration-300">Report Lost Baggage</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Manage Check-in -->
-            <div id="manage-checkin" class="tab-content hidden text-center py-20 animate-fade-in-up">
-                <div class="max-w-xs mx-auto opacity-30">
-                    <i class="fas fa-id-card text-6xl mb-6"></i>
-                    <p class="text-sm font-bold uppercase tracking-widest">Check-in opens 48h before departure</p>
+            <div id="manage-checkin" class="tab-content hidden text-center py-24 animate-fade-in">
+                <div class="opacity-20 flex flex-col items-center">
+                    <i class="fas fa-id-card text-7xl mb-6 text-gray-400"></i>
+                    <p class="text-xs font-black uppercase tracking-[0.3em] text-gray-900">Check-in opens 48h before departure</p>
                 </div>
             </div>
 
-            <!-- Flight Status -->
-            <div id="flight-status" class="tab-content hidden text-center py-20 animate-fade-in-up">
-                <div class="max-w-xs mx-auto opacity-30">
-                    <i class="fas fa-search-location text-6xl mb-6"></i>
-                    <p class="text-sm font-bold uppercase tracking-widest">Check live flight details</p>
+            <div id="flight-status" class="tab-content hidden text-center py-24 animate-fade-in">
+                <div class="opacity-20 flex flex-col items-center">
+                    <i class="fas fa-search-location text-7xl mb-6 text-gray-400"></i>
+                    <p class="text-xs font-black uppercase tracking-[0.3em] text-gray-900">Live Status Updates & Schedule</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<div id="reportModal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
+    <div class="bg-white p-10 rounded-[3rem] w-full max-w-xl relative shadow-2xl overflow-y-auto max-h-[90vh] border border-gray-100">
+        <button onclick="closeReportModal()" class="absolute top-8 right-8 text-gray-300 hover:text-red-500 transition-colors">
+            <i class="fas fa-times text-xl"></i>
+        </button>
 
-<!-- London Promo Section -->
-<section class="container mx-auto px-6 py-20">
-    <h2 class="text-3xl font-light text-gray-700 mb-2">Still interested in travelling to London?</h2>
-    <p class="text-gray-500 mb-8">There is a limited number of seats available. Complete your booking to secure yours.</p>
-
-    <div class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col lg:flex-row">
-        <div class="lg:w-1/3">
-            <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&q=80&w=800" alt="London Tower Bridge" class="h-64 lg:h-full w-full object-cover">
+        <div class="mb-10">
+            <h3 class="text-3xl font-black text-gray-900 tracking-tighter">Baggage Report</h3>
+            <p class="text-sm text-gray-400 mt-2">Fill the details for priority claim handling.</p>
         </div>
-        <div class="lg:w-2/3 p-8 flex flex-col justify-between">
+
+        <form id="reportForm" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Passenger Name</label>
+                    <input type="text" id="reportName" placeholder="Full Name" class="w-full bg-gray-50 border border-gray-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-[#8b1d41]/5 outline-none font-bold transition-all" required>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
+                    <input type="email" id="reportEmail" placeholder="email@example.com" class="w-full bg-gray-50 border border-gray-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-[#8b1d41]/5 outline-none font-bold transition-all" required>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Passport Number</label>
+                    <input type="text" id="reportPassport" placeholder="N0000000" class="w-full bg-gray-50 border border-gray-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-[#8b1d41]/5 outline-none font-bold transition-all" required>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Flight Number</label>
+                    <input type="text" id="reportFlight" placeholder="CEY-000" class="w-full bg-gray-50 border border-gray-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-[#8b1d41]/5 outline-none font-bold transition-all" required>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Baggage Description</label>
+                <textarea id="reportDesc" placeholder="Color, brand, unique marks..." class="w-full bg-gray-50 border border-gray-100 p-4 rounded-2xl focus:bg-white focus:ring-4 focus:ring-[#8b1d41]/5 outline-none font-bold transition-all" rows="3" required></textarea>
+            </div>
+
+            <div class="space-y-2">
+                <label id="uploadLabel" class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-100 rounded-[2rem] cursor-pointer bg-gray-50 hover:bg-white hover:border-[#8b1d41] transition-all group">
+                    <i class="fas fa-camera text-gray-300 text-3xl mb-3 group-hover:text-[#8b1d41] transition-colors"></i>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Upload Photo (Optional)</p>
+                    <input type="file" id="reportPhoto" class="hidden" accept="image/*" />
+                </label>
+            </div>
+
+            <div id="photoPreviewContainer" class="hidden mt-3 p-3 bg-slate-50 rounded-2xl border border-slate-200 flex items-center gap-4">
+                <img id="imagePreview" src="#" alt="Preview" class="w-16 h-16 rounded-xl object-cover border border-white shadow-md">
+                <div class="flex-1 overflow-hidden">
+                    <p id="previewFileName" class="text-[11px] font-bold text-slate-700 truncate">filename.jpg</p>
+                    <p class="text-[9px] text-emerald-600 font-black uppercase tracking-wider">Ready to upload</p>
+                </div>
+                <button type="button" onclick="removeSelectedPhoto()" class="w-8 h-8 flex items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+
+            <button type="submit" class="w-full bg-[#8b1d41] text-white py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-[#8b1d41]/20 hover:bg-[#6e1632] transform active:scale-95 transition-all">
+                Submit Priority Report
+            </button>
+        </form>
+    </div>
+</div>
+
+<section class="container mx-auto px-6 py-24" data-aos="fade-up">
+    <div class="mb-10 text-center lg:text-left">
+        <h2 class="text-4xl font-bold text-slate-800 tracking-tight mb-2">Still interested in travelling to <span class="text-[#8b1d41]">London?</span></h2>
+        <p class="text-slate-500 font-medium">There is a limited number of seats available. Complete your booking to secure yours.</p>
+    </div>
+
+    <div class="bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col lg:flex-row border border-slate-100 group">
+        <div class="lg:w-1/3 relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&q=80&w=800" alt="London Tower Bridge" class="h-64 lg:h-full w-full object-cover transition duration-700 group-hover:scale-110">
+            <div class="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent"></div>
+        </div>
+        <div class="lg:w-2/3 p-10 flex flex-col justify-between bg-gradient-to-br from-white to-slate-50">
             <div>
-                <div class="text-sm text-gray-400 mb-4">27 Apr 2026 - 25 May 2026</div>
-                <div class="flex items-center justify-between mb-8 max-w-md">
-                    <div>
-                        <div class="text-2xl font-bold">CMB</div>
-                        <div class="text-sm text-gray-500">Colombo</div>
+                <div class="flex items-center gap-2 text-xs font-bold text-[#C5A059] uppercase tracking-widest mb-6">
+                    <i class="far fa-calendar-alt"></i>
+                    27 Apr 2026 - 25 May 2026
+                </div>
+
+                <div class="flex flex-col md:flex-row items-center justify-between mb-10 max-w-2xl gap-8">
+                    <div class="text-center md:text-left">
+                        <div class="text-3xl font-black text-slate-900 tracking-tighter">CMB</div>
+                        <div class="text-xs font-bold text-slate-400 uppercase">Colombo</div>
                     </div>
-                    <div class="flex-1 mx-4 flex flex-col items-center">
-                        <i class="fas fa-plane text-gray-300"></i>
-                        <div class="w-full border-t border-dashed border-gray-300 mt-2"></div>
+
+                    <div class="flex-1 flex flex-col items-center px-4">
+                        <i class="fas fa-plane text-[#8b1d41] transform rotate-45 mb-2"></i>
+                        <div class="w-full border-t-2 border-dashed border-slate-200"></div>
                     </div>
-                    <div>
-                        <div class="text-2xl font-bold">LHR</div>
-                        <div class="text-sm text-gray-500 text-right">London</div>
+
+                    <div class="text-center md:text-right">
+                        <div class="text-3xl font-black text-slate-900 tracking-tighter">LHR</div>
+                        <div class="text-xs font-bold text-slate-400 uppercase text-right">London</div>
                     </div>
-                    <div class="ml-12">
-                        <div class="text-xs text-gray-400">Return</div>
-                        <div class="text-sm font-semibold">1 Passenger</div>
+
+                    <div class="md:ml-8 text-center md:text-left bg-slate-100/50 px-4 py-2 rounded-xl">
+                        <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Return</div>
+                        <div class="text-sm font-bold text-slate-700">1 Passenger</div>
                     </div>
-                    <div class="ml-8">
-                        <button class="primary-color text-white px-6 py-2 rounded-full text-sm font-bold primary-hover transition">
-                            Complete my booking
+
+                    <div class="md:ml-4">
+                        <button class="bg-[#8b1d41] text-white px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#6e1632] transition-all shadow-lg shadow-[#8b1d41]/20 hover:-translate-y-1 active:scale-95">
+                            Complete booking
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 border-t">
-                <div class="flex items-start space-x-3">
-                    <i class="fas fa-award text-xl text-gray-400"></i>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 border-t border-slate-200/60">
+                <div class="flex items-start space-x-4">
+                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-award text-[#C5A059]"></i>
+                    </div>
                     <div>
-                        <h4 class="text-sm font-bold text-gray-700">Why book with us</h4>
-                        <p class="text-xs text-gray-500">Enjoy exclusive benefits and 24/7 priority support when you book direct.</p>
+                        <h4 class="text-sm font-bold text-slate-800">Why book with us</h4>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">Enjoy exclusive benefits and 24/7 priority support.</p>
                     </div>
                 </div>
-                <div class="flex items-start space-x-3 border-l border-gray-100 pl-4">
-                    <i class="fas fa-clock text-xl text-gray-400"></i>
+                <div class="flex items-start space-x-4">
+                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-clock text-[#C5A059]"></i>
+                    </div>
                     <div>
-                        <h4 class="text-sm font-bold text-gray-700">Cancel within 24 hours</h4>
-                        <p class="text-xs text-gray-500">Plans change. Enjoy fee-free cancellation on select fare types.</p>
+                        <h4 class="text-sm font-bold text-slate-800">Flexible Changes</h4>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">Enjoy fee-free cancellation on select fare types.</p>
                     </div>
                 </div>
-                <div class="flex items-start space-x-3 border-l border-gray-100 pl-4">
-                    <i class="fas fa-wallet text-xl text-gray-400"></i>
+                <div class="flex items-start space-x-4">
+                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-wallet text-[#C5A059]"></i>
+                    </div>
                     <div>
-                        <h4 class="text-sm font-bold text-gray-700">Pay with Cash + Points</h4>
-                        <p class="text-xs text-gray-500">Benefit from incredible savings and greater payment flexibility.</p>
+                        <h4 class="text-sm font-bold text-slate-800">Cash + Points</h4>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">Incredible savings and greater payment flexibility.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
 <div class="fixed bottom-8 right-8 z-[100] flex flex-col items-end">
-
-    <div id="chat-window" class="hidden w-[380px] h-[550px] bg-white rounded-[2rem] shadow-2xl flex flex-col overflow-hidden mb-6 border border-gray-100 transition-all duration-300 animate-in fade-in slide-in-from-bottom-5">
-
-        <div class="bg-[#8b1d41] p-6 text-white flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                    <i class="fas fa-robot text-lg"></i>
+    <div id="chat-window" class="hidden w-[380px] h-[580px] bg-white rounded-[2.5rem] shadow-[0_25px_60px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden mb-6 border border-slate-100 transition-all duration-300 animate-in fade-in slide-in-from-bottom-5">
+        <div class="bg-gradient-to-r from-[#8b1d41] to-[#6e1632] p-7 text-white flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30">
+                    <i class="fas fa-robot text-xl"></i>
                 </div>
                 <div>
-                    <h4 class="font-bold text-sm">Ceylon AI Assistant</h4>
-                    <p class="text-[10px] opacity-70 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span> Online now
+                    <h4 class="font-black text-sm tracking-tight uppercase">Ceylon Assistant</h4>
+                    <p class="text-[10px] font-bold opacity-70 flex items-center gap-1 uppercase tracking-widest">
+                        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> Online
                     </p>
                 </div>
             </div>
-            <button onclick="toggleChat()" class="hover:bg-white/10 w-8 h-8 rounded-full transition">
+            <button onclick="toggleChat()" class="hover:bg-white/10 w-10 h-10 rounded-full transition flex items-center justify-center">
                 <i class="fas fa-times"></i>
             </button>
         </div>
 
-        <div id="chat-messages" class="flex-1 overflow-y-auto p-6 flex flex-col gap-4 bg-gray-50 scroll-smooth">
-            <div class="self-start bg-white border border-gray-200 text-gray-800 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-sm shadow-sm">
-                Ayubowan! 🙏 Welcome to Ceylon Airlines. I'm your AI travel assistant. How can I help you today?
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-8 flex flex-col gap-5 bg-slate-50/50">
+            <div class="self-start bg-white border border-slate-100 text-slate-700 p-4 rounded-2xl rounded-tl-none max-w-[90%] text-sm shadow-sm leading-relaxed">
+                Ayubowan! 🙏 Welcome to Ceylon Airlines. How can I assist with your journey today?
             </div>
 
-            <div class="flex flex-wrap gap-2 mt-2" id="quick-actions">
-                <button onclick="sendQuickMessage('Track my baggage')" class="text-[11px] font-bold border border-[#8b1d41] text-[#8b1d41] px-3 py-1.5 rounded-full hover:bg-[#8b1d41] hover:text-white transition">Track Baggage</button>
-                <button onclick="sendQuickMessage('Flight Status')" class="text-[11px] font-bold border border-[#8b1d41] text-[#8b1d41] px-3 py-1.5 rounded-full hover:bg-[#8b1d41] hover:text-white transition">Flight Status</button>
-                <button onclick="sendQuickMessage('Booking Help')" class="text-[11px] font-bold border border-[#8b1d41] text-[#8b1d41] px-3 py-1.5 rounded-full hover:bg-[#8b1d41] hover:text-white transition">Booking Help</button>
+            <div class="flex flex-col gap-2 mt-2" id="quick-actions">
+                <button onclick="sendQuickMessage('Track my baggage')" class="text-left px-5 py-3 text-[11px] font-bold border border-slate-200 bg-white text-slate-600 rounded-xl hover:border-[#8b1d41] hover:text-[#8b1d41] transition-all shadow-sm">🔍 Track Baggage Status</button>
+                <button onclick="sendQuickMessage('Flight Status')" class="text-left px-5 py-3 text-[11px] font-bold border border-slate-200 bg-white text-slate-600 rounded-xl hover:border-[#8b1d41] hover:text-[#8b1d41] transition-all shadow-sm">✈️ Check Flight Status</button>
             </div>
         </div>
 
-        <div class="p-4 bg-white border-t border-gray-100">
-            <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex gap-2">
+        <div class="p-6 bg-white border-t border-slate-100">
+            <form id="chat-form" onsubmit="handleChatSubmit(event)" class="flex gap-3">
                 <input type="text" id="user-input" placeholder="Ask me anything..."
-                       class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#8b1d41] outline-none">
-                <button type="submit" class="bg-[#8b1d41] text-white w-12 h-12 rounded-xl flex items-center justify-center hover:bg-[#6a1632] transition shadow-lg active:scale-95">
+                       class="flex-1 bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-[#8b1d41]/10 outline-none font-medium">
+                <button type="submit" class="bg-slate-900 text-white w-14 h-14 rounded-2xl flex items-center justify-center hover:bg-[#8b1d41] transition shadow-lg active:scale-95">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </form>
         </div>
     </div>
 
-    <button onclick="toggleChat()" class="bg-[#8b1d41] w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-white text-2xl hover:scale-110 active:scale-95 transition-all duration-300 relative">
-        <i id="chat-icon" class="fas fa-comment-dots"></i>
-        <span class="absolute top-0 right-0 w-4 h-4 bg-yellow-400 rounded-full border-2 border-white"></span>
+    <button onclick="toggleChat()" class="bg-[#8b1d41] w-20 h-20 rounded-[2rem] shadow-2xl shadow-[#8b1d41]/30 flex items-center justify-center text-white text-3xl hover:scale-105 active:scale-95 transition-all duration-300 relative group">
+        <i id="chat-icon" class="fas fa-comment-alt group-hover:rotate-12 transition-transform"></i>
+        <span class="absolute top-0 right-0 w-5 h-5 bg-yellow-400 rounded-full border-4 border-white"></span>
     </button>
 </div>
 
-
-<section class="container mx-auto px-6 pb-32">
-    <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
-        <div>
-            <span class="text-gold font-bold tracking-[0.3em] uppercase text-[10px] mb-2 block" style="color: var(--burnished-gold)">Inspiration for your journey</span>
-            <h2 class="text-4xl font-bold brand-text text-gray-900">Start planning your next trip</h2>
+<section class="container mx-auto px-6 pb-32" data-aos="fade-up">
+    <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+        <div class="max-w-xl">
+            <span class="text-[#C5A059] font-black tracking-[0.4em] uppercase text-[10px] mb-4 block">Inspiration for your journey</span>
+            <h2 class="text-5xl font-black text-slate-900 tracking-tighter leading-none">Start planning your <br> next <span class="text-[#8b1d41]">escape.</span></h2>
         </div>
-        <p class="text-gray-500 max-w-md text-sm leading-relaxed">Thinking of travelling somewhere soon? Explore our most curated destinations with world-class hospitality.</p>
+        <p class="text-slate-500 max-w-sm text-sm font-medium leading-relaxed">Thinking of travelling somewhere soon? Explore our most curated destinations with world-class hospitality.</p>
     </div>
 
     <div id="planningContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        <div class="group cursor-pointer">
-            <div class="relative h-80 overflow-hidden rounded-[2rem] shadow-xl transition-all duration-500 group-hover:-translate-y-2">
-                <img src="https://images.unsplash.com/photo-1552423814-24830a21f0fe?auto=format&fit=crop&q=80&w=800" alt="Sigiriya" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                <div class="absolute bottom-6 left-6 right-6">
-                    <span class="text-[9px] font-bold text-gold uppercase tracking-widest mb-1 block" style="color: var(--burnished-gold)">Sri Lanka</span>
-                    <h3 class="text-xl font-bold text-white brand-text">Ancient Majesty</h3>
+        <div class="group cursor-pointer" data-aos="fade-up" data-aos-delay="100">
+            <div class="relative h-[450px] overflow-hidden rounded-[2.5rem] shadow-2xl transition-all duration-700">
+                <img src="https://images.unsplash.com/photo-1552423814-24830a21f0fe?auto=format&fit=crop&q=80&w=800" alt="Sigiriya" class="w-full h-full object-cover transition duration-1000 group-hover:scale-110">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/20 to-transparent"></div>
+                <div class="absolute bottom-10 left-8 right-8">
+                    <span class="text-[10px] font-black text-[#C5A059] uppercase tracking-widest mb-2 block">Sri Lanka</span>
+                    <h3 class="text-2xl font-black text-white tracking-tight">Ancient Majesty</h3>
+                    <p class="mt-4 text-xs text-slate-300 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">Discover the hidden gems of the teardrop island.</p>
                 </div>
             </div>
-            <p class="mt-4 text-xs text-gray-500 font-medium px-2 leading-relaxed">Discover the hidden gems of the teardrop island.</p>
         </div>
 
-        <div class="group cursor-pointer">
-            <div class="relative h-80 overflow-hidden rounded-[2rem] shadow-xl transition-all duration-500 group-hover:-translate-y-2">
-                <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=800" alt="Maldives" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                <div class="absolute bottom-6 left-6 right-6">
-                    <span class="text-[9px] font-bold text-gold uppercase tracking-widest mb-1 block" style="color: var(--burnished-gold)">Maldives</span>
-                    <h3 class="text-xl font-bold text-white brand-text">Azure Escapes</h3>
+        <div class="group cursor-pointer" data-aos="fade-up" data-aos-delay="200">
+            <div class="relative h-[450px] overflow-hidden rounded-[2.5rem] shadow-2xl transition-all duration-700">
+                <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=800" alt="Maldives" class="w-full h-full object-cover transition duration-1000 group-hover:scale-110">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/20 to-transparent"></div>
+                <div class="absolute bottom-10 left-8 right-8">
+                    <span class="text-[10px] font-black text-[#C5A059] uppercase tracking-widest mb-2 block">Maldives</span>
+                    <h3 class="text-2xl font-black text-white tracking-tight">Azure Escapes</h3>
+                    <p class="mt-4 text-xs text-slate-300 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">Luxury overwater villas and crystal clear lagoons.</p>
                 </div>
             </div>
-            <p class="mt-4 text-xs text-gray-500 font-medium px-2 leading-relaxed">Luxury overwater villas and crystal clear lagoons.</p>
         </div>
 
-        <div class="group cursor-pointer">
-            <div class="relative h-80 overflow-hidden rounded-[2rem] shadow-xl transition-all duration-500 group-hover:-translate-y-2">
-                <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&q=80&w=800" alt="Paris" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                <div class="absolute bottom-6 left-6 right-6">
-                    <span class="text-[9px] font-bold text-gold uppercase tracking-widest mb-1 block" style="color: var(--burnished-gold)">France</span>
-                    <h3 class="text-xl font-bold text-white brand-text">City of Lights</h3>
+        <div class="group cursor-pointer" data-aos="fade-up" data-aos-delay="300">
+            <div class="relative h-[450px] overflow-hidden rounded-[2.5rem] shadow-2xl transition-all duration-700">
+                <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&q=80&w=800" alt="Paris" class="w-full h-full object-cover transition duration-1000 group-hover:scale-110">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/20 to-transparent"></div>
+                <div class="absolute bottom-10 left-8 right-8">
+                    <span class="text-[10px] font-black text-[#C5A059] uppercase tracking-widest mb-2 block">France</span>
+                    <h3 class="text-2xl font-black text-white tracking-tight">City of Lights</h3>
+                    <p class="mt-4 text-xs text-slate-300 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">Experience the ultimate romance and culinary arts.</p>
                 </div>
             </div>
-            <p class="mt-4 text-xs text-gray-500 font-medium px-2 leading-relaxed">Experience the ultimate romance and culinary arts.</p>
         </div>
 
-        <div class="group cursor-pointer">
-            <div class="relative h-80 overflow-hidden rounded-[2rem] shadow-xl transition-all duration-500 group-hover:-translate-y-2">
-                <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=800" alt="Japan" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                <div class="absolute bottom-6 left-6 right-6">
-                    <span class="text-[9px] font-bold text-gold uppercase tracking-widest mb-1 block" style="color: var(--burnished-gold)">Japan</span>
-                    <h3 class="text-xl font-bold text-white brand-text">Modern Zen</h3>
+        <div class="group cursor-pointer" data-aos="fade-up" data-aos-delay="400">
+            <div class="relative h-[450px] overflow-hidden rounded-[2.5rem] shadow-2xl transition-all duration-700">
+                <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=800" alt="Japan" class="w-full h-full object-cover transition duration-1000 group-hover:scale-110">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/20 to-transparent"></div>
+                <div class="absolute bottom-10 left-8 right-8">
+                    <span class="text-[10px] font-black text-[#C5A059] uppercase tracking-widest mb-2 block">Japan</span>
+                    <h3 class="text-2xl font-black text-white tracking-tight">Modern Zen</h3>
+                    <p class="mt-4 text-xs text-slate-300 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">Where ancient tradition meets neon future.</p>
                 </div>
             </div>
-            <p class="mt-4 text-xs text-gray-500 font-medium px-2 leading-relaxed">Where ancient tradition meets neon future.</p>
         </div>
     </div>
 </section>
 
-<!-- Footer -->
-<footer class="bg-gray-900 text-gray-400 py-12">
-    <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
-        <div>
-            <div class="text-white text-xl font-bold mb-6 tracking-tighter">
-                <span class="text-yellow-400">CEYLONE</span> AIRLINES
+<footer class="bg-slate-950 text-slate-400 py-20 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-96 h-96 bg-[#8b1d41]/5 rounded-full blur-3xl -mr-48 -mt-48"></div>
+
+    <div class="container mx-auto px-6 relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-16">
+            <div class="col-span-1">
+                <div class="text-white text-2xl font-black tracking-tighter mb-8">
+                    <span class="text-yellow-400">CEYLON</span> AIRLINES
+                </div>
+                <p class="text-sm leading-relaxed opacity-60">The pride of Sri Lanka, taking you to new heights with elegance, safety and authentic hospitality since 2026.</p>
             </div>
-            <p class="text-sm">The pride of Sri Lanka, taking you to new heights with elegance and safety since 2026.</p>
-        </div>
-        <div>
-            <h4 class="text-white font-bold mb-4">Ceylone Airlines</h4>
-            <ul class="text-sm space-y-2">
-                <li><a href="#" class="hover:text-white">About us</a></li>
-                <li><a href="#" class="hover:text-white">Careers</a></li>
-                <li><a href="#" class="hover:text-white">Press releases</a></li>
-                <li><a href="#" class="hover:text-white">Sustainability</a></li>
-            </ul>
-        </div>
-        <div>
-            <h4 class="text-white font-bold mb-4">Help</h4>
-            <ul class="text-sm space-y-2">
-                <li><a href="#" class="hover:text-white">Contact us</a></li>
-                <li><a href="#" class="hover:text-white">Travel alerts</a></li>
-                <li><a href="#" class="hover:text-white">Bagage</a></li>
-                <li><a href="#" class="hover:text-white">Refuacnds</a></li>
-            </ul>
-        </div>
-        <div>
-            <h4 class="text-white font-bold mb-4">Follow us</h4>
-            <div class="flex space-x-4 text-xl">
-                <a href="#" class="hover:text-white"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="hover:text-white"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="hover:text-white"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+
+            <div>
+                <h4 class="text-white font-black text-xs uppercase tracking-[0.2em] mb-8">Ceylone Airlines</h4>
+                <ul class="text-sm space-y-4">
+                    <li><a href="#" class="hover:text-[#C5A059] transition">About us</a></li>
+                    <li><a href="#" class="hover:text-[#C5A059] transition">Careers</a></li>
+                    <li><a href="#" class="hover:text-[#C5A059] transition">Press releases</a></li>
+                    <li><a href="#" class="hover:text-[#C5A059] transition">Sustainability</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-white font-black text-xs uppercase tracking-[0.2em] mb-8">Support Center</h4>
+                <ul class="text-sm space-y-4">
+                    <li><a href="#" class="hover:text-[#C5A059] transition">Contact us</a></li>
+                    <li><a href="#" class="hover:text-[#C5A059] transition">Travel alerts</a></li>
+                    <li><a href="#" class="hover:text-[#C5A059] transition">Baggage Policy</a></li>
+                    <li><a href="#" class="hover:text-[#C5A059] transition">Refunds</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-white font-black text-xs uppercase tracking-[0.2em] mb-8">Connect With Us</h4>
+                <div class="flex space-x-5">
+                    <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-[#8b1d41] hover:text-white transition-all"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-[#8b1d41] hover:text-white transition-all"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-[#8b1d41] hover:text-white transition-all"><i class="fab fa-instagram"></i></a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="container mx-auto px-6 border-t border-gray-800 mt-12 pt-8 text-xs flex justify-between">
-        <p>&copy; 2026 Ceylone Airlines. All rights reserved.</p>
-        <div class="flex space-x-6">
-            <a href="#" class="hover:text-white">Privacy Policy</a>
-            <a href="#" class="hover:text-white">Cookie Policy</a>
-            <a href="#" class="hover:text-white">Conditions of Carriage</a>
+
+        <div class="pt-10 border-t border-white/5 text-[10px] font-bold uppercase tracking-[0.2em] flex flex-col md:flex-row justify-between items-center gap-6 opacity-40">
+            <p>&copy; 2026 Ceylone Airlines. All rights reserved.</p>
+            <div class="flex gap-8">
+                <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition">Cookie Policy</a>
+                <a href="#" class="hover:text-white transition">Terms & Conditions</a>
+            </div>
         </div>
     </div>
 </footer>
 
 <script>
-    const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash);
-    const token = decodeURIComponent(params.get('token'));
-
-    if (token && token !== 'null') {
-        localStorage.setItem('token', token);
-        history.replaceState(null, null, window.location.pathname);
-    }
-    // Improved Tab Switcher
-    const tabs = document.querySelectorAll(".tab-btn");
-    const contents = document.querySelectorAll(".tab-content");
-
-
-    tabs.forEach(tab => {
-        tab.addEventListener("click", () => {
-            // UI Update for Tabs
-            tabs.forEach(t => {
-                t.classList.remove("border-b-2", "border-maroon-700", "text-primary", "font-semibold");
-                t.classList.add("text-gray-500");
+    document.addEventListener("DOMContentLoaded", () => {
+        // 1. Initialize AOS (Animate on Scroll)
+        if (typeof AOS !== 'undefined') {
+            AOS.init({
+                duration: 1000,
+                once: true,
+                easing: 'ease-out-cubic'
             });
-            tab.classList.add("border-b-2", "border-maroon-700", "text-primary", "font-semibold");
-            tab.classList.remove("text-gray-500");
-
-            // UI Update for Contents
-            contents.forEach(c => c.classList.add("hidden"));
-            const target = tab.getAttribute("data-target");
-            document.getElementById(target).classList.remove("hidden");
-        });
-    });
-
-    // Baggage Tracking Simulation
-    function simulateTracking() {
-        const input = document.getElementById('bagTagInput').value;
-        if(!input) {
-            alert("Please enter a valid tag number.");
-            return;
         }
 
-        const statusDiv = document.getElementById('liveStatus');
-        statusDiv.classList.remove('hidden');
-        document.getElementById('statusText').innerText = "Locating Baggage...";
-
-        setTimeout(() => {
-            document.getElementById('statusText').innerText = "In Transit (En route to London)";
-        }, 1000);
-    }
-
-    function updateNavbar() {
-        const user = JSON.parse(localStorage.getItem("user"));
+        // 2. Global Elements Selection
+        const exploreBtn = document.getElementById('exploreBtn');
+        const megaMenu = document.querySelector('.mega-menu');
+        const closeBtn = document.querySelector('.close-btn');
         const loginBtn = document.getElementById("loginBtn");
         const userInfo = document.getElementById("userInfo");
-        const userEmail = document.getElementById("userEmail");
-        const userPhoto = document.getElementById("userPhoto");
         const logoutBtn = document.getElementById("logoutBtn");
 
-        if (user) {
-            // Hide login button
-            loginBtn.classList.add("hidden");
+        // 3. Mega Menu Logic
+        if (exploreBtn && megaMenu) {
+            exploreBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                megaMenu.classList.remove('hidden');
+            });
 
-            // Show user info
-            userInfo.classList.remove("hidden");
-            userEmail.textContent = user.name || user.email; // show name if available
-            userPhoto.src = user.photoUrl || `https://i.pravatar.cc/150?u=${user.email}`;
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    megaMenu.classList.add('hidden');
+                });
+            }
 
-            // Logout functionality
-            logoutBtn.onclick = () => {
-                localStorage.removeItem("user");
-                localStorage.removeItem("token");
-                window.location.reload();
-            };
-        } else {
-            loginBtn.classList.remove("hidden");
-            userInfo.classList.add("hidden");
+            // Close mega menu if clicking outside
+            document.addEventListener('click', (e) => {
+                if (!megaMenu.contains(e.target) && !exploreBtn.contains(e.target)) {
+                    megaMenu.classList.add('hidden');
+                }
+            });
         }
-    }
 
-    // Call this on page load to update navbar dynamically
-    document.addEventListener("DOMContentLoaded", updateNavbar);
+        // 4. Tab Switcher Logic
+        const tabs = document.querySelectorAll(".tab-btn");
+        const contents = document.querySelectorAll(".tab-content");
 
-    <!-- JS for Tabs & Passenger Dropdown -->
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                const targetId = tab.getAttribute("data-target");
+                const targetContent = document.getElementById(targetId);
 
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            btn.classList.add('active-tab');
-            document.getElementById(btn.dataset.target).classList.remove('hidden');
+                if (targetContent) {
+                    // Remove active classes from all tabs
+                    tabs.forEach(t => t.classList.remove("active-tab", "border-b-2", "border-[#8b1d41]", "text-[#8b1d41]"));
+                    // Hide all contents
+                    contents.forEach(c => c.classList.add("hidden"));
+
+                    // Add active class to clicked tab
+                    tab.classList.add("active-tab");
+                    // Show target content
+                    targetContent.classList.remove("hidden");
+                }
+            });
         });
+
+        // 5. Token Handling from URL (OAuth/Login)
+        const hash = window.location.hash.substring(1);
+        const params = new URLSearchParams(hash);
+        const token = params.get('token');
+
+        if (token && token !== 'null') {
+            localStorage.setItem('token', token);
+            history.replaceState(null, null, window.location.pathname);
+        }
+
+        // 6. User Authentication & Navbar Update
+        function updateNavbar() {
+            const user = JSON.parse(localStorage.getItem("user"));
+            const userEmail = document.getElementById("userEmail");
+            const userPhoto = document.getElementById("userPhoto");
+
+            if (user && loginBtn && userInfo) {
+                loginBtn.classList.add("hidden");
+                userInfo.classList.remove("hidden");
+
+                if (userEmail) userEmail.textContent = user.name || user.email;
+                if (userPhoto) userPhoto.src = user.photoUrl || `https://i.pravatar.cc/150?u=${user.email}`;
+
+                if (logoutBtn) {
+                    logoutBtn.onclick = () => {
+                        localStorage.removeItem("user");
+                        localStorage.removeItem("token");
+                        window.location.reload();
+                    };
+                }
+            } else if (loginBtn) {
+                loginBtn.classList.remove("hidden");
+                if (userInfo) userInfo.classList.add("hidden");
+            }
+        }
+        updateNavbar();
+
+        // 7. Passenger Dropdown Toggle
+        const passengerTrigger = document.getElementById('passengerTrigger');
+        const passengerDropdown = document.getElementById('passengerDropdown');
+
+        if (passengerTrigger && passengerDropdown) {
+            passengerTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                passengerDropdown.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!passengerDropdown.contains(e.target) && !passengerTrigger.contains(e.target)) {
+                    passengerDropdown.classList.add('hidden');
+                }
+            });
+        }
     });
 
-        // Passenger dropdown toggle
-        document.getElementById('passengerTrigger').addEventListener('click', () => {
-        document.getElementById('passengerDropdown').classList.toggle('hidden');
-    });
+    // 8. Passenger Counter Functions (Global Scope for HTML onclick)
+    function updateCount(type, delta) {
+        const el = document.getElementById(type + 'Count');
+        if (!el) return;
 
-        // Simple passenger counter
-        function updateCount(type, delta) {
-        const el = document.getElementById(type+'Count');
         let val = parseInt(el.textContent);
         val = Math.max(0, val + delta);
         el.textContent = val;
         updateSummary();
     }
-        function updateClass(cls) { updateSummary(cls); }
-        function updateSummary(cls) {
-        const adults = document.getElementById('adultsCount').textContent;
-        const children = document.getElementById('childrenCount').textContent;
-        const infants = document.getElementById('infantsCount').textContent;
-        const c = cls || document.querySelector('#passengerDropdown select').value;
-        document.getElementById('passengerSummary').textContent = `${adults} Adult(s), ${children} Child(ren), ${infants} Infant(s), ${c}`;
+
+    function updateClass(cls) {
+        updateSummary(cls);
     }
 
+    function updateSummary(cls) {
+        const adults = document.getElementById('adultsCount')?.textContent || "1";
+        const children = document.getElementById('childrenCount')?.textContent || "0";
+        const summaryEl = document.getElementById('passengerSummary');
 
+        // Get class from select if not provided
+        const classSelect = document.querySelector('#passengerDropdown select');
+        const selectedClass = cls || (classSelect ? classSelect.value : "Economy");
 
-
-
-        const exploreBtn = document.getElementById('exploreBtn');
-        const megaMenu = document.querySelector('.mega-menu');
-        const closeBtn = document.querySelector('.mega-menu .close-btn');
-
-        // Open mega menu on Explore click
-        exploreBtn.addEventListener('click', (e) => {
-        e.preventDefault(); // Prevent default link behavior
-        megaMenu.classList.remove('hidden');
-    });
-
-        // Close mega menu when clicking the X button
-        closeBtn.addEventListener('click', () => {
-        megaMenu.classList.add('hidden');
-    });
-
-        // Optional: close mega menu if clicking outside
-        document.addEventListener('click', (e) => {
-        if (!megaMenu.contains(e.target) && !exploreBtn.contains(e.target)) {
-        megaMenu.classList.add('hidden');
+        if (summaryEl) {
+            summaryEl.textContent = `${adults} Adult(s), ${children} Child(ren), ${selectedClass}`;
+        }
     }
-    });
+
+    // 9. Baggage Tracking Simulation
+    function simulateTracking() {
+        const input = document.getElementById('bagTagInput')?.value;
+        if (!input) {
+            alert("Please enter a valid passport or tag number.");
+            return;
+        }
+
+        const statusDiv = document.getElementById('liveStatus');
+        const statusText = document.getElementById('statusText');
+
+        if (statusDiv && statusText) {
+            statusDiv.classList.remove('hidden');
+            statusText.innerText = "Locating Baggage...";
+
+            setTimeout(() => {
+                statusText.innerText = "In Transit (En route to London)";
+                // Optional: Update dots
+                const stepChecked = document.getElementById('step-checked');
+                if (stepChecked) stepChecked.classList.add('active');
+            }, 1500);
+        }
+    }
 
 </script>
+        <script src="../JavaScript/HomePageJS/Baggages%20Report.js"></script>
 <script src="../JavaScript/HomePageJS/PlanningSection.js"></script>
 <script src="../JavaScript/HomePageJS/HMFlightsSearch.js"></script>
 <script src="../JavaScript/HomePageJS/HMBaggage.js"></script>
 <script src="../JavaScript/HomePageJS/Chatbot.js"></script>
+        <script src="../JavaScript/HomePageJS/Homepage.js"></script>
+
 </body>
 </html>
