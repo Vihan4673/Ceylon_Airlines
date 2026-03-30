@@ -50,7 +50,6 @@ public class SeatServiceImpl implements SeatService {
     @Transactional
     public boolean bookSeat(String flightNumber, String seatId, String passengerName) {
 
-        // 🔹 Validate input
         if (flightNumber == null || flightNumber.isBlank() ||
                 seatId == null || seatId.isBlank()) {
             return false;
@@ -68,7 +67,6 @@ public class SeatServiceImpl implements SeatService {
         Seat seat = seatRepository
                 .findBySeatIdAndFlightForUpdate(seatId, flight)
                 .orElseGet(() -> {
-                    // 🔹 Create new seat if not exists
                     Seat newSeat = new Seat();
                     newSeat.setSeatId(seatId);
                     newSeat.setFlight(flight);

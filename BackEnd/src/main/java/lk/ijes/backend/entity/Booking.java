@@ -16,16 +16,19 @@ public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // ✅ primary key
+    private Long id;
 
     @Column(unique = true)
-    private String pnr; // ✅ business ID
+    private String pnr;
 
     @Column(nullable = false)
     private String passenger;
 
     @Column(nullable = false)
     private String flightNumber;
+
+    @Column(nullable = false)
+    private String passportNumber;
 
     @Column(nullable = false)
     private String seat;
@@ -50,7 +53,6 @@ public class Booking {
     @Column(nullable = false)
     private String destination;
 
-    // ✅ Added email field
     @Column(nullable = false)
     private String email;
 }

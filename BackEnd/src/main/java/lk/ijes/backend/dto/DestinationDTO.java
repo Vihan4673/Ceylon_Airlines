@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DestinationDTO {
 
+    private Long id;
     private String city;
     private String airportCode;
 }

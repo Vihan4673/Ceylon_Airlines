@@ -49,11 +49,9 @@ public class Flight {
     private String economyFare;
 
     @Column(nullable = false)
-    private String businessFare;  // e.g., "50000"
+    private String businessFare;
 
-    /**
-     * Convert the flightDate String to LocalDate
-     */
+
     public LocalDate getDate() {
         if (flightDate == null || flightDate.isBlank()) return null;
         return LocalDate.parse(flightDate, DateTimeFormatter.ISO_LOCAL_DATE);

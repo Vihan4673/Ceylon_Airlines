@@ -38,7 +38,6 @@ public class FlightDTO {
 
     private String status = "On Time";
 
-    // Fares
     @NotNull(message = "Economy fare cannot be empty")
     private String economyFare;
 

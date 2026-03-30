@@ -7,9 +7,8 @@ public interface BookingService {
 
     BookingDTO saveBooking(BookingDTO bookingDTO);
 
-    BookingDTO updateBooking(Long id, BookingDTO bookingDTO); // ✅ FIXED
+    BookingDTO updateBooking(Long id, BookingDTO bookingDTO);
 
-    // 🔥🔥🔥 ================= UPDATE BOOKING BY PNR (NEW) ================= 🔥🔥🔥
     BookingDTO updateBookingByPnr(String pnr, BookingDTO bookingDTO);
 
     void deleteBooking(Long id);
@@ -17,4 +16,6 @@ public interface BookingService {
     List<BookingDTO> getAllBookings();
 
     BookingDTO searchBookingByID(Long id);
+
+    BookingDTO getBookingByPnr(String pnr);
 }

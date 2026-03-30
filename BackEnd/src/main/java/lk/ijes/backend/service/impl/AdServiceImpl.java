@@ -26,6 +26,7 @@ public class AdServiceImpl implements AdService {
 
     private final AdRepository adRepository;
     private final ModelMapper modelMapper;
+    private final Path uploadDir = Paths.get("uploads");
 
     @Override
     public AdDTO createAd(AdDTO adDTO) {
@@ -60,50 +61,62 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public AdDTO saveAdWithImage(MultipartFile file,
-                                 String title,
-                                 String description,
-                                 String placement,
-                                 String startDate,
-                                 String endDate) throws IOException {
+    public AdDTO saveAdWithImage(MultipartFile file, String title, String description,
+                                 String placement, String startDate, String endDate) throws IOException {
 
-        if (file == null || file.isEmpty()) {
-            throw new IOException("File is empty");
+        String imageUrl = null;
+        if (file != null && !file.isEmpty()) {
+            imageUrl = saveFile(file);
         }
 
-        // ✅ uploads folder check
-        Path uploadDir = Paths.get("uploads");
+        Ad ad = new Ad();
+        updateAdFields(ad, title, description, placement, startDate, endDate, imageUrl);
+        ad.setActive(true);
+
+        return modelMapper.map(adRepository.save(ad), AdDTO.class);
+    }
+
+    @Override
+    public AdDTO updateAdWithImage(Long id, MultipartFile file, String title, String description,
+                                   String placement, String startDate, String endDate) throws IOException {
+
+        Ad existingAd = adRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ad not found with id: " + id));
+
+        String newImageUrl = existingAd.getImageUrl();
+
+        if (file != null && !file.isEmpty()) {
+            newImageUrl = saveFile(file);
+        }
+
+        updateAdFields(existingAd, title, description, placement, startDate, endDate, newImageUrl);
+
+        return modelMapper.map(adRepository.save(existingAd), AdDTO.class);
+    }
+
+    private String saveFile(MultipartFile file) throws IOException {
         if (!Files.exists(uploadDir)) {
             Files.createDirectories(uploadDir);
         }
-
-        // ✅ unique filename
         String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Path filePath = uploadDir.resolve(filename);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        return "/uploads/" + filename;
+    }
 
-        // ✅ parse dates safely
-        LocalDate start;
-        LocalDate end;
+    private void updateAdFields(Ad ad, String title, String description, String placement,
+                                String startDate, String endDate, String imageUrl) {
         try {
-            start = LocalDate.parse(startDate);
-            end = LocalDate.parse(endDate);
+            ad.setTitle(title);
+            ad.setDescription(description);
+            ad.setPlacement(placement);
+            ad.setStartDate(LocalDate.parse(startDate));
+            ad.setEndDate(LocalDate.parse(endDate));
+            if (imageUrl != null) {
+                ad.setImageUrl(imageUrl);
+            }
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Invalid date format. Use YYYY-MM-DD");
         }
-
-        // ✅ create Ad entity
-        Ad ad = new Ad();
-        ad.setTitle(title);
-        ad.setDescription(description);
-        ad.setPlacement(placement);
-        ad.setStartDate(start);
-        ad.setEndDate(end);
-        ad.setImageUrl("/uploads/" + filename); // browser can access via WebConfig
-        ad.setActive(true);
-
-        Ad savedAd = adRepository.save(ad);
-
-        return modelMapper.map(savedAd, AdDTO.class);
     }
 }

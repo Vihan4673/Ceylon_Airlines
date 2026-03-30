@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DestinationRepository extends JpaRepository<Destination, Long> {
-    // Optional: custom query if needed
-    // Destination findByFromAndTo(String from, String to);
+
 }

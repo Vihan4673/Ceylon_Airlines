@@ -19,9 +19,7 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService bookingService;
-    private final EmailService emailService; // ✅ inject EmailService
-
-    // ================= CREATE BOOKING =================
+    private final EmailService emailService;
     @PostMapping
     public ResponseEntity<APIResponse<BookingDTO>> createBooking(
             @Valid @RequestBody BookingDTO bookingDTO) {
@@ -42,7 +40,6 @@ public class BookingController {
         }
     }
 
-    // ================= UPDATE BOOKING BY PNR (Payment Success) =================
     @PutMapping("/pnr/{pnr}")
     public ResponseEntity<APIResponse<BookingDTO>> updateBookingByPnr(
             @PathVariable String pnr,
@@ -55,13 +52,12 @@ public class BookingController {
 
             BookingDTO updatedBooking = bookingService.updateBookingByPnr(pnr, bookingDTO);
 
-            // 🔥 Payment success එකේදී Email යවන්න
             if (updatedBooking.getPaid() != null && updatedBooking.getPaid()) {
                 try {
                     emailService.sendBookingConfirmation(updatedBooking.getEmail(), updatedBooking);
-                    System.out.println("✅ Email sent to: " + updatedBooking.getEmail());
+                    System.out.println(" Email sent to: " + updatedBooking.getEmail());
                 } catch (Exception mailError) {
-                    System.err.println("❌ Email sending failed: " + mailError.getMessage());
+                    System.err.println(" Email sending failed: " + mailError.getMessage());
                 }
             }
 
@@ -75,7 +71,6 @@ public class BookingController {
         }
     }
 
-    // ================= DELETE BOOKING =================
     @DeleteMapping("/{id}")
     public ResponseEntity<APIResponse<String>> deleteBooking(@PathVariable Long id) {
         try {
@@ -87,22 +82,21 @@ public class BookingController {
         }
     }
 
-    // ================= GET ALL BOOKINGS =================
     @GetMapping
     public ResponseEntity<APIResponse<List<BookingDTO>>> getAllBookings() {
         List<BookingDTO> bookingList = bookingService.getAllBookings();
         return ResponseEntity.ok(new APIResponse<>(200, "Bookings retrieved successfully", bookingList));
     }
 
-    // ================= GET BOOKING BY ID =================
-    @GetMapping("/{id}")
-    public ResponseEntity<APIResponse<BookingDTO>> getBookingById(@PathVariable Long id) {
+
+    @GetMapping("/pnr/{pnr}")
+    public ResponseEntity<APIResponse<BookingDTO>> getBookingByPnr(@PathVariable String pnr) {
         try {
-            BookingDTO bookingDTO = bookingService.searchBookingByID(id);
+            BookingDTO bookingDTO = bookingService.getBookingByPnr(pnr);
             return ResponseEntity.ok(new APIResponse<>(200, "Booking retrieved successfully", bookingDTO));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new APIResponse<>(404, "Booking not found: " + e.getMessage(), null));
+                    .body(new APIResponse<>(404, "PNR not found: " + e.getMessage(), null));
         }
     }
 }

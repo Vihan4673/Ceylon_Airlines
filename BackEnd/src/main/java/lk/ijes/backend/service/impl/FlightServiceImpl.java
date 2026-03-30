@@ -23,7 +23,6 @@ public class FlightServiceImpl implements FlightService {
     @Autowired
     private ModelMapper modelMapper;
 
-    // ================= SAVE FLIGHT =================
     @Override
     public void saveFlight(FlightDTO flightDTO) {
         if (flightDTO == null) {
@@ -59,7 +58,6 @@ public class FlightServiceImpl implements FlightService {
 
     }
 
-    // ================= UPDATE FLIGHT =================
     @Override
     public void updateFlight(FlightDTO flightDTO) {
         if (flightDTO == null) {
@@ -89,7 +87,6 @@ public class FlightServiceImpl implements FlightService {
         flightRepository.save(existingFlight);
     }
 
-    // ================= DELETE FLIGHT =================
     @Override
     public void deleteFlight(Long id) {
         if (!flightRepository.existsById(id)) {

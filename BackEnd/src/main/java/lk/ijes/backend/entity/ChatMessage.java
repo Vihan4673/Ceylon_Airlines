@@ -13,7 +13,7 @@ public class ChatMessage {
     private Long id;
 
     @Column(nullable = false)
-    private String sender; // "USER" or "BOT"
+    private String sender;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String message;

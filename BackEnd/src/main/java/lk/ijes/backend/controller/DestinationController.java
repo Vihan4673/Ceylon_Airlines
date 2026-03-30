@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/flights")
+@CrossOrigin
 public class DestinationController {
 
     private final DestinationService destinationService;
@@ -21,36 +22,61 @@ public class DestinationController {
         this.destinationService = destinationService;
     }
 
-    // ================= GET ALL DESTINATIONS =================
+    // ================= GET ALL =================
     @GetMapping("/destinations")
     public ResponseEntity<List<DestinationDTO>> getAllDestinations() {
         try {
             List<DestinationDTO> destinations = destinationService.getAllDestinations();
             return ResponseEntity.ok(destinations);
-        } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to fetch destinations");
         }
     }
 
-    // ================= GET DESTINATION BY FLIGHT ID =================
-    @GetMapping("/destination/{flightId}")
-    public ResponseEntity<DestinationDTO> getDestination(@PathVariable Long flightId) {
+    // ================= GET BY ID =================
+    @GetMapping("/destination/{id}")
+    public ResponseEntity<DestinationDTO> getDestination(@PathVariable Long id) {
         try {
-            DestinationDTO destinationDTO = destinationService.getDestinationById(flightId);
+            DestinationDTO destinationDTO = destinationService.getDestinationById(id);
             return ResponseEntity.ok(destinationDTO);
-        } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Destination not found");
         }
     }
 
-    // ================= ADD NEW DESTINATION =================
+    // ================= CREATE =================
     @PostMapping("/destination")
     public ResponseEntity<DestinationDTO> addDestination(@RequestBody DestinationDTO dto) {
         try {
             DestinationDTO saved = destinationService.createDestination(dto);
-            return ResponseEntity.ok(saved);
-        } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to create destination");
+        }
+    }
+
+    // ================= UPDATE =================
+    @PutMapping("/destination/{id}")
+    public ResponseEntity<DestinationDTO> updateDestination(
+            @PathVariable Long id,
+            @RequestBody DestinationDTO dto) {
+
+        try {
+            DestinationDTO updated = destinationService.updateDestination(id, dto);
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to update destination");
+        }
+    }
+
+    // ================= DELETE =================
+    @DeleteMapping("/destination/{id}")
+    public ResponseEntity<Void> deleteDestination(@PathVariable Long id) {
+        try {
+            destinationService.deleteDestination(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Failed to delete destination");
         }
     }
 }

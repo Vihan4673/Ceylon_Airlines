@@ -29,10 +29,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    // application.properties eke dapu Client ID ekama methanata damma
     private static final String GOOGLE_CLIENT_ID = "";
 
-    // ================= NORMAL LOGIN =================
     public AuthResponseDTO authenticate(AuthDTO authDTO) {
         User user = userRepository.findByEmail(authDTO.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + authDTO.getEmail()));
@@ -49,7 +47,6 @@ public class AuthService {
         return new AuthResponseDTO(token, user.getRole().name());
     }
 
-    // ================= REGISTER =================
     public String register(RegisterDTO registerDTO) {
         if (userRepository.findByEmail(registerDTO.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
@@ -75,7 +72,6 @@ public class AuthService {
         return "User registered successfully";
     }
 
-    // ================= GOOGLE USER HANDLING =================
     public String handleGoogleUser(String email, String name) {
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
@@ -92,7 +88,6 @@ public class AuthService {
         return jwtUtil.generateToken(user.getEmail(), user.getRole().name());
     }
 
-    // ================= VERIFY GOOGLE ID TOKEN (Manual Flow) =================
     public String verifyGoogleIdToken(String idToken) {
         try {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(

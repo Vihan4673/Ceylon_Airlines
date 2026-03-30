@@ -14,12 +14,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/ads")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:63342","http://127.0.0.1:63342"})
+@CrossOrigin(origins = {"http://localhost:63342", "http://127.0.0.1:63342"})
 public class AdController {
 
     private final AdService adService;
 
-    // ✅ Upload ad with image
+
     @PostMapping("/upload")
     public ResponseEntity<AdDTO> uploadAd(
             @RequestParam("file") MultipartFile file,
@@ -29,24 +29,35 @@ public class AdController {
             @RequestParam("startDate") String startDate,
             @RequestParam("endDate") String endDate
     ) throws IOException {
-        // Call service to save file & ad
         AdDTO adDTO = adService.saveAdWithImage(file, title, description, placement, startDate, endDate);
         return new ResponseEntity<>(adDTO, HttpStatus.CREATED);
     }
 
-    // ✅ Get all ads
+
+    @PutMapping("/{id}")
+    public ResponseEntity<AdDTO> updateAd(
+            @PathVariable Long id,
+            @RequestParam(value = "file", required = false) MultipartFile file, // Image එක අනිවාර්ය නැත
+            @RequestParam("title") String title,
+            @RequestParam("description") String description,
+            @RequestParam("placement") String placement,
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate
+    ) throws IOException {
+        AdDTO updatedAd = adService.updateAdWithImage(id, file, title, description, placement, startDate, endDate);
+        return new ResponseEntity<>(updatedAd, HttpStatus.OK);
+    }
+
     @GetMapping
     public ResponseEntity<List<AdDTO>> getAllAds() {
         return new ResponseEntity<>(adService.getAllAds(), HttpStatus.OK);
     }
 
-    // ✅ Get active ads only
     @GetMapping("/active")
     public ResponseEntity<List<AdDTO>> getActiveAds() {
         return new ResponseEntity<>(adService.getActiveAds(), HttpStatus.OK);
     }
 
-    // ✅ Delete ad by id
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAd(@PathVariable Long id) {
         adService.deleteAd(id);

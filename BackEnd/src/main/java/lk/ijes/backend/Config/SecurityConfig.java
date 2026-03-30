@@ -33,7 +33,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/api/v1/flights/**", "/api/v1/ads/**", "/api/v1/chat/**", "/api/v1/passengers/**","/api/v1/seats/**","/api/v1/bookings/**","/api/v1/baggages/**" ).permitAll()
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/flights/**", "/api/v1/ads/**", "/api/v1/chat/**", "/api/v1/passengers/**", "/api/v1/seats/**", "/api/v1/bookings/**", "/api/v1/baggages/**","/api/v1/baggage").permitAll()
 
                         .anyRequest().permitAll()
                 )
@@ -58,7 +58,9 @@ public class SecurityConfig {
                 "http://localhost:*",
                 "http://127.0.0.1:*"
         ));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(Arrays.asList(
+                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
+        ));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setExposedHeaders(Arrays.asList("Authorization"));
 

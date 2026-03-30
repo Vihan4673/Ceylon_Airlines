@@ -19,7 +19,6 @@ public class FlightController {
 
     private final FlightService flightService;
 
-    // Save Flight
     @PostMapping("/saveFlight")
     public ResponseEntity<APIResponse<String>> saveFlight(
             @Valid @RequestBody FlightDTO flightDTO) {
@@ -32,7 +31,6 @@ public class FlightController {
         );
     }
 
-    // Update Flight
     @PutMapping("/updateFlight")
     public ResponseEntity<APIResponse<String>> updateFlight(
             @Valid @RequestBody FlightDTO flightDTO) {
@@ -45,7 +43,6 @@ public class FlightController {
         );
     }
 
-    // Delete Flight
     @DeleteMapping("/deleteFlight/{id}")
     public ResponseEntity<APIResponse<String>> deleteFlight(
             @PathVariable Long id) {
@@ -58,7 +55,6 @@ public class FlightController {
         );
     }
 
-    // Get All Flights
     @GetMapping("/getAllFlight")
     public ResponseEntity<APIResponse<List<FlightDTO>>> getAllFlight() {
 
@@ -70,7 +66,6 @@ public class FlightController {
         );
     }
 
-    // Search Flight By ID
     @GetMapping("/searchFlight/{id}")
     public ResponseEntity<APIResponse<FlightDTO>> searchFlight(
             @PathVariable Long id) {

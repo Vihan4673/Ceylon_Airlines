@@ -19,7 +19,6 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final ModelMapper modelMapper;
 
-    // ================= CREATE BOOKING =================
     @Override
     public BookingDTO saveBooking(BookingDTO bookingDTO) {
         if (bookingRepository.existsByFlightNumberAndSeat(
@@ -45,7 +44,7 @@ public class BookingServiceImpl implements BookingService {
         return modelMapper.map(savedBooking, BookingDTO.class);
     }
 
-    // ================= UPDATE BOOKING BY ID =================
+
     @Override
     public BookingDTO updateBooking(Long id, BookingDTO bookingDTO) {
         Booking booking = bookingRepository.findById(id)
@@ -57,7 +56,6 @@ public class BookingServiceImpl implements BookingService {
         return modelMapper.map(updatedBooking, BookingDTO.class);
     }
 
-    // 🔥🔥🔥 ================= UPDATE BOOKING BY PNR (NEW) ================= 🔥🔥🔥
     @Override
     public BookingDTO updateBookingByPnr(String pnr, BookingDTO bookingDTO) {
         Booking booking = bookingRepository.findByPnr(pnr)
@@ -71,16 +69,25 @@ public class BookingServiceImpl implements BookingService {
             booking.setStatus(bookingDTO.getStatus());
         }
 
-        // ✅ Also update email if present
         if (bookingDTO.getEmail() != null) {
             booking.setEmail(bookingDTO.getEmail());
+        }
+
+        if (bookingDTO.getPassportNumber() != null) {
+            booking.setPassportNumber(bookingDTO.getPassportNumber());
         }
 
         Booking updatedBooking = bookingRepository.save(booking);
         return modelMapper.map(updatedBooking, BookingDTO.class);
     }
 
-    // ================= DELETE BOOKING =================
+    @Override
+    public BookingDTO getBookingByPnr(String pnr) {
+        Booking booking = bookingRepository.findByPnr(pnr)
+                .orElseThrow(() -> new RuntimeException("Booking not found with PNR: " + pnr));
+        return modelMapper.map(booking, BookingDTO.class);
+    }
+
     @Override
     public void deleteBooking(Long id) {
         if (!bookingRepository.existsById(id)) {
@@ -89,7 +96,6 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.deleteById(id);
     }
 
-    // ================= GET ALL BOOKINGS =================
     @Override
     public List<BookingDTO> getAllBookings() {
         return bookingRepository.findAll()
@@ -98,7 +104,6 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
     }
 
-    // ================= GET BOOKING BY ID =================
     @Override
     public BookingDTO searchBookingByID(Long id) {
         Booking booking = bookingRepository.findById(id)
@@ -106,7 +111,6 @@ public class BookingServiceImpl implements BookingService {
         return modelMapper.map(booking, BookingDTO.class);
     }
 
-    // ================= HELPERS =================
     private void updateBookingFields(Booking booking, BookingDTO bookingDTO) {
         booking.setPassenger(bookingDTO.getPassenger());
         booking.setSeat(bookingDTO.getSeat());
@@ -115,12 +119,12 @@ public class BookingServiceImpl implements BookingService {
         booking.setTravelClass(bookingDTO.getTravelClass());
         booking.setPrice(bookingDTO.getPrice());
         booking.setFlightNumber(bookingDTO.getFlightNumber());
+        booking.setPassportNumber(bookingDTO.getPassportNumber());
 
         if (bookingDTO.getPaid() != null) booking.setPaid(bookingDTO.getPaid());
         if (bookingDTO.getStatus() != null) booking.setStatus(bookingDTO.getStatus());
         if (bookingDTO.getDepartureDate() != null) booking.setDepartureDate(bookingDTO.getDepartureDate());
 
-        // ✅ Also update email here for general updates
         if (bookingDTO.getEmail() != null) {
             booking.setEmail(bookingDTO.getEmail());
         }

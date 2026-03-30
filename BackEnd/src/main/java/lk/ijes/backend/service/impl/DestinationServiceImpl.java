@@ -20,6 +20,7 @@ public class DestinationServiceImpl implements DestinationService {
         this.destinationRepository = destinationRepository;
     }
 
+    // ================= GET BY ID =================
     @Override
     public DestinationDTO getDestinationById(Long id) {
         Destination destination = destinationRepository.findById(id)
@@ -28,30 +29,64 @@ public class DestinationServiceImpl implements DestinationService {
         return mapToDTO(destination);
     }
 
+    // ================= CREATE =================
     @Override
     public DestinationDTO createDestination(DestinationDTO dto) {
+
         if (dto.getCity() == null || dto.getAirportCode() == null) {
             throw new RuntimeException("City and airport code cannot be null");
         }
 
         Destination destination = new Destination();
         destination.setCity(dto.getCity());
-        destination.setAirportCode(dto.getAirportCode());
+        destination.setAirportCode(dto.getAirportCode().toUpperCase());
 
         Destination saved = destinationRepository.save(destination);
         return mapToDTO(saved);
     }
 
+    // ================= GET ALL =================
     @Override
     public List<DestinationDTO> getAllDestinations() {
-        List<Destination> destinations = destinationRepository.findAll();
-        return destinations.stream()
+        return destinationRepository.findAll()
+                .stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
+    // ================= UPDATE =================
+    @Override
+    public DestinationDTO updateDestination(Long id, DestinationDTO dto) {
+
+        Destination existing = destinationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Destination not found"));
+
+        if (dto.getCity() != null) {
+            existing.setCity(dto.getCity());
+        }
+
+        if (dto.getAirportCode() != null) {
+            existing.setAirportCode(dto.getAirportCode().toUpperCase());
+        }
+
+        Destination updated = destinationRepository.save(existing);
+        return mapToDTO(updated);
+    }
+
+    // ================= DELETE =================
+    @Override
+    public void deleteDestination(Long id) {
+
+        Destination existing = destinationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Destination not found"));
+
+        destinationRepository.delete(existing);
+    }
+
+    // ================= MAPPER =================
     private DestinationDTO mapToDTO(Destination destination) {
         return new DestinationDTO(
+                destination.getId(),   // ⭐ VERY IMPORTANT
                 destination.getCity(),
                 destination.getAirportCode()
         );

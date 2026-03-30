@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @Data
 public class BookingDTO {
 
-    // ❌ remove pnr from input (optional but recommended)
     private String pnr;
 
     @NotBlank(message = "Passenger name cannot be empty")
@@ -21,6 +20,9 @@ public class BookingDTO {
 
     @NotBlank(message = "Flight number cannot be empty")
     private String flightNumber;
+
+    @NotBlank(message = "Passport number cannot be empty")
+    private String passportNumber;
 
     @NotBlank(message = "Seat cannot be empty")
     private String seat;
@@ -45,7 +47,6 @@ public class BookingDTO {
     @NotBlank(message = "Destination cannot be empty")
     private String destination;
 
-    // ✅ Added email field
     @NotBlank(message = "Email cannot be empty")
     private String email;
 }

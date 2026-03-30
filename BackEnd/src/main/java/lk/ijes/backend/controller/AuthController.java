@@ -42,8 +42,7 @@ public class AuthController {
         }
     }
 
-    // ================= GOOGLE LOGIN (MANUAL TOKEN VERIFY) =================
-    // Me method eka use venne frontend ekath ekka manual token verify karanawanam vitharai.
+    // ================= GOOGLE LOGIN  =================
     @PostMapping("/google")
     public ResponseEntity<APIResponse> googleLogin(@RequestBody Map<String, String> body) {
         String idToken = body.get("token");
@@ -54,12 +53,8 @@ public class AuthController {
         }
 
         try {
-            // AuthService eke verifyGoogleIdToken method eka update karala thiyenna one
             String email = authService.verifyGoogleIdToken(idToken);
 
-            // Userwa handle karala token eka gannawa
-            // Api kalin handleGoogleUser method eka wenas kala email saha name ganna.
-            // Name eka manual eken enne nathi nisa null damma.
             String jwtToken = authService.handleGoogleUser(email, null);
 
             return ResponseEntity.ok(new APIResponse(200, "Google Login Successful", Map.of("token", jwtToken)));
