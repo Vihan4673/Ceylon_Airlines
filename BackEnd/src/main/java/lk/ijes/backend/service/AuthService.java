@@ -29,7 +29,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    private static final String GOOGLE_CLIENT_ID = "";
 
     public AuthResponseDTO authenticate(AuthDTO authDTO) {
         User user = userRepository.findByEmail(authDTO.getEmail())
@@ -99,7 +98,7 @@ public class AuthService {
             GoogleIdToken token = verifier.verify(idToken);
             if (token != null) {
                 GoogleIdToken.Payload payload = token.getPayload();
-                return payload.getEmail(); // Email eka gannawa verify unata passe
+                return payload.getEmail();
             } else {
                 throw new BadCredentialsException("Invalid Google ID Token");
             }
