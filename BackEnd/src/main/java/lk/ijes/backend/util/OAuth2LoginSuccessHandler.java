@@ -11,7 +11,9 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -23,17 +25,24 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                                         Authentication authentication) throws IOException, ServletException {
 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+
         String email = oAuth2User.getAttribute("email");
         String name = oAuth2User.getAttribute("name");
+        String picture = oAuth2User.getAttribute("picture");
 
-        String token = authService.handleGoogleUser(email, name);
+        // handleGoogleUser eka athule User wa DB save karala JWT hadanna ona
+        Map<String, String> authData = authService.handleGoogleUser(email, name, picture);
 
+        String token = authData.get("token");
+        String profilePic = authData.get("picture");
+        String role = authData.get("role");
 
-        //     String targetUrl = "http://localhost:63342/Ceylon%20Airlines/FrontEnd/Web/Pages/HomePage.html#token=" + token;
-        //      getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        // URL Parameters widiyata token eka yawima (LoginPage.html ekata)
+        String targetUrl = "http://127.0.0.1:5500/FrontEnd/Web/Pages/LoginPage.html?token="
+                + URLEncoder.encode(token, StandardCharsets.UTF_8)
+                + "&picture=" + URLEncoder.encode(profilePic != null ? profilePic : "", StandardCharsets.UTF_8)
+                + "&role=" + URLEncoder.encode(role, StandardCharsets.UTF_8);
 
-        String encodedToken = java.net.URLEncoder.encode(token, "UTF-8");
-        String targetUrl = "http://127.0.0.1:5500/FrontEnd/Web/Pages/HomePage.html#token=" + encodedToken;
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 }

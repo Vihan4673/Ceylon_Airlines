@@ -4,9 +4,10 @@ import lk.ijes.backend.entity.Baggage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List; // Optional වෙනුවට List පාවිච්චි කරමු
 
 @Repository
 public interface BaggageRepository extends JpaRepository<Baggage, Long> {
-    Optional<Baggage> findByPassportNo(String passportNo);
+
+    List<Baggage> findByPassportNo(String passportNo);
 }
