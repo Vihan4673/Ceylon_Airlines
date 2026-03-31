@@ -1,5 +1,5 @@
-const API_URL = "http://localhost:8080/api/v1/auth/signup";
 
+const API_URL = "http://localhost:8080/api/v1/auth/signup";
 
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("signupForm");
@@ -80,7 +80,6 @@ function showMessage(message, type) {
 
     setTimeout(() => msgBox.remove(), 3000);
 }
-
 function handleCredentialResponse(response) {
     console.log("Encoded JWT ID token: " + response.credential);
 
@@ -93,7 +92,6 @@ function handleCredentialResponse(response) {
         .then(data => {
             if(data.success){
                 showNotification("Logged in with Google!", "success");
-                // redirect or update UI
                 setTimeout(() => window.location.href = "Dashboard.html", 1000);
             } else {
                 showNotification("Google login failed", "error");
@@ -104,6 +102,7 @@ function handleCredentialResponse(response) {
             showNotification("Server error", "error");
         });
 }
+
 function showNotification(msg, type) {
     const notification = document.getElementById('notification');
     notification.innerText = msg;

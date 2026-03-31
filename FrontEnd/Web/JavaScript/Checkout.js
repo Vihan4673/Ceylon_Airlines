@@ -1,4 +1,3 @@
-
 function getFlightState() {
     return JSON.parse(localStorage.getItem("selectedFlight")) || {};
 }
@@ -76,7 +75,6 @@ function updatePassengerDetails() {
     const emailDiv = document.querySelector(".fa-envelope")?.parentElement;
     const phoneDiv = document.querySelector(".fa-phone")?.parentElement;
 
-    // Passport UI display
     const passportDiv = document.querySelector(".fa-id-card")?.parentElement || document.querySelector(".fa-passport")?.parentElement;
 
     if (emailDiv) emailDiv.innerHTML = `<i class="fa-solid fa-envelope mr-1"></i> ${passenger.email || "N/A"}`;
@@ -122,7 +120,6 @@ async function bookSeatAndProceed() {
         : new Date(rawDate).toISOString().split("T")[0];
 
     const passengerName = `${passenger.title || ""} ${passenger.firstName || ""} ${passenger.lastName || ""}`.trim();
-
     const passportNo = passenger.passportNumber || passenger.documentNumber || passenger.passport || "N/A";
 
     const bookingDTO = {
@@ -148,7 +145,7 @@ async function bookSeatAndProceed() {
         const result = await res.json();
 
         if (res.ok && result.data) {
-            alert(" Booking created successfully!");
+            alert("Booking created successfully!");
             localStorage.setItem("bookingIdForPayment", result.data.id);
             localStorage.setItem("currentBookingPNR", result.data.pnr);
             window.location.href = "../Pages/Pyment.html";
@@ -157,7 +154,7 @@ async function bookSeatAndProceed() {
         }
     } catch (err) {
         console.error("Booking Error:", err);
-        alert(" Server not reachable!");
+        alert("Server not reachable!");
     }
 }
 

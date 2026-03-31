@@ -199,14 +199,17 @@ function closeModal() {
 
 window.onload = fetchPassengers;
 
+//ewoj
+// Integration for Search & Stats
 let allPassengers = [];
 
-
+// Override the original render function to capture data for search
 const originalRender = window.renderPassengers;
 window.renderPassengers = function(data) {
     allPassengers = data;
     updateStats(data);
 
+    // Inline filtering logic
     const searchVal = document.getElementById('searchInput').value.toLowerCase();
     const natFilter = document.getElementById('filterNationality').value;
 
@@ -222,6 +225,8 @@ window.renderPassengers = function(data) {
         return;
     }
 
+    // Call the display logic from your external JS
+    // (Note: Since we are using the external passenger.js, ensure functions are accessible)
     displayData(filtered);
 };
 
@@ -236,6 +241,7 @@ function updateStats(data) {
     document.getElementById('stat-expiring').innerText = expiringCount;
 }
 
+// Helper to call original mapping logic
 function displayData(data) {
     const tbody = document.getElementById("passenger-table");
     tbody.innerHTML = data.map(p => {
@@ -283,5 +289,6 @@ function displayData(data) {
     }).join("");
 }
 
+// Event listeners for search and filter
 document.getElementById('searchInput').addEventListener('input', () => window.renderPassengers(allPassengers));
 document.getElementById('filterNationality').addEventListener('change', () => window.renderPassengers(allPassengers));

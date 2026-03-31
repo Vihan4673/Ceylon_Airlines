@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     updatePassengerSummary();
 });
 
+// ================= Destinations =================
 async function fetchDestinations() {
     try {
         const res = await fetch("http://localhost:8080/api/v1/flights/destinations");
@@ -35,6 +36,7 @@ async function fetchDestinations() {
         document.getElementById("toLoc").value = "Dubai (DXB)";
     }
 }
+
 function initDestinationInputs() {
     const fromInput = document.getElementById("fromLoc");
     const toInput = document.getElementById("toLoc");
@@ -84,6 +86,7 @@ function initDestinationInputs() {
         });
     });
 }
+
 function initTripType() {
     const radios = document.querySelectorAll('input[name="trip"]');
     const returnContainer = document.getElementById("returnContainer");

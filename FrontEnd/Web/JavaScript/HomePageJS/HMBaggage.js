@@ -1,3 +1,6 @@
+// =====================================================
+// CONFIGURATION & GLOBAL VARIABLES
+// =====================================================
 const API_URL = "http://localhost:8080/api/v1/baggages";
 
 const bagTagInput = document.getElementById("bagTagInput");
@@ -10,7 +13,6 @@ const stepFlight = document.getElementById("step-flight");
 const stepArrival = document.getElementById("step-arrival");
 
 let liveInterval = null;
-
 
 function resetTimeline() {
     [stepChecked, stepFlight, stepArrival].forEach(step => {
@@ -29,24 +31,19 @@ function updateTimeline(status) {
     if (currentStatus) {
         setActiveStep(stepChecked);
     }
-
     if (currentStatus === "Scanning" || currentStatus === "Loaded") {
         setActiveStep(stepFlight);
     }
-
     if (currentStatus === "Arrived") {
         setActiveStep(stepFlight);
         setActiveStep(stepArrival);
     }
 }
-
 function setActiveStep(el) {
     if (!el) return;
     el.classList.remove("bg-gray-100", "text-gray-400");
     el.classList.add("bg-[#8b1d41]", "text-white", "border-[#8b1d41]", "scale-110", "shadow-lg");
 }
-
-
 
 async function fetchBaggageByPassport(passportNumber) {
     try {
@@ -63,7 +60,6 @@ async function fetchBaggageByPassport(passportNumber) {
     }
 }
 
-
 async function performTracking() {
     const passportNumber = bagTagInput.value.trim();
 
@@ -71,7 +67,6 @@ async function performTracking() {
         alert("Please enter a passport number");
         return;
     }
-
 
     const originalText = trackBtn.innerText;
     trackBtn.innerText = "Tracking...";
@@ -93,13 +88,11 @@ async function performTracking() {
     statusText.textContent = baggage.status;
 
     updateTimeline(baggage.status);
-
     startLiveUpdate(passportNumber);
 }
 
 function startLiveUpdate(passportNumber) {
     stopLiveUpdate();
-
     liveInterval = setInterval(async () => {
         const baggage = await fetchBaggageByPassport(passportNumber);
         if (baggage) {
@@ -117,9 +110,7 @@ function stopLiveUpdate() {
     }
 }
 
-
 trackBtn.addEventListener("click", performTracking);
-
 bagTagInput.addEventListener("input", () => {
     if (bagTagInput.value.length === 0) {
         liveStatus.classList.add("hidden");

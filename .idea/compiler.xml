@@ -7,7 +7,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="springboot-POS-Backend" />
+        <module name="Backend" />
       </profile>
     </annotationProcessing>
   </component>
@@ -16,7 +16,7 @@
       <module name="BackEnd" options="-parameters" />
       <module name="BackEnd.main" options="-parameters" />
       <module name="BackEnd.test" options="-parameters" />
-      <module name="springboot-POS-Backend" options="-parameters" />
+      <module name="Backend" options="-parameters" />
     </option>
   </component>
 </project>

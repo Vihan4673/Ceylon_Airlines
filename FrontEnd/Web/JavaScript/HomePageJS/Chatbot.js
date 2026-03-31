@@ -77,6 +77,7 @@ function appendMessage(role, text, id = null) {
         behavior: 'smooth'
     });
 }
+
 function handleChatSubmit(event) {
     event.preventDefault();
     sendMessage();

@@ -85,7 +85,6 @@ function clearFlightForm() {
     const modalTitle = document.querySelector('#flight-modal h3');
     if (modalTitle) modalTitle.innerText = 'Schedule New Flight';
 }
-
 async function editFlight(id) {
     try {
         const response = await fetch(`http://localhost:8080/api/v1/flights/searchFlight/${id}`);
@@ -94,6 +93,7 @@ async function editFlight(id) {
         if (response.ok && result.data) {
             const flight = result.data;
             currentEditFlightId = flight.id;
+
             document.getElementById('flightNumber').value = flight.flightNumber;
             document.getElementById('totalSeats').value = flight.totalSeats;
             document.getElementById('economyFare').value = flight.economyFare;
@@ -151,6 +151,7 @@ async function handleSubmitFlight() {
         return;
     }
 
+    // currentEditFlightId thiyenawa nam PUT, natham POST
     const url = currentEditFlightId
         ? 'http://localhost:8080/api/v1/flights/updateFlight'
         : 'http://localhost:8080/api/v1/flights/saveFlight';

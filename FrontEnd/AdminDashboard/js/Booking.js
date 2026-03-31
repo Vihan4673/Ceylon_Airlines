@@ -5,6 +5,7 @@ const SEAT_API = "http://localhost:8080/api/v1/seats";
 
 let bookings = [];
 let occupiedSeats = [];
+
 document.addEventListener("DOMContentLoaded", () => {
     loadBookings();
 
@@ -31,7 +32,6 @@ async function lookupPassenger() {
         const result = await response.json();
 
         if (response.ok && result.data) {
-
             const fullName = `${result.data.title || ''} ${result.data.firstName || ''} ${result.data.lastName || ''}`.trim();
             nameInput.value = fullName;
             emailInput.value = result.data.email || "";
@@ -47,13 +47,13 @@ async function lookupPassenger() {
     }
 }
 
+
 async function fetchOccupiedSeats(flightNo) {
     if (!flightNo) return;
 
     try {
         const response = await fetch(`${SEAT_API}/flight-number/${encodeURIComponent(flightNo)}`);
         const result = await response.json();
-
         if (result.status === 200 && result.data) {
             occupiedSeats = result.data
                 .filter(s => s.booked === true)
@@ -82,6 +82,7 @@ function initSeatMap() {
             const isBooked = occupiedSeats.includes(seatId);
 
             const seatDiv = document.createElement('div');
+            // Tailwind classes dynamic ලෙස ඇතුළත් කිරීම
             seatDiv.className = `seat-btn w-10 h-10 rounded-xl border-2 flex items-center justify-center text-[10px] font-black transition-all cursor-pointer 
                 ${isBooked ? 'bg-slate-200 text-slate-400 border-slate-100 cursor-not-allowed' : 'bg-white text-slate-900 border-slate-100 hover:border-[#8A1538] hover:text-[#8A1538]'}`;
 
@@ -97,11 +98,12 @@ function initSeatMap() {
 
 function selectSeat(id, element) {
     document.querySelectorAll('.seat-btn').forEach(el => {
-        if(!el.classList.contains('bg-slate-200')) {
+        if(!el.classList.contains('bg-slate-200')) { // Booked නොවන ඒවා පමණක්
             el.classList.remove('bg-[#8A1538]', 'text-white', 'border-[#8A1538]');
             el.classList.add('bg-white', 'text-slate-900', 'border-slate-100');
         }
     });
+
     element.classList.remove('bg-white', 'text-slate-900');
     element.classList.add('bg-[#8A1538]', 'text-white', 'border-[#8A1538]');
 
@@ -193,6 +195,7 @@ async function deleteBooking(id) {
     }
 }
 
+
 function renderTable() {
     const tbody = document.getElementById('booking-table-body');
     if(!tbody) return;
@@ -235,6 +238,7 @@ function renderTable() {
     document.getElementById('total-count').innerText = bookings.length;
     document.getElementById('active-seats').innerText = bookings.length;
 }
+
 
 function openModal() {
     document.getElementById('bookingModal').classList.remove('hidden');

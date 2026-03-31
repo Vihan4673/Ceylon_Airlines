@@ -15,7 +15,6 @@ async function loadHomeAds() {
 
         const ads = await res.json();
         const now = new Date();
-
         const homeAds = ads.filter(ad => {
             const start = ad.startDate ? new Date(ad.startDate) : null;
             const end = ad.endDate ? new Date(ad.endDate) : null;
@@ -35,10 +34,12 @@ async function loadHomeAds() {
 
         homeAds.forEach(ad => {
             const card = document.createElement("div");
+
             let imageUrl = "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&q=80&w=800"; // Default image
             if (ad.imageUrl && ad.imageUrl.trim() !== "") {
                 imageUrl = ad.imageUrl.startsWith("http") ? ad.imageUrl : `${BASE_URL}${ad.imageUrl}`;
             }
+
             card.className = "group cursor-pointer h-full";
             card.innerHTML = `
                 <div class="relative h-80 overflow-hidden rounded-[2rem] shadow-xl transition-all duration-500 group-hover:-translate-y-2">

@@ -1,23 +1,13 @@
-// =====================================================
-// GET DATA FROM LOCAL STORAGE
-// =====================================================
+
 const flightState = JSON.parse(localStorage.getItem("selectedFlight"));
 const passenger = JSON.parse(localStorage.getItem("passengerInfo"));
 
-// =====================================================
-// CONFIG
-// =====================================================
 let selectedSeat = null;
 let occupiedSeats = [];
 
 const API_URL = "http://localhost:8080/api/v1/seats";
-
-// 🔥 FIX: encode flight number (UL 225 → UL%20225)
 const flightNumber = encodeURIComponent(flightState?.flightNumber || "");
 
-// =====================================================
-// FORMAT DATE
-// =====================================================
 function formatDate(dateStr) {
     if (!dateStr) return "N/A";
     return new Date(dateStr).toLocaleDateString("en-GB", {
@@ -27,9 +17,6 @@ function formatDate(dateStr) {
     });
 }
 
-// =====================================================
-// UPDATE HEADER (🔥 FIXED)
-// =====================================================
 function updateHeader() {
 
     if (!flightState) return;
@@ -44,17 +31,11 @@ function updateHeader() {
         `${flightState.from} → ${flightState.to}`;
 }
 
-// =====================================================
-// SHOW BOOKED COUNT
-// =====================================================
 function updateSeatCountUI(total, booked) {
     const el = document.getElementById("seat-count");
     if (el) el.innerText = `Booked Seats: ${booked} / ${total}`;
 }
 
-// =====================================================
-// FETCH SEATS (🔥 FIXED ERROR HANDLING)
-// =====================================================
 async function fetchOccupiedSeats() {
 
     if (!flightNumber) {
@@ -93,9 +74,6 @@ async function fetchOccupiedSeats() {
     renderSeatMap();
 }
 
-// =====================================================
-// RENDER SEAT MAP (🔥 EXTRA LEG ROOM ADDED)
-// =====================================================
 function renderSeatMap() {
 
     const container = document.getElementById("seat-container");
@@ -115,7 +93,7 @@ function renderSeatMap() {
 
             const seatId = `${i}${col}`;
             const isBooked = occupiedSeats.includes(seatId);
-            const isXL = (i === 10); // 🔥 extra leg row
+            const isXL = (i === 10);
 
             const seat = document.createElement("div");
             seat.className = "p-2 text-center border rounded cursor-pointer text-xs font-bold";
@@ -137,7 +115,6 @@ function renderSeatMap() {
 
             rowDiv.appendChild(seat);
 
-            // aisle gap
             if (index === 2) {
                 const gap = document.createElement("div");
                 gap.innerText = i;
@@ -150,9 +127,6 @@ function renderSeatMap() {
     }
 }
 
-// =====================================================
-// SELECT SEAT (🔥 FIXED UI)
-// =====================================================
 function selectSeat(seatId) {
 
     if (occupiedSeats.includes(seatId)) return;
@@ -169,9 +143,6 @@ function selectSeat(seatId) {
     }
 }
 
-// =====================================================
-// CLEAR SELECTION
-// =====================================================
 function clearSelection() {
     selectedSeat = null;
     document.getElementById("footer-seat-id").innerText = "-";
@@ -181,9 +152,6 @@ function clearSelection() {
     btn.className = "bg-gray-300 text-gray-500 px-8 py-2 rounded font-bold cursor-not-allowed";
 }
 
-// =====================================================
-// BOOK SEAT (🔥 FULL FIX)
-// =====================================================
 async function confirmBooking() {
 
     if (!selectedSeat) {
@@ -209,7 +177,6 @@ async function confirmBooking() {
 
         if (res.ok) {
 
-            // ✅ SAVE SEAT TO FLIGHT STATE (🔥 VERY IMPORTANT)
             flightState.selectedSeat = selectedSeat;
             localStorage.setItem("selectedFlight", JSON.stringify(flightState));
 
@@ -227,11 +194,8 @@ async function confirmBooking() {
     }
 }
 
-// =====================================================
-// INIT
-// =====================================================
 document.addEventListener("DOMContentLoaded", () => {
-    updateHeader();      // 🔥 FIX
+    updateHeader();
     fetchOccupiedSeats();
     document.getElementById("confirm-btn")?.addEventListener("click", confirmBooking);
 });

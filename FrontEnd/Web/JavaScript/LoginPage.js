@@ -1,12 +1,8 @@
-// =====================================================
-// BASE URL
-// =====================================================
+
 const AUTH_BASE_URL = "http://localhost:8080/api/v1/auth";
+
 const notification = document.getElementById("notification");
 
-// =====================================================
-// 🔔 NOTIFICATION
-// =====================================================
 function showNotification(message, isError = false) {
     if (!notification) {
         alert(message);
@@ -22,55 +18,30 @@ function showNotification(message, isError = false) {
     }, 3000);
 }
 
-// =====================================================
-// 🌐 GOOGLE LOGIN (FIXED FOR MANUAL TOKEN FLOW) 🔥
-// =====================================================
 function loginWithGoogle() {
-    // 1. Google Identity Services initialize kirima
-    google.accounts.id.initialize({
-        client_id: "29624464708-i2hhl9f3bv3h77s9l9r9gb87ohmo1ccj.apps.googleusercontent.com",
-        callback: handleCredentialResponse // Token eka labunama meka call wenawa
-    });
-
-    // 2. Google Login Popup eka pennana
-    google.accounts.id.prompt();
+    window.location.href = "http://localhost:8080/oauth2/authorization/google";
 }
 
-// Google eken dena Token eka backend ekata yawana function eka
-async function handleCredentialResponse(response) {
-    const idToken = response.credential; // Meka thama Google ID Token eka
+window.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
 
-    try {
-        const res = await fetch(`${AUTH_BASE_URL}/google`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token: idToken })
-        });
+    if (token) {
+        console.log("Google Token Received!");
 
-        const result = await res.json();
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify({ role: "USER", type: "GOOGLE" }));
 
-        // Status 200 unoth pamanak login wenna
-        if (res.ok && (result.status === 200 || result.code === 200)) {
-            const jwtToken = result.data.token;
-            localStorage.setItem("token", jwtToken);
-            localStorage.setItem("user", JSON.stringify({ role: "USER", type: "GOOGLE" }));
+        showNotification("Google Login Successful!");
 
-            showNotification("Google Login Successful!");
-            setTimeout(() => {
-                window.location.href = "HomePage.html"; // Path eka hariyata check karanna
-            }, 1000);
-        } else {
-            showNotification(result.message || "Google Authentication Failed", true);
-        }
-    } catch (error) {
-        console.error("Google Auth Error:", error);
-        showNotification("Server Connection Error", true);
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        setTimeout(() => {
+            window.location.href = "../Pages/HomePage.html";
+        }, 1000);
     }
-}
+});
 
-// =====================================================
-// 🔑 NORMAL LOGIN
-// =====================================================
 document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -104,8 +75,7 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
                 localStorage.setItem("user", JSON.stringify(userData));
 
                 setTimeout(() => {
-                    const role = userData.role || (userData.data && userData.data.role);
-                    if (role?.toUpperCase() === "ADMIN") {
+                    if (userData.role?.toUpperCase() === "ADMIN") {
                         window.location.href = "../../AdminDashboard/index.html";
                     } else {
                         window.location.href = "HomePage.html";
@@ -122,9 +92,6 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
     }
 });
 
-// =====================================================
-// 📝 TAB SWITCH
-// =====================================================
 function switchTab(type) {
     const loginForm = document.getElementById("loginForm");
     const signupForm = document.getElementById("signupForm");

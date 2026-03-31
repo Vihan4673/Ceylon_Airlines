@@ -9,6 +9,7 @@ const API_URL = "http://localhost:8080/api/v1/flights";
 let isEditMode = false;
 let currentEditId = null;
 
+
 async function loadDestinations() {
     try {
         const res = await fetch(`${API_URL}/destinations`);
@@ -22,7 +23,7 @@ async function loadDestinations() {
     }
 }
 
-// ================= UPDATE COUNT =================
+
 function updateCount() {
     const rows = tableBody.querySelectorAll('tr').length;
     countSpan.innerText = `${rows} Locations`;
@@ -92,7 +93,6 @@ form.addEventListener('submit', async (e) => {
     }
 });
 
-// ================= DELETE =================
 async function deleteDestination(id) {
     if (!confirm("Are you sure you want to delete this destination?")) return;
 
@@ -112,8 +112,6 @@ async function deleteDestination(id) {
         alert("Error deleting destination");
     }
 }
-
-// ================= EDIT =================
 function editDestination(id) {
     const row = document.getElementById(`row-${id}`);
     const city = row.querySelector('.city-cell').textContent;
@@ -126,16 +124,12 @@ function editDestination(id) {
     currentEditId = id;
     if (submitBtn) submitBtn.innerText = "Update Destination";
 }
-
-// ================= RESET FORM =================
 function resetForm() {
     form.reset();
     isEditMode = false;
     currentEditId = null;
     if (submitBtn) submitBtn.innerText = "Add Destination";
 }
-
-// ================= SEARCH FUNCTION =================
 function filterDestinations() {
     const searchTerm = searchInput.value.toLowerCase();
     const rows = tableBody.querySelectorAll('.destination-row');
@@ -156,5 +150,4 @@ if (searchInput) {
     searchInput.addEventListener('input', filterDestinations);
 }
 
-// ================= INIT =================
 window.addEventListener('DOMContentLoaded', loadDestinations);

@@ -1,4 +1,3 @@
-// ================= CONFIG =================
 const API_BASE = "http://localhost:8080/api/v1/baggages";
 const BOOKING_API = "http://localhost:8080/api/v1/bookings";
 let allBaggages = [];
@@ -15,7 +14,6 @@ async function fetchBaggages() {
         console.error("Failed to fetch baggages:", err);
     }
 }
-
 window.renderBaggages = () => {
     const list = document.getElementById("baggageList");
     const searchInput = document.getElementById("searchInput");
@@ -81,7 +79,6 @@ window.renderBaggages = () => {
     renderFilterButtons();
 };
 
-// ================= FILTER BUTTONS =================
 function renderFilterButtons() {
     const flights = [...new Set(allBaggages.map(b => b.flightNo).filter(f => f))];
     const container = document.getElementById("dynamicFilters");
@@ -99,7 +96,6 @@ window.setFilter = (f) => {
     renderBaggages();
 };
 
-// ================= STATS =================
 function updateStats() {
     const total = document.getElementById("statTotal");
     const scan = document.getElementById("statScan");
@@ -112,7 +108,6 @@ function updateStats() {
     if(arrived) arrived.innerText = allBaggages.filter(b => b.status === "Arrived").length;
 }
 
-// ================= STATUS UPDATE =================
 window.updateStatus = async (id, status) => {
     try {
         const res = await fetch(`${API_BASE}/status/${id}?status=${status}`, { method: "PATCH" });
@@ -122,7 +117,6 @@ window.updateStatus = async (id, status) => {
     }
 };
 
-// ================= DELETE BAGGAGE =================
 window.deleteItem = async (id) => {
     if (!confirm("Delete this baggage record permanently?")) return;
     try {
@@ -133,7 +127,7 @@ window.deleteItem = async (id) => {
     }
 };
 
-// ================= MODAL CONTROLS =================
+
 window.openModal = () => document.getElementById("modal").classList.remove("hidden");
 window.closeModal = () => {
     document.getElementById("modal").classList.add("hidden");
@@ -141,7 +135,7 @@ window.closeModal = () => {
     if(form) form.reset();
 };
 
-// ================= PNR =================
+// ================= PNR  =================
 window.handlePNRLookup = async (pnr) => {
     const loader = document.getElementById("pnrLoader");
     const nameInput = document.getElementById("fName");
@@ -161,6 +155,7 @@ window.handlePNRLookup = async (pnr) => {
 
         const responseData = await res.json();
         const booking = responseData.data || responseData;
+
         const dbPassport = booking.passportNumber || booking.passportNo || '';
 
         nameInput.value = booking.passenger || '';
@@ -188,7 +183,6 @@ function generateTag(passport, flight) {
     return `${flightPart}-${passPart}-${random}`;
 }
 
-// ================= FORM SUBMISSION =================
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("baggageForm");
     if (form) {
