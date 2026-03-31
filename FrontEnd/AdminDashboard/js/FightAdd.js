@@ -1,4 +1,3 @@
-// Global variable ekak thiyagannawa update karana flight ID eka track karanna
 let currentEditFlightId = null;
 
 function toggleModal(id, show) {
@@ -7,7 +6,7 @@ function toggleModal(id, show) {
     if (show === true) modal.classList.remove('hidden');
     else if (show === false) {
         modal.classList.add('hidden');
-        currentEditFlightId = null; // Modal eka close weddi ID eka reset karanawa
+        currentEditFlightId = null;
         clearFlightForm();
     } else modal.classList.toggle('hidden');
 }
@@ -65,13 +64,11 @@ function convertDateTimeToISO(dateStr, timeStr) {
     return dt.toISOString();
 }
 
-// ISO Date string ekakin input type="date" ekata ona format eka gannawa (YYYY-MM-DD)
 function formatDateForInput(isoStr) {
     if (!isoStr) return '';
     return isoStr.split('T')[0];
 }
 
-// ISO Date string ekakin input type="time" ekata ona format eka gannawa (HH:MM)
 function formatTimeForInput(isoStr) {
     if (!isoStr) return '';
     const d = new Date(isoStr);
@@ -89,7 +86,6 @@ function clearFlightForm() {
     if (modalTitle) modalTitle.innerText = 'Schedule New Flight';
 }
 
-// --- EDIT FLIGHT FUNCTION ---
 async function editFlight(id) {
     try {
         const response = await fetch(`http://localhost:8080/api/v1/flights/searchFlight/${id}`);
@@ -97,9 +93,7 @@ async function editFlight(id) {
 
         if (response.ok && result.data) {
             const flight = result.data;
-            currentEditFlightId = flight.id; // Meka thamai update ekedi use wenne
-
-            // Form ekata data fill karanawa
+            currentEditFlightId = flight.id;
             document.getElementById('flightNumber').value = flight.flightNumber;
             document.getElementById('totalSeats').value = flight.totalSeats;
             document.getElementById('economyFare').value = flight.economyFare;
@@ -111,7 +105,6 @@ async function editFlight(id) {
             document.getElementById('arrivalTime').value = formatTimeForInput(flight.arrivalTime);
             document.getElementById('duration').value = flight.duration;
 
-            // Modal title eka wenas karanawa
             const modalTitle = document.querySelector('#flight-modal h3');
             if (modalTitle) modalTitle.innerText = 'Update Flight Details';
 
@@ -138,7 +131,7 @@ async function handleSubmitFlight() {
     const duration = calculateDuration();
 
     const data = {
-        id: currentEditFlightId, // Update ekak nam ID eka yanawa, Save ekak nam null yanawa
+        id: currentEditFlightId,
         flightNumber: flightNumberEl.value.trim(),
         bookedSeats: 0,
         totalSeats: parseInt(totalSeatsEl.value) || 0,
@@ -158,7 +151,6 @@ async function handleSubmitFlight() {
         return;
     }
 
-    // currentEditFlightId thiyenawa nam PUT, natham POST
     const url = currentEditFlightId
         ? 'http://localhost:8080/api/v1/flights/updateFlight'
         : 'http://localhost:8080/api/v1/flights/saveFlight';

@@ -4,7 +4,6 @@ const BOOKING_API = "http://localhost:8080/api/v1/bookings";
 let allBaggages = [];
 let activeFilter = "All";
 
-// ================= FETCH ALL BAGGAGES =================
 async function fetchBaggages() {
     try {
         const res = await fetch(`${API_BASE}/all`);
@@ -17,7 +16,6 @@ async function fetchBaggages() {
     }
 }
 
-// ================= RENDER BAGGAGE CARDS =================
 window.renderBaggages = () => {
     const list = document.getElementById("baggageList");
     const searchInput = document.getElementById("searchInput");
@@ -143,7 +141,7 @@ window.closeModal = () => {
     if(form) form.reset();
 };
 
-// ================= PNR LOOKUP (FIXED PASSPORT FETCH) =================
+// ================= PNR =================
 window.handlePNRLookup = async (pnr) => {
     const loader = document.getElementById("pnrLoader");
     const nameInput = document.getElementById("fName");
@@ -163,22 +161,18 @@ window.handlePNRLookup = async (pnr) => {
 
         const responseData = await res.json();
         const booking = responseData.data || responseData;
-
-        // ✅ DB එකේ තියෙන Passport Number එකම ගන්නවා (Generate කරන්නේ නැත)
         const dbPassport = booking.passportNumber || booking.passportNo || '';
 
         nameInput.value = booking.passenger || '';
         flightInput.value = booking.flightNumber || '';
         passportInput.value = dbPassport;
 
-        // Tag ID එක පමණක් Flight No සහ Passport No ඇසුරෙන් create කරයි
         if(flightInput.value && passportInput.value) {
             tagInput.value = generateTag(passportInput.value, flightInput.value);
         }
 
     } catch (err) {
         console.error("PNR lookup failed:", err);
-        // වැරදි PNR එකක් ගැහුවොත් fields හිස් කරයි
         [nameInput, passportInput, flightInput, tagInput].forEach(i => i.value = '');
     } finally {
         loader.classList.add("hidden");

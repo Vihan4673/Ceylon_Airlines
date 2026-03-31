@@ -1,11 +1,4 @@
-/**
- * Ceylon Air - Employee Registration & Admin Control
- * Logic for Modal handling, Form submission and Backend integration
- */
 
-// ================= MODAL CONTROLS =================
-
-// Add Admin Modal එක පෙන්වීම හෝ සැඟවීම
 function toggleAddModal(show) {
     const modal = document.getElementById('addModal');
     if (show) {
@@ -17,7 +10,6 @@ function toggleAddModal(show) {
     }
 }
 
-// Forgot Password Modal එක පෙන්වීම හෝ සැඟවීම
 function toggleForgotModal(show) {
     const modal = document.getElementById('forgotModal');
     if (show) {
@@ -29,9 +21,6 @@ function toggleForgotModal(show) {
     }
 }
 
-// ================= PASSWORD TOGGLE =================
-
-// Password එක පෙන්වන/සඟවන ඇසේ සලකුණේ ක්‍රියාකාරීත්වය
 function togglePass(id, event) {
     const input = document.getElementById(id);
     const btn = event.currentTarget;
@@ -46,32 +35,26 @@ function togglePass(id, event) {
     }
 }
 
-// ================= REGISTER ADMIN (BACKEND INTEGRATION) =================
 
 async function registerAdmin() {
-    // Input fields ලබා ගැනීම
     const nameInput = document.getElementById('newName');
     const emailInput = document.getElementById('newEmail');
     const passInput = document.getElementById('newPassword');
     const roleSelect = document.getElementById('newRole'); // UI Designation
-
-    // 1. සරල Validation එකක්
     if (!nameInput.value || !emailInput.value || !passInput.value) {
         return showToast('Error', 'Please fill all fields before submitting.', 'bg-red-500');
     }
 
-    // 2. Backend DTO එකට ගැලපෙන ලෙස දත්ත සකස් කිරීම (CRITICAL FOR 400 ERROR FIX)
     const adminData = {
         username: nameInput.value.trim(),
         email: emailInput.value.trim(),
         password: passInput.value,
-        role: "ADMIN" // Database එකේ role එක ADMIN ලෙස save වීමට
+        role: "ADMIN"
     };
 
     console.log("Attempting to Register:", adminData);
 
     try {
-        // 3. API එකට Request එක යැවීම
         const response = await fetch('http://localhost:8080/api/v1/auth/signup', {
             method: 'POST',
             headers: {
@@ -81,22 +64,18 @@ async function registerAdmin() {
             body: JSON.stringify(adminData)
         });
 
-        // 4. Response එක පරීක්ෂා කිරීම
         const result = await response.json();
 
         if (response.ok) {
-            // සාර්ථක නම් Table එකට Row එකක් එකතු කර Modal එක වසන්න
             addAdminToTable(nameInput.value, emailInput.value, roleSelect.value);
 
             toggleAddModal(false);
             showToast('Success', 'Administrator registered successfully!', 'bg-emerald-500');
 
-            // Form එක clear කරන්න
             nameInput.value = '';
             emailInput.value = '';
             passInput.value = '';
         } else {
-            // Backend එකෙන් දෙන error message එක පෙන්වන්න (උදා: Email already exists)
             console.error("Backend Error:", result);
             showToast('Registration Failed', result.message || 'Error 400: Check data format.', 'bg-red-500');
         }
@@ -105,8 +84,6 @@ async function registerAdmin() {
         showToast('Connection Error', 'Backend server is not reachable.', 'bg-red-500');
     }
 }
-
-// ================= ADD ADMIN TO TABLE UI =================
 
 function addAdminToTable(name, email, displayRole) {
     const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
@@ -134,8 +111,6 @@ function addAdminToTable(name, email, displayRole) {
     tableBody.insertAdjacentHTML('beforeend', newRow);
 }
 
-// ================= TOAST NOTIFICATION =================
-
 function showToast(title, msg, iconColor = 'bg-emerald-500') {
     const toast = document.getElementById('toast');
     const titleEl = document.getElementById('toastTitle');
@@ -147,17 +122,13 @@ function showToast(title, msg, iconColor = 'bg-emerald-500') {
     titleEl.innerText = title;
     msgEl.innerText = msg;
     iconEl.className = `w-8 h-8 ${iconColor} rounded-full flex items-center justify-center text-[10px]`;
-
-    // Animation classes
     toast.classList.remove('translate-y-32', 'opacity-0');
 
-    // තත්පර 3 කට පසු සැඟවීම
     setTimeout(() => {
         toast.classList.add('translate-y-32', 'opacity-0');
     }, 3000);
 }
 
-// Forgot Password placeholder logic
 function handleResetRequest() {
     const email = document.getElementById('resetEmail').value;
     if(email) {

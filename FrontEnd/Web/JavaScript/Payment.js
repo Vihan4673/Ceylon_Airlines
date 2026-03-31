@@ -1,17 +1,12 @@
-// =====================================================
-// CONFIGURATION & GLOBAL VARIABLES
-// =====================================================
 const API_BASE = "http://localhost:8080/api/v1/bookings";
 let currentBooking = null;
 
-// =====================================================
-// 1. INIT PAGE: GET DATA VIA PNR
-// =====================================================
+
 async function initPage() {
     const savedPnr = localStorage.getItem("currentBookingPNR");
 
     if (!savedPnr) {
-        console.error("❌ PNR not found in localStorage");
+        console.error("PNR not found in localStorage");
         alert("Booking session expired. Redirecting to checkout...");
         window.location.href = "../Pages/Checkout.html";
         return;
@@ -22,26 +17,22 @@ async function initPage() {
         const result = await response.json();
 
         if (response.ok && result.data) {
-            // DB එකෙන් අපේ PNR එකට අදාළ දත්ත සොයයි (මෙහි දැන් passportNumber ද ඇත)
             const matched = result.data.find(b => b.pnr === savedPnr);
 
             if (matched) {
                 currentBooking = matched;
-                console.log("✅ Booking Synced (with Passport):", currentBooking);
+                console.log("Booking Synced (with Passport):", currentBooking);
                 renderBookingDetails(currentBooking);
             } else {
-                console.error("❌ PNR not found in Database.");
+                console.error("PNR not found in Database.");
                 alert("Booking details not found. Please try again.");
             }
         }
     } catch (error) {
-        console.error("❌ Sync Error:", error);
+        console.error("Sync Error:", error);
     }
 }
 
-// =====================================================
-// 2. HANDLE PAYMENT (FIXED PAYLOAD)
-// =====================================================
 async function handlePayment(e) {
     e.preventDefault();
 
@@ -60,13 +51,11 @@ async function handlePayment(e) {
     spinner?.classList.remove('hidden');
     btnText?.classList.add('hidden');
 
-    // 🔴 Final Payload: Backend එකේ BookingDTO එකට ගැලපෙන ලෙස සකස් කර ඇත.
     const updateData = {
         id: currentBooking.id,
         pnr: currentBooking.pnr,
         passenger: currentBooking.passenger,
         email: currentBooking.email || "",
-        // ✅ Passport Number එක මෙහිදී payload එකට එක් වේ
         passportNumber: currentBooking.passportNumber || "",
         flightNumber: currentBooking.flightNumber,
         origin: currentBooking.origin,
@@ -76,11 +65,11 @@ async function handlePayment(e) {
         travelClass: currentBooking.travelClass,
         price: currentBooking.price,
         bookingDate: currentBooking.bookingDate,
-        paid: true,           // ✅ Boolean True (Payment done)
-        status: "CONFIRMED"   // ✅ String Status
+        paid: true,
+        status: "CONFIRMED"
     };
 
-    console.log("🚀 Final Payload to Backend (Updating Paid Status):", updateData);
+    console.log("Final Payload to Backend (Updating Paid Status):", updateData);
 
     try {
         const res = await fetch(`${API_BASE}/pnr/${savedPnr}`, {
@@ -95,20 +84,20 @@ async function handlePayment(e) {
         const responseJson = await res.json();
 
         if (res.ok) {
-            console.log("✅ Payment & DB Update Success!");
-            alert("✅ Payment Successful! Your ticket is confirmed.");
+            console.log("Payment & DB Update Success!");
+            alert("Payment Successful! Your ticket is confirmed.");
 
             localStorage.removeItem("currentBookingPNR");
             localStorage.removeItem("bookingIdForPayment");
 
             document.getElementById("success-overlay")?.classList.remove("hidden");
         } else {
-            console.error("❌ Backend Error Details:", responseJson);
+            console.error("Backend Error Details:", responseJson);
             alert("Update Failed: " + (responseJson.message || "Invalid Data Format"));
         }
     } catch (err) {
-        console.error("❌ Network Error:", err);
-        alert("❌ Server not reachable.");
+        console.error("Network Error:", err);
+        alert("Server not reachable.");
     } finally {
         btn.disabled = false;
         spinner?.classList.add('hidden');
@@ -116,16 +105,11 @@ async function handlePayment(e) {
     }
 }
 
-// =====================================================
-// UI & CARD HELPERS
-// =====================================================
 function renderBookingDetails(data) {
     setText("summary-pnr", data.pnr);
     setText("summary-name", data.passenger);
     setText("summary-from", data.origin);
     setText("summary-to", data.destination);
-
-    // UI එකේ Passport එක පෙන්වීමට තැනක් ඇත්නම්:
     setText("summary-passport", data.passportNumber);
 
     const price = parseFloat(data.price) || 0;
@@ -168,9 +152,6 @@ function flipCard(flipped) {
     if (card) flipped ? card.classList.add('flipped') : card.classList.remove('flipped');
 }
 
-// =====================================================
-// LISTENERS
-// =====================================================
 document.addEventListener("DOMContentLoaded", initPage);
 document.getElementById('payment-form')?.addEventListener('submit', handlePayment);
 

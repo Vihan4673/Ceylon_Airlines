@@ -8,8 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
 async function loadHomeAds() {
     const container = document.getElementById("planningContainer");
 
-    // පින්තූරයේ ඇති පරිදි Grid එක නිවැරදිව පෙනීමට container එකේ පන්ති පරීක්ෂා කරන්න
-    // container.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8";
 
     try {
         const res = await fetch(API_BASE, { cache: "no-store" });
@@ -18,7 +16,6 @@ async function loadHomeAds() {
         const ads = await res.json();
         const now = new Date();
 
-        // Home ads සහ වලංගු කාලසීමාව අනුව filter කිරීම
         const homeAds = ads.filter(ad => {
             const start = ad.startDate ? new Date(ad.startDate) : null;
             const end = ad.endDate ? new Date(ad.endDate) : null;
@@ -38,14 +35,10 @@ async function loadHomeAds() {
 
         homeAds.forEach(ad => {
             const card = document.createElement("div");
-
-            // Image URL සකස් කිරීම
             let imageUrl = "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&q=80&w=800"; // Default image
             if (ad.imageUrl && ad.imageUrl.trim() !== "") {
                 imageUrl = ad.imageUrl.startsWith("http") ? ad.imageUrl : `${BASE_URL}${ad.imageUrl}`;
             }
-
-            // පින්තූරයේ ඇති Design එකට අනුව HTML ව්‍යුහය
             card.className = "group cursor-pointer h-full";
             card.innerHTML = `
                 <div class="relative h-80 overflow-hidden rounded-[2rem] shadow-xl transition-all duration-500 group-hover:-translate-y-2">

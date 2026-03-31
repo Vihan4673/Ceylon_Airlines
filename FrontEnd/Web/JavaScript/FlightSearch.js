@@ -8,16 +8,14 @@ let state = {
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
-    // --- Set default departure date to today ---
     const depInput = document.getElementById("depDate");
     const today = new Date();
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     depInput.value = `${yyyy}-${mm}-${dd}`;
-    depInput.min = `${yyyy}-${mm}-${dd}`; // prevent past dates
+    depInput.min = `${yyyy}-${mm}-${dd}`;
 
-    // Optional: set return date to tomorrow by default
     const retInput = document.getElementById("retDate");
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -25,13 +23,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const tmm = String(tomorrow.getMonth() + 1).padStart(2, '0');
     const tdd = String(tomorrow.getDate()).padStart(2, '0');
     retInput.value = `${tyyyy}-${tmm}-${tdd}`;
-    retInput.min = `${yyyy}-${mm}-${dd}`; // return cannot be before today
+    retInput.min = `${yyyy}-${mm}-${dd}`;
 
     await fetchDestinations();
     initTripType();
     initPassengerDropdown();
     initSearchButton();
-    initDestinationInputs(); // Suggestion dropdown logic
+    initDestinationInputs();
     updatePassengerSummary();
 });
 

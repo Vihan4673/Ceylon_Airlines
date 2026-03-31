@@ -2,7 +2,6 @@
 // BASE URL
 // =====================================================
 const AUTH_BASE_URL = "http://localhost:8080/api/v1/auth";
-
 const notification = document.getElementById("notification");
 
 // =====================================================
@@ -10,7 +9,7 @@ const notification = document.getElementById("notification");
 // =====================================================
 function showNotification(message, isError = false) {
     if (!notification) {
-        alert(message); // Notification element එක නැතිනම් alert එකක් පෙන්වන්න
+        alert(message);
         return;
     }
 
@@ -24,40 +23,50 @@ function showNotification(message, isError = false) {
 }
 
 // =====================================================
-// 🌐 GOOGLE LOGIN REDIRECT
+// 🌐 GOOGLE LOGIN (FIXED FOR MANUAL TOKEN FLOW) 🔥
 // =====================================================
 function loginWithGoogle() {
-    // Backend OAuth2 endpoint එකට redirect කරනවා
-    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    // 1. Google Identity Services initialize kirima
+    google.accounts.id.initialize({
+        client_id: "29624464708-i2hhl9f3bv3h77s9l9r9gb87ohmo1ccj.apps.googleusercontent.com",
+        callback: handleCredentialResponse // Token eka labunama meka call wenawa
+    });
+
+    // 2. Google Login Popup eka pennana
+    google.accounts.id.prompt();
 }
 
-// =====================================================
-// 🔄 HANDLE GOOGLE REDIRECT SUCCESS 🔥
-// =====================================================
-window.addEventListener("DOMContentLoaded", () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
+// Google eken dena Token eka backend ekata yawana function eka
+async function handleCredentialResponse(response) {
+    const idToken = response.credential; // Meka thama Google ID Token eka
 
-    if (token) {
-        console.log("Google Token Received!");
+    try {
+        const res = await fetch(`${AUTH_BASE_URL}/google`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token: idToken })
+        });
 
-        // 1. Save Token
-        localStorage.setItem("token", token);
+        const result = await res.json();
 
-        // 2. Save Basic User Info
-        localStorage.setItem("user", JSON.stringify({ role: "USER", type: "GOOGLE" }));
+        // Status 200 unoth pamanak login wenna
+        if (res.ok && (result.status === 200 || result.code === 200)) {
+            const jwtToken = result.data.token;
+            localStorage.setItem("token", jwtToken);
+            localStorage.setItem("user", JSON.stringify({ role: "USER", type: "GOOGLE" }));
 
-        showNotification("Google Login Successful!");
-
-        // 3. Clean the URL (Token එක URL එකෙන් අයින් කරනවා ආරක්ෂාවට)
-        window.history.replaceState({}, document.title, window.location.pathname);
-
-        // 4. Redirect to Home (Path එක නිවැරදිද බලන්න)
-        setTimeout(() => {
-            window.location.href = "../Pages/HomePage.html";
-        }, 1000);
+            showNotification("Google Login Successful!");
+            setTimeout(() => {
+                window.location.href = "HomePage.html"; // Path eka hariyata check karanna
+            }, 1000);
+        } else {
+            showNotification(result.message || "Google Authentication Failed", true);
+        }
+    } catch (error) {
+        console.error("Google Auth Error:", error);
+        showNotification("Server Connection Error", true);
     }
-});
+}
 
 // =====================================================
 // 🔑 NORMAL LOGIN
@@ -87,7 +96,6 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
         if (response.ok) {
             showNotification("Login Successful!");
 
-            // Backend එකෙන් එන data structure එක අනුව මේවා save වෙනවා
             const token = result.data?.token || result.token;
             const userData = result.data || result;
 
@@ -96,8 +104,8 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
                 localStorage.setItem("user", JSON.stringify(userData));
 
                 setTimeout(() => {
-                    // Role එක අනුව Redirect වෙනවා
-                    if (userData.role?.toUpperCase() === "ADMIN") {
+                    const role = userData.role || (userData.data && userData.data.role);
+                    if (role?.toUpperCase() === "ADMIN") {
                         window.location.href = "../../AdminDashboard/index.html";
                     } else {
                         window.location.href = "HomePage.html";
@@ -115,7 +123,7 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
 });
 
 // =====================================================
-// 📝 REGISTER & TAB SWITCH (පැහැදිලිව තබාගෙන ඇත)
+// 📝 TAB SWITCH
 // =====================================================
 function switchTab(type) {
     const loginForm = document.getElementById("loginForm");

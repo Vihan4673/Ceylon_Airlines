@@ -35,8 +35,6 @@ function renderTable(reports) {
         const statusColor = getStatusColor(report.status);
         const row = document.createElement('tr');
         row.className = "hover:bg-slate-50 border-b border-slate-50";
-
-        // JSON දත්ත කෙලින්ම යැවීමේදී එන වැරදි මගහැරීමට data- attribute පාවිච්චි කිරීම ආරක්ෂිතයි
         row.innerHTML = `
             <td class="px-6 py-5">
                 <p class="font-bold text-slate-900 text-sm">${report.passengerName}</p>
@@ -59,8 +57,6 @@ function renderTable(reports) {
         `;
         list.appendChild(row);
     });
-
-    // Button click event පාලනය
     document.querySelectorAll('.view-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const report = JSON.parse(e.target.getAttribute('data-report'));

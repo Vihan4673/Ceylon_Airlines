@@ -2,14 +2,13 @@ const form = document.getElementById('destinationForm');
 const tableBody = document.getElementById('destinationTableBody');
 const countSpan = document.getElementById('count');
 const submitBtn = form.querySelector('button[type="submit"]');
-const searchInput = document.getElementById('searchInput'); // Search input eke ID eka check karanna
+const searchInput = document.getElementById('searchInput');
 
 const API_URL = "http://localhost:8080/api/v1/flights";
 
 let isEditMode = false;
 let currentEditId = null;
 
-// ================= LOAD =================
 async function loadDestinations() {
     try {
         const res = await fetch(`${API_URL}/destinations`);
@@ -29,7 +28,6 @@ function updateCount() {
     countSpan.innerText = `${rows} Locations`;
 }
 
-// ================= ADD ROW =================
 function addRowToTable(dest) {
     const id = dest.id || dest.destId;
     const newRow = document.createElement('tr');
@@ -55,7 +53,6 @@ function addRowToTable(dest) {
     tableBody.appendChild(newRow);
 }
 
-// ================= FORM SUBMIT (CREATE/UPDATE) =================
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -87,7 +84,7 @@ form.addEventListener('submit', async (e) => {
 
         if (!res.ok) throw new Error(await res.text());
 
-        await loadDestinations(); // Reload table after success
+        await loadDestinations();
         resetForm();
     } catch (err) {
         console.error(err);
@@ -138,7 +135,7 @@ function resetForm() {
     if (submitBtn) submitBtn.innerText = "Add Destination";
 }
 
-// ================= SEARCH FUNCTION (FIXED) =================
+// ================= SEARCH FUNCTION =================
 function filterDestinations() {
     const searchTerm = searchInput.value.toLowerCase();
     const rows = tableBody.querySelectorAll('.destination-row');
@@ -155,7 +152,6 @@ function filterDestinations() {
     });
 }
 
-// Search input ekata event listener ekak add kirima
 if (searchInput) {
     searchInput.addEventListener('input', filterDestinations);
 }

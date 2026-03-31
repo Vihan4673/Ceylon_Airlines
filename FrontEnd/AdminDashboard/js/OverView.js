@@ -1,7 +1,4 @@
-/**
- * Ceylon Airlines - Dashboard Intelligence Logic
- * Final Functional Version (March 2026)
- */
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Backend API Base Configuration
@@ -15,10 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const paxLoadCountEl = document.getElementById('pax-load-count');
     const clockEl = document.getElementById('dashboard-clock');
 
-    /**
-     * Live Clock Function
-     * සිස්ටම් එකේ වෙලාව තත්පරයෙන් තත්පරයට යාවත්කාලීන කරයි.
-     */
     function updateClock() {
         if (clockEl) {
             const now = new Date();
@@ -35,38 +28,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /**
-     * Dashboard Data Synchronizer
-     * Backend API හරහා ගුවන් ගමන් සහ වෙන් කිරීම් දත්ත ලබා ගනී.
-     */
     async function refreshDashboardData() {
         try {
-            // --- 1. FETCH FLIGHTS ---
             const flightRes = await fetch(`${BASE_URL}/flights/getAllFlight`);
             if (!flightRes.ok) throw new Error('Flight API failed');
             const flightData = await flightRes.json();
 
-            // API එකෙන් එන දත්ත වල code එක 200 නම් පමණක් ක්‍රියාත්මක වේ
             if (flightData.code === 200) {
                 const flights = flightData.data || [];
                 if (totalFlightsEl) totalFlightsEl.textContent = flights.length;
                 renderFlightTable(flights);
             }
 
-            // --- 2. FETCH BOOKINGS ---
             const bookingRes = await fetch(`${BASE_URL}/bookings`);
             if (!bookingRes.ok) throw new Error('Booking API failed');
             const bookingData = await bookingRes.json();
 
-            // code හෝ status 200 දැයි පරීක්ෂා කරයි
             if (bookingData.code === 200 || bookingData.status === 200) {
                 const bookings = bookingData.data || [];
 
-                // අගයන් update කිරීම
                 if (totalBookingsEl) totalBookingsEl.textContent = bookings.length.toLocaleString();
                 if (paxLoadCountEl) paxLoadCountEl.textContent = bookings.length.toLocaleString();
 
-                // මුළු ආදායම ගණනය කිරීම (Price අගයන් එකතු කිරීම)
                 const totalRev = bookings.reduce((sum, b) => sum + (parseFloat(b.price) || 0), 0);
 
                 if (totalRevenueEl) {
@@ -79,22 +62,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error("Dashboard Sync Error:", error.message);
-            // Error එකක් ආවොත් Table එකේ පණිවිඩයක් පෙන්වීමට
             if (flightTableBody && flightTableBody.innerHTML.includes('Loading')) {
                 flightTableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-red-400">Connection error with backend.</td></tr>`;
             }
         }
     }
 
-    /**
-     * Table Renderer
-     * දත්ත පේළි 5ක් පමණක් ලස්සනට table එකට ඇතුළු කරයි.
-     */
     function renderFlightTable(flights) {
         if (!flightTableBody) return;
         flightTableBody.innerHTML = '';
 
-        // දත්ත නොමැති නම්
         if (flights.length === 0) {
             flightTableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400">No active flights found.</td></tr>`;
             return;
@@ -104,15 +81,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = document.createElement('tr');
             row.className = "hover:bg-slate-50/80 transition-all cursor-pointer group border-b border-slate-100";
 
-            // Status Badge Logic
             let statusClass = "status-on-time";
             let statusText = flight.status || "On Time";
 
             const lowerStatus = statusText.toLowerCase();
             if (lowerStatus === "delayed" || lowerStatus === "cancelled") statusClass = "status-delayed";
             else if (lowerStatus === "airborne" || lowerStatus === "departed") statusClass = "status-airborne";
-
-            // Occupancy (ආසන පිරී ඇති ප්‍රතිශතය)
             const booked = flight.bookedSeats || 0;
             const total = flight.totalSeats || 100;
             const occupancy = Math.round((booked / total) * 100);
@@ -150,9 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /**
-     * ISO Time Formatter
-     */
     function formatTime(isoStr) {
         try {
             const d = new Date(isoStr);
@@ -163,10 +134,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 3. Execution (Initialize)
     updateClock();
-    setInterval(updateClock, 1000); // සෑම තත්පරයකම ඔරලෝසුව update වේ
+    setInterval(updateClock, 1000);
 
-    refreshDashboardData(); // මුලින්ම දත්ත ලබා ගනී
-    setInterval(refreshDashboardData, 30000); // සෑම තත්පර 30කට වරක් auto-refresh වේ
+    refreshDashboardData();
+    setInterval(refreshDashboardData, 30000);
 });

@@ -1,28 +1,18 @@
-// =====================================================
-// CONFIGURATION & GLOBAL STATES
-// =====================================================
+
 const API_URL = "http://localhost:8080/api/v1/bookings";
 const PASSENGER_API = "http://localhost:8080/api/v1/passengers";
 const SEAT_API = "http://localhost:8080/api/v1/seats";
 
 let bookings = [];
 let occupiedSeats = [];
-
-// =====================================================
-// INITIALIZATION
-// =====================================================
 document.addEventListener("DOMContentLoaded", () => {
     loadBookings();
 
-    // Flight Number එක ටයිප් කර ඉවර වූ පසු Seat Map එක refresh කිරීම
     document.getElementById('m-flightNumber').addEventListener('blur', (e) => {
         if(e.target.value) fetchOccupiedSeats(e.target.value);
     });
 });
 
-// =====================================================
-// PASSPORT LOOKUP LOGIC (🔥 FIXED)
-// =====================================================
 async function lookupPassenger() {
     const passport = document.getElementById('m-passport').value;
     const nameInput = document.getElementById('m-passenger');
@@ -36,13 +26,12 @@ async function lookupPassenger() {
     nameInput.placeholder = "Searching database...";
 
     try {
-        // Backend එකේ passport එකෙන් search කරන endpoint එකට call කිරීම
-        // සටහන: ඔයාගේ Controller එකේ searchPassengerByPassport ලෙස endpoint එකක් තිබිය යුතුය.
+
         const response = await fetch(`${PASSENGER_API}/passport/${passport}`);
         const result = await response.json();
 
         if (response.ok && result.data) {
-            // නම සැකසීම (Title, First Name, Last Name එකතු කර)
+
             const fullName = `${result.data.title || ''} ${result.data.firstName || ''} ${result.data.lastName || ''}`.trim();
             nameInput.value = fullName;
             emailInput.value = result.data.email || "";
@@ -58,10 +47,6 @@ async function lookupPassenger() {
     }
 }
 
-// =====================================================
-// SEAT SELECTION LOGIC (🔥 DB CONNECTED)
-// =====================================================
-
 async function fetchOccupiedSeats(flightNo) {
     if (!flightNo) return;
 
@@ -69,7 +54,6 @@ async function fetchOccupiedSeats(flightNo) {
         const response = await fetch(`${SEAT_API}/flight-number/${encodeURIComponent(flightNo)}`);
         const result = await response.json();
 
-        // Booked කර ඇති seat IDs පමණක් Array එකකට ගැනීම
         if (result.status === 200 && result.data) {
             occupiedSeats = result.data
                 .filter(s => s.booked === true)
@@ -98,7 +82,6 @@ function initSeatMap() {
             const isBooked = occupiedSeats.includes(seatId);
 
             const seatDiv = document.createElement('div');
-            // Tailwind classes dynamic ලෙස ඇතුළත් කිරීම
             seatDiv.className = `seat-btn w-10 h-10 rounded-xl border-2 flex items-center justify-center text-[10px] font-black transition-all cursor-pointer 
                 ${isBooked ? 'bg-slate-200 text-slate-400 border-slate-100 cursor-not-allowed' : 'bg-white text-slate-900 border-slate-100 hover:border-[#8A1538] hover:text-[#8A1538]'}`;
 
@@ -113,15 +96,12 @@ function initSeatMap() {
 }
 
 function selectSeat(id, element) {
-    // කලින් select කර තිබූ seat එක reset කිරීම
     document.querySelectorAll('.seat-btn').forEach(el => {
-        if(!el.classList.contains('bg-slate-200')) { // Booked නොවන ඒවා පමණක්
+        if(!el.classList.contains('bg-slate-200')) {
             el.classList.remove('bg-[#8A1538]', 'text-white', 'border-[#8A1538]');
             el.classList.add('bg-white', 'text-slate-900', 'border-slate-100');
         }
     });
-
-    // අලුත් seat එක highlight කිරීම
     element.classList.remove('bg-white', 'text-slate-900');
     element.classList.add('bg-[#8A1538]', 'text-white', 'border-[#8A1538]');
 
@@ -129,9 +109,6 @@ function selectSeat(id, element) {
     document.getElementById('selected-seat-label').innerText = `SEAT: ${id}`;
 }
 
-// =====================================================
-// CORE CRUD OPERATIONS
-// =====================================================
 
 async function loadBookings() {
     try {
@@ -174,7 +151,6 @@ async function saveBooking() {
     }
 
     try {
-        // 1. Booking එක Save කිරීම
         const res = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -182,7 +158,6 @@ async function saveBooking() {
         });
 
         if (res.ok) {
-            // 2. Seat එක Booked ලෙස DB එකේ Update කිරීම
             await fetch(`${SEAT_API}/book`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -217,10 +192,6 @@ async function deleteBooking(id) {
         alert("Delete failed.");
     }
 }
-
-// =====================================================
-// UI RENDER HELPERS
-// =====================================================
 
 function renderTable() {
     const tbody = document.getElementById('booking-table-body');
@@ -265,15 +236,10 @@ function renderTable() {
     document.getElementById('active-seats').innerText = bookings.length;
 }
 
-// =====================================================
-// MODAL CONTROLS
-// =====================================================
-
 function openModal() {
     document.getElementById('bookingModal').classList.remove('hidden');
     generatePNR();
 
-    // Default Seat Map load (එවෙලේම flight එකක් තියෙනවා නම්)
     const flight = document.getElementById('m-flightNumber').value;
     if(flight) fetchOccupiedSeats(flight);
     else initSeatMap();
@@ -281,7 +247,6 @@ function openModal() {
 
 function closeModal() {
     document.getElementById('bookingModal').classList.add('hidden');
-    // Form එක clear කිරීම
     const fields = ['m-passenger', 'm-email', 'm-flightNumber', 'm-origin', 'm-destination', 'm-departureDate', 'm-seat', 'm-price', 'm-passport'];
     fields.forEach(f => {
         const el = document.getElementById(f);

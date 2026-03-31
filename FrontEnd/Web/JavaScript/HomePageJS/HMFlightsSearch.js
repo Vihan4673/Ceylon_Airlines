@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     updatePassengerSummary();
 });
 
-// ================= Destinations =================
 async function fetchDestinations() {
     try {
         const res = await fetch("http://localhost:8080/api/v1/flights/destinations");
@@ -36,8 +35,6 @@ async function fetchDestinations() {
         document.getElementById("toLoc").value = "Dubai (DXB)";
     }
 }
-
-// ================= Destination Inputs =================
 function initDestinationInputs() {
     const fromInput = document.getElementById("fromLoc");
     const toInput = document.getElementById("toLoc");
@@ -87,8 +84,6 @@ function initDestinationInputs() {
         });
     });
 }
-
-// ================= Trip Type =================
 function initTripType() {
     const radios = document.querySelectorAll('input[name="trip"]');
     const returnContainer = document.getElementById("returnContainer");
@@ -101,7 +96,6 @@ function initTripType() {
     });
 }
 
-// ================= Passenger Dropdown =================
 function initPassengerDropdown() {
     const trigger = document.getElementById("passengerTrigger");
     const dropdown = document.getElementById("passengerDropdown");
@@ -145,7 +139,6 @@ function updatePassengerSummary() {
     document.getElementById("passengerSummary").innerText = text;
 }
 
-// ================= Swap Locations =================
 function initSwapButton() {
     const btn = document.querySelector('.swap-btn');
     if (!btn) return;
@@ -167,7 +160,6 @@ function swapLocations() {
     btnIcon.style.transform = btnIcon.style.transform === "rotate(180deg)" ? "rotate(0deg)" : "rotate(180deg)";
 }
 
-// ================= Search Button =================
 function initSearchButton() {
     const searchBtn = document.getElementById("searchBtn");
 

@@ -1,24 +1,15 @@
-// =====================================================
-// API CONFIG
-// =====================================================
 const API_URL = "http://localhost:8080/api/v1/auth/signup";
 
-// =====================================================
-// INIT
-// =====================================================
+
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("signupForm");
     if (!form) return;
     form.addEventListener("submit", handleSignup);
 });
 
-// =====================================================
-// HANDLE SIGNUP
-// =====================================================
 async function handleSignup(e) {
     e.preventDefault();
 
-    // ✅ Correct IDs matching your HTML
     const name = document.getElementById("signupUsername")?.value.trim();
     const email = document.getElementById("signupEmail")?.value.trim();
     const password = document.getElementById("signupPassword")?.value.trim();
@@ -32,7 +23,7 @@ async function handleSignup(e) {
         username: name,
         email: email,
         password: password,
-        role: "USER" // optional: force role from frontend
+        role: "USER"
     };
 
     try {
@@ -48,14 +39,11 @@ async function handleSignup(e) {
 
         if (response.ok) {
             showMessage("Registration successful!", "success");
-
-            // auto redirect to login page
             setTimeout(() => {
-                window.location.href = "LoginPage.html"; // adjust path if needed
+                window.location.href = "LoginPage.html";
             }, 1000);
 
         } else {
-            // handle duplicate email or backend error
             showMessage(data.message || "Signup failed", "error");
         }
 
@@ -65,9 +53,6 @@ async function handleSignup(e) {
     }
 }
 
-// =====================================================
-// SHOW MESSAGE FUNCTION
-// =====================================================
 function showMessage(message, type) {
     let msgBox = document.getElementById("msgBox");
 
@@ -96,12 +81,9 @@ function showMessage(message, type) {
     setTimeout(() => msgBox.remove(), 3000);
 }
 
-// Google Sign-in callback
 function handleCredentialResponse(response) {
-    // The response contains JWT ID token
     console.log("Encoded JWT ID token: " + response.credential);
 
-    // Optionally send this token to your backend to verify and create a session
     fetch('http://localhost:8080/api/v1/auth/google-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -122,8 +104,6 @@ function handleCredentialResponse(response) {
             showNotification("Server error", "error");
         });
 }
-
-// Optional: show notification function (reuse your msgBox logic)
 function showNotification(msg, type) {
     const notification = document.getElementById('notification');
     notification.innerText = msg;

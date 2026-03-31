@@ -7,9 +7,7 @@ const searchTo = params.get("to");
 const searchDate = params.get("dep");
 const searchReturn = params.get("ret");
 
-// =====================================================
-// 🔐 LOGIN CHECK
-// =====================================================
+
 function checkAuth() {
     const token = localStorage.getItem("token");
 
@@ -254,12 +252,9 @@ function updateSummary() {
     el.innerText = `${total} Traveler${total > 1 ? "s" : ""}, ${state.cabin}`;
 }
 
-// =====================================================
-// INIT (LOGIN REQUIRED)
-// =====================================================
 document.addEventListener("DOMContentLoaded", () => {
 
-    checkAuth(); // 🔥 ONLY CHANGE
+    checkAuth();
 
     updateNavbar();
     updateHeroRoute();
@@ -268,9 +263,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateSummary();
 });
 
-// =====================================================
-// BOOK BUTTON PROTECT
-// =====================================================
 document.getElementById('footer-summary')?.querySelector('button')?.addEventListener('click', () => {
 
     const token = localStorage.getItem("token");

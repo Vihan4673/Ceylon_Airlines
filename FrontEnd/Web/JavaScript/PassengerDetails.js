@@ -1,6 +1,5 @@
 const API_BASE_URL = "http://localhost:8080/api/v1/passengers";
 
-// ================= 🔐 GET AUTH TOKEN =================
 function getAuthToken() {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -12,13 +11,11 @@ function getAuthToken() {
     return token;
 }
 
-// ================= 📅 DATE CONVERTER =================
 function convertToISO(dateStr) {
     if (!dateStr) return null;
     return dateStr;
 }
 
-// ================= 🚀 FETCH ALL PASSENGERS =================
 async function fetchPassengers() {
     const token = getAuthToken();
     if (!token) return;
@@ -44,12 +41,10 @@ async function fetchPassengers() {
     }
 }
 
-// ================= 📝 SAVE PASSENGER =================
 async function savePassenger() {
     const token = getAuthToken();
     if (!token) return;
 
-    // UI elements walin values ganna
     const title = document.getElementById("title")?.value;
     const firstName = document.getElementById("firstName")?.value.trim().toUpperCase();
     const lastName = document.getElementById("lastName")?.value.trim().toUpperCase();
@@ -64,7 +59,6 @@ async function savePassenger() {
 
     const gender = genderEl ? genderEl.value.toUpperCase() : "";
 
-    // Validation
     if (!firstName || !lastName || !gender || !dobRaw || !email || !mobile || !passportNumber || !nationality || !expiryRaw) {
         alert("Please fill all required fields.");
         return;
@@ -75,7 +69,6 @@ async function savePassenger() {
         return;
     }
 
-    // Backend DTO ekata 100% match wenna ona
     const passengerDTO = {
         title: title,
         firstName: firstName,
@@ -84,9 +77,8 @@ async function savePassenger() {
         dateOfBirth: dobRaw,
         email: email,
         phoneNumber: mobile,
-        // ✅ Passport number eka "passportNumber" widiyata save kala (Checkout ekata lesi wenna)
         passportNumber: passportNumber,
-        documentNumber: passportNumber, // Backend compatibility
+        documentNumber: passportNumber,
         nationality: nationality,
         expiryDate: expiryRaw
     };
@@ -107,9 +99,7 @@ async function savePassenger() {
 
         if (res.ok) {
             alert("Passenger details saved successfully!");
-            // ✅ LocalStorage ekata "currentPassenger" widiyata sampurna data set ekama damma
             localStorage.setItem("currentPassenger", JSON.stringify(passengerDTO));
-            // ✅ Checkout page ekata yama
             window.location.href = "Checkout page.html";
         } else {
             alert(result.message || "Save failed.");
@@ -120,7 +110,6 @@ async function savePassenger() {
     }
 }
 
-// ================= 🗑️ DELETE PASSENGER =================
 async function deletePassenger(id) {
     const token = getAuthToken();
     if (!token || !confirm("Delete this passenger?")) return;
@@ -140,7 +129,6 @@ async function deletePassenger(id) {
     }
 }
 
-// ================= 📊 RENDER TABLE =================
 function renderPassengers(passengers) {
     const tbody = document.getElementById("passenger-table");
     if (!tbody) return;
@@ -159,7 +147,6 @@ function renderPassengers(passengers) {
     `).join("");
 }
 
-// ================= 🚦 INITIALIZE =================
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("passengerForm");
     form?.addEventListener("submit", (e) => {

@@ -1,21 +1,15 @@
-// =====================================================
-// GET DATA (ALWAYS FRESH 🔥)
-// =====================================================
+
 function getFlightState() {
     return JSON.parse(localStorage.getItem("selectedFlight")) || {};
 }
 
 function getPassenger() {
-    // Passenger details ලබා ගැනීමේදී ප්‍රමුඛතාවය අනුව localStorage එක පරීක්ෂා කරයි
     return JSON.parse(
         localStorage.getItem("passengerInfo") ||
         localStorage.getItem("currentPassenger")
     ) || {};
 }
 
-// =====================================================
-// FORMAT DATE
-// =====================================================
 function formatFullDate(dateStr) {
     if (!dateStr) return "Date not available";
     return new Date(dateStr).toLocaleDateString("en-GB", {
@@ -26,17 +20,11 @@ function formatFullDate(dateStr) {
     });
 }
 
-// =====================================================
-// HELPER
-// =====================================================
 function setText(id, value) {
     const el = document.getElementById(id);
     if (el) el.innerText = value || "";
 }
 
-// =====================================================
-// UPDATE UI
-// =====================================================
 function updateFlightSummary() {
     const flight = getFlightState();
     const totalPriceFormatted = calculateTotalPrice(flight);
@@ -94,9 +82,7 @@ function updatePassengerDetails() {
     if (emailDiv) emailDiv.innerHTML = `<i class="fa-solid fa-envelope mr-1"></i> ${passenger.email || "N/A"}`;
     if (phoneDiv) phoneDiv.innerHTML = `<i class="fa-solid fa-phone mr-1"></i> ${passenger.phoneNumber || passenger.mobile || "N/A"}`;
 
-    // ✅ Passport number එක පෙන්වීම
     if (passportDiv) {
-        // Passenger object එකේ ඇති ඕනෑම passport field එකකින් දත්ත ලබාගනී
         const passNo = passenger.passportNumber || passenger.documentNumber || passenger.passport || "N/A";
         passportDiv.innerHTML = `<i class="fa-solid fa-id-card mr-1"></i> ${passNo}`;
     }
@@ -121,9 +107,6 @@ function updateHero() {
     if (el) el.innerText = `${flight.from || ""} to ${flight.to || ""}`;
 }
 
-// =====================================================
-// BOOKING FUNCTION (FIXED FOR PASSPORT SAVING 🔥)
-// =====================================================
 async function bookSeatAndProceed() {
     const flight = getFlightState();
     const passenger = getPassenger();
@@ -131,9 +114,8 @@ async function bookSeatAndProceed() {
     if (!flight.flightNumber) return alert("Select flight first!");
     if (!flight.selectedSeat) return alert("Select seat first!");
 
-    // Date formatting
     let rawDate = flight.departureDate || flight.date || flight.flightDate;
-    if (!rawDate) return alert("❌ Flight date missing!");
+    if (!rawDate) return alert("Flight date missing!");
 
     let departureDate = (typeof rawDate === "string" && rawDate.includes("-"))
         ? rawDate
@@ -141,13 +123,11 @@ async function bookSeatAndProceed() {
 
     const passengerName = `${passenger.title || ""} ${passenger.firstName || ""} ${passenger.lastName || ""}`.trim();
 
-    // ✅ Passport number එක Passenger details වලින් ලබා ගැනීම (ප්‍රමුඛතාවය අනුව)
     const passportNo = passenger.passportNumber || passenger.documentNumber || passenger.passport || "N/A";
 
     const bookingDTO = {
         passenger: passengerName,
         email: passenger.email || "",
-        // ✅ මෙන්න මෙතැනදී Passport Number එක DB එකේ save වීමට DTO එකට එක් වේ
         passportNumber: passportNo,
         flightNumber: flight.flightNumber,
         seat: flight.selectedSeat,
@@ -168,7 +148,7 @@ async function bookSeatAndProceed() {
         const result = await res.json();
 
         if (res.ok && result.data) {
-            alert("✅ Booking created successfully!");
+            alert(" Booking created successfully!");
             localStorage.setItem("bookingIdForPayment", result.data.id);
             localStorage.setItem("currentBookingPNR", result.data.pnr);
             window.location.href = "../Pages/Pyment.html";
@@ -177,13 +157,10 @@ async function bookSeatAndProceed() {
         }
     } catch (err) {
         console.error("Booking Error:", err);
-        alert("❌ Server not reachable!");
+        alert(" Server not reachable!");
     }
 }
 
-// =====================================================
-// INIT
-// =====================================================
 document.addEventListener("DOMContentLoaded", () => {
     updateSeatCard();
     updateFlightSummary();

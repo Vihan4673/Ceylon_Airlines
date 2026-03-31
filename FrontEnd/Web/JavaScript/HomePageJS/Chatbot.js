@@ -3,11 +3,9 @@ const chatIcon = document.getElementById('chat-icon');
 const chatMessages = document.getElementById('chat-messages');
 const userInput = document.getElementById('user-input');
 
-// 1. Chat Window එක Open/Close කිරීම
 function toggleChat() {
     if (chatWindow.classList.contains('hidden')) {
         chatWindow.classList.remove('hidden');
-        // Icon එක මාරු කිරීම (FontAwesome පාවිච්චි කරනවා නම්)
         const icon = document.querySelector('#chat-icon i') || chatIcon;
         icon.className = 'fas fa-chevron-down';
     } else {
@@ -17,16 +15,13 @@ function toggleChat() {
     }
 }
 
-// 2. මැසේජ් එකක් යැවීම
 async function sendMessage() {
     const message = userInput.value.trim();
     if (!message) return;
 
-    // User ගේ මැසේජ් එක පෙන්වීම
     appendMessage('user', message);
     userInput.value = '';
 
-    // Loading indicator එකක් පෙන්වීම
     const loadingId = 'loading-' + Date.now();
     appendMessage('ai', '<span class="animate-pulse italic text-gray-400">Thinking...</span>', loadingId);
 
@@ -43,10 +38,8 @@ async function sendMessage() {
             throw new Error(`Server Error: ${response.status}`);
         }
 
-        // 🟢 වැදගත්: response.text() වෙනුවට response.json() පාවිච්චි කරන්න
         const data = await response.json();
 
-        // AI ගේ පිළිතුර පෙන්වීම (ඔයාගේ DTO එකේ තියෙන්නේ 'message' කියන field එක නම්)
         const aiReply = data.message || data.reply || "No response from AI";
         document.getElementById(loadingId).innerHTML = aiReply;
 
@@ -57,13 +50,11 @@ async function sendMessage() {
     }
 }
 
-// 3. Quick buttons පාවිච්චි කිරීම
 function sendQuickMessage(text) {
     userInput.value = text;
     sendMessage();
 }
 
-// 4. මැසේජ් එක UI එකට එකතු කිරීම
 function appendMessage(role, text, id = null) {
     const msgWrapper = document.createElement('div');
     msgWrapper.className = role === 'user' ? 'flex justify-end mb-4' : 'flex justify-start mb-4';
@@ -81,14 +72,11 @@ function appendMessage(role, text, id = null) {
     msgWrapper.appendChild(innerDiv);
     chatMessages.appendChild(msgWrapper);
 
-    // ස්වයංක්‍රීයව පහළට scroll කිරීම
     chatMessages.scrollTo({
         top: chatMessages.scrollHeight,
         behavior: 'smooth'
     });
 }
-
-// 5. Form Submit එක පාලනය (Enter key එකෙන් මැසේජ් යැවීමට)
 function handleChatSubmit(event) {
     event.preventDefault();
     sendMessage();
