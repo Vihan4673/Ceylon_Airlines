@@ -3,7 +3,7 @@ package lk.ijes.backend.controller;
 import jakarta.validation.Valid;
 import lk.ijes.backend.dto.BookingDTO;
 import lk.ijes.backend.service.BookingService;
-import lk.ijes.backend.service.EmailService; // ✅ EmailService import
+import lk.ijes.backend.service.EmailService;
 import lk.ijes.backend.util.APIResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

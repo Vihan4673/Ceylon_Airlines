@@ -1,6 +1,7 @@
 package lk.ijes.backend.service;
 
 import lk.ijes.backend.dto.DestinationDTO;
+
 import java.util.List;
 
 public interface DestinationService {

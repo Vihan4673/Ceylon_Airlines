@@ -1,6 +1,7 @@
 package lk.ijes.backend.service;
 
 import lk.ijes.backend.dto.PassengerDTO;
+
 import java.util.List;
 
 public interface PassengerService {
