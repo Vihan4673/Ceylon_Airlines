@@ -19,6 +19,7 @@ const toastTitle = document.getElementById("toast-title");
 const toastMsg = document.getElementById("toast-msg");
 const toastIcon = document.getElementById("toast-icon");
 
+// ================= MODAL & FORM HELPERS =================
 
 function openModal() {
     adModal.classList.remove("hidden");
@@ -66,6 +67,8 @@ function removeAdImage() {
     previewBg.style.backgroundImage = "none";
 }
 
+// ================= CORE FUNCTIONS =================
+
 async function fetchAds() {
     try {
         const res = await fetch(API_BASE);
@@ -95,6 +98,7 @@ async function deployCampaign() {
     }
 
     const formData = new FormData();
+    // Image එකක් select කරලා තියෙනවා නම් විතරක් append කරන්න
     if (adImageFileInput.files[0]) {
         formData.append("file", adImageFileInput.files[0]);
     }
@@ -174,6 +178,7 @@ async function editAd(id) {
         if (!ad) return;
 
         openModal();
+        // Hidden input එකට ID එක දානවා, එතකොට තමයි deployCampaign එක දන්නේ මේක Update එකක් කියලා
         adIdInput.value = ad.id;
         adTitleInput.value = ad.title;
         adDescInput.value = ad.description;
@@ -202,6 +207,8 @@ function showToast(title, msg, success = true) {
     toast.classList.remove("translate-y-32", "opacity-0");
     setTimeout(() => toast.classList.add("translate-y-32", "opacity-0"), 3000);
 }
+
+// ================= LISTENERS =================
 document.addEventListener("DOMContentLoaded", fetchAds);
 adImageFileInput.addEventListener("change", handleAdImageUpload);
 adTitleInput.addEventListener("input", syncPreview);
