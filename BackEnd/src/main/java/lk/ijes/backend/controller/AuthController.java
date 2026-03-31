@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:63342"}) // ✅ IntelliJ port ekath add kala
+@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:63342", "http://127.0.0.1:63342"})
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -42,7 +42,7 @@ public class AuthController {
         }
     }
 
-    // ================= GOOGLE LOGIN  =================
+    // ================= GOOGLE LOGIN =================
     @PostMapping("/google")
     public ResponseEntity<APIResponse> googleLogin(@RequestBody Map<String, String> body) {
         String idToken = body.get("token");
@@ -53,11 +53,15 @@ public class AuthController {
         }
 
         try {
-            String email = authService.verifyGoogleIdToken(idToken);
+            Map<String, String> googleInfo = authService.verifyGoogleIdToken(idToken);
 
-            String jwtToken = authService.handleGoogleUser(email, null);
+            Map<String, String> authData = authService.handleGoogleUser(
+                    googleInfo.get("email"),
+                    googleInfo.get("name"),
+                    googleInfo.get("picture")
+            );
 
-            return ResponseEntity.ok(new APIResponse(200, "Google Login Successful", Map.of("token", jwtToken)));
+            return ResponseEntity.ok(new APIResponse(200, "Google Login Successful", authData));
 
         } catch (Exception e) {
             return ResponseEntity.status(401)
