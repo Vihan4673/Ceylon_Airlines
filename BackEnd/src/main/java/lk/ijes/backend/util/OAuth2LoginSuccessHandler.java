@@ -30,14 +30,12 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String name = oAuth2User.getAttribute("name");
         String picture = oAuth2User.getAttribute("picture");
 
-        // handleGoogleUser eka athule User wa DB save karala JWT hadanna ona
         Map<String, String> authData = authService.handleGoogleUser(email, name, picture);
 
         String token = authData.get("token");
         String profilePic = authData.get("picture");
         String role = authData.get("role");
 
-        // URL Parameters widiyata token eka yawima (LoginPage.html ekata)
         String targetUrl = "http://127.0.0.1:5500/FrontEnd/Web/Pages/LoginPage.html?token="
                 + URLEncoder.encode(token, StandardCharsets.UTF_8)
                 + "&picture=" + URLEncoder.encode(profilePic != null ? profilePic : "", StandardCharsets.UTF_8)
