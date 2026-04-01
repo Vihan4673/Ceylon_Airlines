@@ -19,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
+    private static final String GOOGLE_CLIENT_ID = "";
 
     public AuthResponseDTO authenticate(AuthDTO authDTO) {
         User user = userRepository.findByEmail(authDTO.getEmail())
@@ -71,23 +74,29 @@ public class AuthService {
         return "User registered successfully";
     }
 
-    public String handleGoogleUser(String email, String name) {
+    public Map<String, String> handleGoogleUser(String email, String name, String picture) {
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
-                    // Aluth user kenek save karaddi name eka username widiyata gannawa
                     User newUser = User.builder()
                             .username(name != null ? name : email.split("@")[0])
                             .email(email)
-                            .password(null) // OAuth userslata password na
+                            .password(null)
                             .role(Role.USER)
                             .build();
                     return userRepository.save(newUser);
                 });
 
-        return jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+
+        Map<String, String> authData = new HashMap<>();
+        authData.put("token", token);
+        authData.put("picture", picture);
+        authData.put("role", user.getRole().name());
+
+        return authData;
     }
 
-    public String verifyGoogleIdToken(String idToken) {
+    public Map<String, String> verifyGoogleIdToken(String idToken) {
         try {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
                     GoogleNetHttpTransport.newTrustedTransport(),
@@ -98,7 +107,13 @@ public class AuthService {
             GoogleIdToken token = verifier.verify(idToken);
             if (token != null) {
                 GoogleIdToken.Payload payload = token.getPayload();
-                return payload.getEmail();
+
+                Map<String, String> info = new HashMap<>();
+                info.put("email", payload.getEmail());
+                info.put("name", (String) payload.get("name"));
+                info.put("picture", (String) payload.get("picture"));
+
+                return info;
             } else {
                 throw new BadCredentialsException("Invalid Google ID Token");
             }
