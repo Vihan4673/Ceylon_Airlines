@@ -151,7 +151,6 @@ async function handleSubmitFlight() {
         return;
     }
 
-    // currentEditFlightId thiyenawa nam PUT, natham POST
     const url = currentEditFlightId
         ? 'http://localhost:8080/api/v1/flights/updateFlight'
         : 'http://localhost:8080/api/v1/flights/saveFlight';
