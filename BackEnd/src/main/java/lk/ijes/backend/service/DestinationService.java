@@ -15,9 +15,7 @@ public interface DestinationService {
 
     List<DestinationDTO> getAllDestinations();
 
-    // ================= UPDATE =================
     DestinationDTO updateDestination(Long id, DestinationDTO dto);
 
-    // ================= DELETE =================
     void deleteDestination(Long id);
 }

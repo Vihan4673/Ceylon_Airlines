@@ -23,7 +23,6 @@ public interface AdService {
                           String startDate,
                           String endDate) throws IOException;
 
-    // --- UPDATE EXISTING AD (FIXED) ---
     AdDTO updateAdWithImage(Long id, MultipartFile file, String title, String description,
                             String placement, String startDate, String endDate) throws IOException;
 }
