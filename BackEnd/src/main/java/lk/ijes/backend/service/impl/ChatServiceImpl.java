@@ -2,8 +2,10 @@ package lk.ijes.backend.service.impl;
 
 import lk.ijes.backend.dto.ChatRequest;
 import lk.ijes.backend.dto.ChatResponse;
+import lk.ijes.backend.entity.Baggage;
 import lk.ijes.backend.entity.ChatMessage;
 import lk.ijes.backend.entity.Flight;
+import lk.ijes.backend.repository.BaggageRepository;
 import lk.ijes.backend.repository.ChatRepository;
 import lk.ijes.backend.repository.FlightRepository;
 import lk.ijes.backend.service.ChatService;
@@ -23,10 +25,12 @@ public class ChatServiceImpl implements ChatService {
     private final String GROQ_API_KEY = "";
     private final ChatRepository chatRepository;
     private final FlightRepository flightRepository;
+    private final BaggageRepository baggageRepository;
 
-    public ChatServiceImpl(ChatRepository chatRepository, FlightRepository flightRepository) {
+    public ChatServiceImpl(ChatRepository chatRepository, FlightRepository flightRepository, BaggageRepository baggageRepository) {
         this.chatRepository = chatRepository;
         this.flightRepository = flightRepository;
+        this.baggageRepository = baggageRepository;
         this.webClient = WebClient.builder()
                 .baseUrl("https://api.groq.com/openai/v1/chat/completions")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -67,15 +71,26 @@ public class ChatServiceImpl implements ChatService {
             ));
         }
 
+        List<Baggage> baggageList = baggageRepository.findAll();
+        StringBuilder baggageContext = new StringBuilder("\nCurrent Passenger Baggage Status Data:\n");
+        for (Baggage b : baggageList) {
+            baggageContext.append(String.format(
+                    "- Passport: %s, Passenger: %s, Tag ID: %s, Flight: %s, PNR: %s, Status: %s\n",
+                    b.getPassportNo(), b.getPassenger(), b.getTagId(), b.getFlightNo(), b.getPnr(), b.getStatus()
+            ));
+        }
+
         Map<String, Object> body = Map.of(
                 "model", "llama-3.3-70b-versatile",
                 "messages", List.of(
                         Map.of("role", "system", "content",
                                 "You are an official AI assistant for Ceylon Airlines. " +
                                         languageInstruction +
-                                        " Use the provided flight data to answer queries. " +
-                                        "Be polite and professional. If no flights match a destination, inform them nicely.\n\n" +
-                                        flightContext.toString()),
+                                        " Use the provided flight data and baggage data to answer queries. " +
+                                        "If a user provides a Passport Number, check the baggage status and tell them. " +
+                                        "Be polite and professional. If no flights or baggage data match, inform them nicely.\n\n" +
+                                        flightContext.toString() +
+                                        baggageContext.toString()), // Added Baggage Context
                         Map.of("role", "user", "content", userMessage)
                 ),
                 "max_tokens", 800,
