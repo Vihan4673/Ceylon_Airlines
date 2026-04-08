@@ -37,7 +37,7 @@ public class AdController {
     @PutMapping("/{id}")
     public ResponseEntity<AdDTO> updateAd(
             @PathVariable Long id,
-            @RequestParam(value = "file", required = false) MultipartFile file, // Image එක අනිවාර්ය නැත
+            @RequestParam(value = "file", required = false) MultipartFile file,
             @RequestParam("title") String title,
             @RequestParam("description") String description,
             @RequestParam("placement") String placement,

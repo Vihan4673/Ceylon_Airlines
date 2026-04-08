@@ -9,6 +9,7 @@ import lk.ijes.backend.repository.BaggageRepository;
 import lk.ijes.backend.repository.ChatRepository;
 import lk.ijes.backend.repository.FlightRepository;
 import lk.ijes.backend.service.ChatService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -22,19 +23,25 @@ import java.util.Map;
 public class ChatServiceImpl implements ChatService {
 
     private final WebClient webClient;
-    private final String GROQ_API_KEY = "";
     private final ChatRepository chatRepository;
     private final FlightRepository flightRepository;
     private final BaggageRepository baggageRepository;
 
-    public ChatServiceImpl(ChatRepository chatRepository, FlightRepository flightRepository, BaggageRepository baggageRepository) {
+    public ChatServiceImpl(
+            ChatRepository chatRepository,
+            FlightRepository flightRepository,
+            BaggageRepository baggageRepository,
+            @Value("${groq.api.key}") String groqApiKey,
+            @Value("${groq.api.url}") String groqApiUrl) {
+
         this.chatRepository = chatRepository;
         this.flightRepository = flightRepository;
         this.baggageRepository = baggageRepository;
+
         this.webClient = WebClient.builder()
-                .baseUrl("https://api.groq.com/openai/v1/chat/completions")
+                .baseUrl(groqApiUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + GROQ_API_KEY)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + groqApiKey)
                 .build();
     }
 
@@ -53,6 +60,7 @@ public class ChatServiceImpl implements ChatService {
         userMsg.setSender("USER");
         userMsg.setMessage(userMessage);
         chatRepository.save(userMsg);
+
         String languageInstruction = "Determine the language used by the user. If they talk in Sinhala, reply in Sinhala. If English, reply in English.";
 
         if (userMessage.contains("සිංහල") || userMessage.equals("2")) {
@@ -90,7 +98,7 @@ public class ChatServiceImpl implements ChatService {
                                         "If a user provides a Passport Number, check the baggage status and tell them. " +
                                         "Be polite and professional. If no flights or baggage data match, inform them nicely.\n\n" +
                                         flightContext.toString() +
-                                        baggageContext.toString()), // Added Baggage Context
+                                        baggageContext.toString()),
                         Map.of("role", "user", "content", userMessage)
                 ),
                 "max_tokens", 800,
@@ -116,6 +124,7 @@ public class ChatServiceImpl implements ChatService {
         } catch (Exception e) {
             aiReply = "සමාවන්න, පද්ධතියේ දෝෂයක් පවතී. / Sorry, a system error occurred.";
         }
+
         ChatMessage botMsg = new ChatMessage();
         botMsg.setSender("BOT");
         botMsg.setMessage(aiReply);

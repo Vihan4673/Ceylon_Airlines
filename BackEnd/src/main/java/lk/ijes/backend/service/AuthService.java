@@ -13,6 +13,7 @@ import lk.ijes.backend.entity.LoginPage.User;
 import lk.ijes.backend.repository.UserRepository;
 import lk.ijes.backend.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value; // Meka add karanna
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,7 +32,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    private static final String GOOGLE_CLIENT_ID = "";
+    @Value("${google.client.id}")
+    private String googleClientId;
 
     public AuthResponseDTO authenticate(AuthDTO authDTO) {
         User user = userRepository.findByEmail(authDTO.getEmail())
@@ -101,7 +103,7 @@ public class AuthService {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
                     GoogleNetHttpTransport.newTrustedTransport(),
                     GsonFactory.getDefaultInstance())
-                    .setAudience(Collections.singletonList(GOOGLE_CLIENT_ID))
+                    .setAudience(Collections.singletonList(googleClientId))
                     .build();
 
             GoogleIdToken token = verifier.verify(idToken);

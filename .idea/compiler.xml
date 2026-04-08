@@ -9,9 +9,11 @@
         <outputRelativeToContentRoot value="true" />
         <module name="Backend" />
         <module name="springboot-POS-Backend" />
-        <module name="springboot-POS-Backend (1)" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="springboot-POS-Backend (1)" target="1.5" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
