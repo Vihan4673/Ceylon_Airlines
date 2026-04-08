@@ -7,6 +7,7 @@ import lk.ijes.backend.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,10 +21,12 @@ public class BookingServiceImpl implements BookingService {
     private final ModelMapper modelMapper;
 
     @Override
+    @Transactional
     public BookingDTO saveBooking(BookingDTO bookingDTO) {
         if (bookingRepository.existsByFlightNumberAndSeat(
                 bookingDTO.getFlightNumber(),
                 bookingDTO.getSeat())) {
+
             throw new RuntimeException(
                     "Seat " + bookingDTO.getSeat() +
                             " is already booked for flight " + bookingDTO.getFlightNumber()
@@ -31,51 +34,35 @@ public class BookingServiceImpl implements BookingService {
         }
 
         Booking booking = modelMapper.map(bookingDTO, Booking.class);
-        booking.setPnr(generatePNR());
+
+        booking.setPnr(generateUniquePNR());
 
         if (booking.getBookingDate() == null) {
             booking.setBookingDate(LocalDate.now());
         }
-
-        if (booking.getStatus() == null) booking.setStatus("CONFIRMED");
-        if (booking.getPaid() == null) booking.setPaid(false);
+        if (booking.getStatus() == null) {
+            booking.setStatus("CONFIRMED");
+        }
+        if (booking.getPaid() == null) {
+            booking.setPaid(false);
+        }
 
         Booking savedBooking = bookingRepository.save(booking);
         return modelMapper.map(savedBooking, BookingDTO.class);
     }
 
-
     @Override
-    public BookingDTO updateBooking(Long id, BookingDTO bookingDTO) {
-        Booking booking = bookingRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
-
-        updateBookingFields(booking, bookingDTO);
-
-        Booking updatedBooking = bookingRepository.save(booking);
-        return modelMapper.map(updatedBooking, BookingDTO.class);
-    }
-
-    @Override
+    @Transactional
     public BookingDTO updateBookingByPnr(String pnr, BookingDTO bookingDTO) {
         Booking booking = bookingRepository.findByPnr(pnr)
                 .orElseThrow(() -> new RuntimeException("Booking not found with PNR: " + pnr));
 
-        if (bookingDTO.getPaid() != null) {
-            booking.setPaid(bookingDTO.getPaid());
-        }
-
-        if (bookingDTO.getStatus() != null) {
-            booking.setStatus(bookingDTO.getStatus());
-        }
-
-        if (bookingDTO.getEmail() != null) {
-            booking.setEmail(bookingDTO.getEmail());
-        }
-
-        if (bookingDTO.getPassportNumber() != null) {
-            booking.setPassportNumber(bookingDTO.getPassportNumber());
-        }
+        if (bookingDTO.getPaid() != null) booking.setPaid(bookingDTO.getPaid());
+        if (bookingDTO.getStatus() != null) booking.setStatus(bookingDTO.getStatus());
+        if (bookingDTO.getEmail() != null) booking.setEmail(bookingDTO.getEmail());
+        if (bookingDTO.getPassportNumber() != null) booking.setPassportNumber(bookingDTO.getPassportNumber());
+        if (bookingDTO.getPassenger() != null) booking.setPassenger(bookingDTO.getPassenger());
+        if (bookingDTO.getSeat() != null) booking.setSeat(bookingDTO.getSeat());
 
         Booking updatedBooking = bookingRepository.save(booking);
         return modelMapper.map(updatedBooking, BookingDTO.class);
@@ -89,14 +76,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public void deleteBooking(Long id) {
-        if (!bookingRepository.existsById(id)) {
-            throw new RuntimeException("Booking not found");
-        }
-        bookingRepository.deleteById(id);
-    }
-
-    @Override
     public List<BookingDTO> getAllBookings() {
         return bookingRepository.findAll()
                 .stream()
@@ -105,10 +84,31 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
+    public void deleteBooking(Long id) {
+        if (!bookingRepository.existsById(id)) {
+            throw new RuntimeException("Booking not found with ID: " + id);
+        }
+        bookingRepository.deleteById(id);
+    }
+
+    @Override
     public BookingDTO searchBookingByID(Long id) {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
         return modelMapper.map(booking, BookingDTO.class);
+    }
+
+    @Override
+    @Transactional
+    public BookingDTO updateBooking(Long id, BookingDTO bookingDTO) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        updateBookingFields(booking, bookingDTO);
+
+        Booking updatedBooking = bookingRepository.save(booking);
+        return modelMapper.map(updatedBooking, BookingDTO.class);
     }
 
     private void updateBookingFields(Booking booking, BookingDTO bookingDTO) {
@@ -120,20 +120,24 @@ public class BookingServiceImpl implements BookingService {
         booking.setPrice(bookingDTO.getPrice());
         booking.setFlightNumber(bookingDTO.getFlightNumber());
         booking.setPassportNumber(bookingDTO.getPassportNumber());
+        booking.setEmail(bookingDTO.getEmail());
 
         if (bookingDTO.getPaid() != null) booking.setPaid(bookingDTO.getPaid());
         if (bookingDTO.getStatus() != null) booking.setStatus(bookingDTO.getStatus());
         if (bookingDTO.getDepartureDate() != null) booking.setDepartureDate(bookingDTO.getDepartureDate());
-
-        if (bookingDTO.getEmail() != null) {
-            booking.setEmail(bookingDTO.getEmail());
-        }
+    }
+    private String generateUniquePNR() {
+        String pnr;
+        do {
+            pnr = generateRandomString(6);
+        } while (bookingRepository.findByPnr(pnr).isPresent());
+        return pnr;
     }
 
-    private String generatePNR() {
+    private String generateRandomString(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < length; i++) {
             int idx = (int) (Math.random() * chars.length());
             sb.append(chars.charAt(idx));
         }

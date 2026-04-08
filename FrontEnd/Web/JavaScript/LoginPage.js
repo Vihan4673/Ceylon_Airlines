@@ -35,7 +35,6 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Normal Form Login
 document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const identifier = document.getElementById("identifier").value.trim();

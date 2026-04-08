@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // --- 1. Elements Selection (Safe Selection) ---
     const elements = {
         userPhoto: document.getElementById('userPhoto'),
         userDropdown: document.getElementById('userDropdown'),
@@ -9,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
         logoutBtn: document.getElementById('logoutBtn')
     };
 
-    // --- 2. Authentication Check & UI Update ---
     const checkLoginState = () => {
         const userStr = localStorage.getItem("user");
         const token = localStorage.getItem("token");
@@ -17,8 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (userStr && token) {
             try {
                 const user = JSON.parse(userStr);
-
-                // Login වෙලා නම් UI එක පෙන්වන්න
                 if (elements.userInfo) {
                     elements.userInfo.classList.remove("hidden");
                     elements.userInfo.classList.add("flex");
@@ -37,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error("Error parsing user data:", e);
             }
         } else {
-            // Login වෙලා නැත්නම් හෝ Logout වුණාම
             if (elements.userInfo) {
                 elements.userInfo.classList.add("hidden");
                 elements.userInfo.classList.remove("flex");
@@ -46,33 +41,24 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // Initial check
     checkLoginState();
-
-    // --- 3. Dropdown Toggle Logic ---
     elements.userPhoto?.addEventListener('click', (e) => {
         e.stopPropagation();
         elements.userDropdown?.classList.toggle('hidden');
     });
 
-    // එළියේ click කළොත් dropdown එක වහන්න
     window.addEventListener('click', () => {
         elements.userDropdown?.classList.add('hidden');
     });
 
-    // --- 4. Logout Logic ---
     elements.logoutBtn?.addEventListener('click', (e) => {
         e.preventDefault();
 
-        // Data clear කිරීම
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         sessionStorage.clear();
 
-        // Notification පෙන්වීම
         showNotification("Logged out successfully! Redirecting...");
-
-        // UI එක වහාම update කිරීම
         checkLoginState();
 
         setTimeout(() => {
@@ -81,23 +67,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// --- 5. Global Functions (Notification & Booking) ---
 
-/**
- * Notification පෙන්වන function එක (ReferenceError එක නැති කිරීමට)
- */
 function showNotification(message, isError = false) {
     console.log(`Notification: ${message}`);
-    // ඔයාට Toast එකක් හෝ සරල Alert එකක් මෙතනින් පාවිච්චි කළ හැකියි
     const statusColor = isError ? "background: red" : "background: green";
 
-    // සරල alert එකක් ලෙස පෙන්වමු (පසුව ලස්සන Toast එකක් දාන්න පුළුවන්)
     alert(message);
 }
 
-/**
- * Flight Booking API Call
- */
 async function makeBooking(flightData) {
     const token = localStorage.getItem("token");
 

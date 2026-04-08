@@ -20,7 +20,6 @@ public class DestinationServiceImpl implements DestinationService {
         this.destinationRepository = destinationRepository;
     }
 
-    // ================= GET BY ID =================
     @Override
     public DestinationDTO getDestinationById(Long id) {
         Destination destination = destinationRepository.findById(id)
@@ -29,7 +28,6 @@ public class DestinationServiceImpl implements DestinationService {
         return mapToDTO(destination);
     }
 
-    // ================= CREATE =================
     @Override
     public DestinationDTO createDestination(DestinationDTO dto) {
 
@@ -45,7 +43,6 @@ public class DestinationServiceImpl implements DestinationService {
         return mapToDTO(saved);
     }
 
-    // ================= GET ALL =================
     @Override
     public List<DestinationDTO> getAllDestinations() {
         return destinationRepository.findAll()
@@ -54,7 +51,6 @@ public class DestinationServiceImpl implements DestinationService {
                 .collect(Collectors.toList());
     }
 
-    // ================= UPDATE =================
     @Override
     public DestinationDTO updateDestination(Long id, DestinationDTO dto) {
 
@@ -73,7 +69,6 @@ public class DestinationServiceImpl implements DestinationService {
         return mapToDTO(updated);
     }
 
-    // ================= DELETE =================
     @Override
     public void deleteDestination(Long id) {
 
@@ -83,10 +78,9 @@ public class DestinationServiceImpl implements DestinationService {
         destinationRepository.delete(existing);
     }
 
-    // ================= MAPPER =================
     private DestinationDTO mapToDTO(Destination destination) {
         return new DestinationDTO(
-                destination.getId(),   // ⭐ VERY IMPORTANT
+                destination.getId(),
                 destination.getCity(),
                 destination.getAirportCode()
         );

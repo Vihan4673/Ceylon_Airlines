@@ -82,7 +82,6 @@ function initSeatMap() {
             const isBooked = occupiedSeats.includes(seatId);
 
             const seatDiv = document.createElement('div');
-            // Tailwind classes dynamic ලෙස ඇතුළත් කිරීම
             seatDiv.className = `seat-btn w-10 h-10 rounded-xl border-2 flex items-center justify-center text-[10px] font-black transition-all cursor-pointer 
                 ${isBooked ? 'bg-slate-200 text-slate-400 border-slate-100 cursor-not-allowed' : 'bg-white text-slate-900 border-slate-100 hover:border-[#8A1538] hover:text-[#8A1538]'}`;
 
@@ -98,7 +97,7 @@ function initSeatMap() {
 
 function selectSeat(id, element) {
     document.querySelectorAll('.seat-btn').forEach(el => {
-        if(!el.classList.contains('bg-slate-200')) { // Booked නොවන ඒවා පමණක්
+        if(!el.classList.contains('bg-slate-200')) {
             el.classList.remove('bg-[#8A1538]', 'text-white', 'border-[#8A1538]');
             el.classList.add('bg-white', 'text-slate-900', 'border-slate-100');
         }

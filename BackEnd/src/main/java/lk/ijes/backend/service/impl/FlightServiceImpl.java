@@ -31,7 +31,6 @@ public class FlightServiceImpl implements FlightService {
 
         Flight flight = modelMapper.map(flightDTO, Flight.class);
 
-        // Default values
         if (flight.getBookedSeats() == null) flight.setBookedSeats(0);
         if (flight.getStatus() == null || flight.getStatus().isEmpty()) flight.setStatus("On Time");
 

@@ -1,6 +1,4 @@
-// =====================================================
-// CONFIGURATION & GLOBAL VARIABLES
-// =====================================================
+
 const API_URL = "http://localhost:8080/api/v1/baggages";
 
 const bagTagInput = document.getElementById("bagTagInput");
